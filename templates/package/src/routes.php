@@ -12,3 +12,4 @@
 */
 
 Route::resource('<%= packageName %>/manage', '<%= vendorNameCaps %>\<%= packageNameCaps %>\Controllers\AdminController');
+Route::get('<%= packageName %>/install', '<%= vendorNameCaps %>\<%= packageNameCaps %>\Controllers\AdminController@install');

@@ -1,12 +1,22 @@
 <?php
 namespace <%= vendorNameCaps %>\<%= packageNameCaps %>\Controllers;
 
-	class AdminController extends \BaseController
+	class AdminController extends BaseController
 	{
 		/**
 	     * The layout that should be used for standard HTML responses.
 	     */
-	    protected $layout = 'layouts.crudl';
+	    protected $layout = '<%= packageName %>::layouts.crudl';
+
+	    /**
+		 * Installation page
+		 *
+		 * @return Response
+		 */
+		public function install()
+		{
+			return 'Got an install page';
+		}
 
 		/**
 		 * Display a listing of the resource.
@@ -17,18 +27,7 @@ namespace <%= vendorNameCaps %>\<%= packageNameCaps %>\Controllers;
 		{
 			// Consolidate data
 			$data = array('hello' => 'world');
-
-			// Handle request
-			switch (\Request::format())
-			{
-				case 'json':
-					return Response::json($data); // API
-				break;
-
-				default:
-					$this->layout->content = \View::make('<%= packageName %>::admin.listing', $data); // HTML
-				break;
-			}
+			$this->setContent($data);
 		}
 
 
@@ -41,18 +40,7 @@ namespace <%= vendorNameCaps %>\<%= packageNameCaps %>\Controllers;
 		{
 			// Consolidate data
 			$data = array('hello' => 'world');
-
-			// Handle request
-			switch (\Request::format())
-			{
-				case 'json':
-					return Response::json($data); // API
-				break;
-
-				default:
-					$this->layout->content = \View::make('<%= packageName %>::admin.create', $data); // HTML
-				break;
-			}
+			$this->setContent($data);
 		}
 
 
@@ -65,18 +53,7 @@ namespace <%= vendorNameCaps %>\<%= packageNameCaps %>\Controllers;
 		{
 			// Consolidate data
 			$data = array('hello' => 'world');
-
-			// Handle request
-			switch (\Request::format())
-			{
-				case 'json':
-					return Response::json($data); // API
-				break;
-
-				default:
-					$this->layout->content = \View::make('<%= packageName %>::admin.store', $data); // HTML
-				break;
-			}
+			$this->setContent($data);
 		}
 
 
@@ -90,18 +67,7 @@ namespace <%= vendorNameCaps %>\<%= packageNameCaps %>\Controllers;
 		{
 			// Consolidate data
 			$data = array('hello' => 'world');
-
-			// Handle request
-			switch (\Request::format())
-			{
-				case 'json':
-					return Response::json($data); // API
-				break;
-
-				default:
-					$this->layout->content = \View::make('<%= packageName %>::admin.show', $data); // HTML
-				break;
-			}
+			$this->setContent($data);
 		}
 
 
@@ -115,18 +81,7 @@ namespace <%= vendorNameCaps %>\<%= packageNameCaps %>\Controllers;
 		{
 			// Consolidate data
 			$data = array('hello' => 'world');
-
-			// Handle request
-			switch (\Request::format())
-			{
-				case 'json':
-					return Response::json($data); // API
-				break;
-
-				default:
-					$this->layout->content = \View::make('<%= packageName %>::admin.edit', $data); // HTML
-				break;
-			}
+			$this->setContent($data);
 		}
 
 
@@ -140,18 +95,7 @@ namespace <%= vendorNameCaps %>\<%= packageNameCaps %>\Controllers;
 		{
 			// Consolidate data
 			$data = array('hello' => 'world');
-
-			// Handle request
-			switch (\Request::format())
-			{
-				case 'json':
-					return Response::json($data); // API
-				break;
-
-				default:
-					$this->layout->content = \View::make('<%= packageName %>::admin.update', $data); // HTML
-				break;
-			}
+			$this->setContent($data);
 		}
 
 
@@ -165,17 +109,6 @@ namespace <%= vendorNameCaps %>\<%= packageNameCaps %>\Controllers;
 		{
 			// Consolidate data
 			$data = array('hello' => 'world');
-
-			// Handle request
-			switch (\Request::format())
-			{
-				case 'json':
-					return Response::json($data); // API
-				break;
-
-				default:
-					$this->layout->content = \View::make('<%= packageName %>::admin.destroy', $data); // HTML
-				break;
-			}
+			$this->setContent($data);
 		}
 	}

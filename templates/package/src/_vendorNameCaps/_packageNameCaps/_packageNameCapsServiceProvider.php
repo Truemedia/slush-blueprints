@@ -1,6 +1,7 @@
 <?php namespace <%= vendorNameCaps %>\<%= packageNameCaps %>;
 
 use Illuminate\Support\ServiceProvider;
+use App\Artisan\InstallCommand;
 
 class <%= packageNameCaps %>ServiceProvider extends ServiceProvider {
 
@@ -18,8 +19,13 @@ class <%= packageNameCaps %>ServiceProvider extends ServiceProvider {
 	 */
 	public function boot()
 	{
-		include __DIR__ . '/../../routes.php';
-		$this->package('<%= vendorName %>/<%= packageName %>');
+		$root_dir = __DIR__ . '/../../';
+
+		// Include routes
+		include $root_dir . 'routes.php';
+
+		// View directory
+		$this->loadViewsFrom($root_dir . 'views', '<%= packageName %>');
 	}
 
 	/**
@@ -29,8 +35,24 @@ class <%= packageNameCaps %>ServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		//
+		// Register commands
+		$this->registerCommands();
+
+        $this->commands('install');
 	}
+
+	/**
+	 * Register all commands available in the package
+	 *
+	 * @return void
+	 */
+	private function registerCommands()
+    {
+        $this->app['install'] = $this->app->share(function($app)
+        {
+            return new InstallCommand;
+        });
+    }
 
 	/**
 	 * Get the services provided by the provider.
