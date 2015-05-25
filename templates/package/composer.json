@@ -10,13 +10,14 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "laravel/framework": "5.*"
+        "laravel/framework": "5.*",
+        "markusjwetzel/laravel-handlebars": "~1.0@dev"
     },
     "autoload": {
         "classmap": [
             "src/controllers",
             "src/commands",
-            "src/migrations"
+            "src/models"
         ],
         "psr-0": {
             "<%= vendorNameCaps %>\\<%= packageNameCaps %>\\": "src/"

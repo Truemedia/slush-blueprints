@@ -11,14 +11,14 @@ class InstallCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $name = 'character:install';
+	protected $name = '<%= packageName %>:install';
 
 	/**
 	 * The console command description.
 	 *
 	 * @var string
 	 */
-	protected $description = 'Install the character package for Regeneration';
+	protected $description = 'Install the <%= packageNameCaps %> package for <%= vendorNameCaps %>';
 
 	/**
 	 * Create a new command instance.
