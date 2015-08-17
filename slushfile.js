@@ -27,7 +27,7 @@ var gutil = require('gulp-util'),
     jsonpatch = require('jsonpatch'),
     jsonfile = require('jsonfile'),
     walk = require('tree-walk'),
-    kvp = require('key-value-pointer');
+    kvp = require('key-value-pointer'),
     // CLI UI
     Table = require('cli-table'),
     ProgressBar = require('progress');
