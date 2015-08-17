@@ -8,6 +8,7 @@
 
 'use strict';
 
+// Slush core files
 var gulp = require('gulp'),
     install = require('gulp-install'),
     conflict = require('gulp-conflict'),
@@ -15,6 +16,21 @@ var gulp = require('gulp'),
     rename = require('gulp-rename'),
     _ = require('underscore.string'),
     inquirer = require('inquirer');
+
+// Extras specific to this project
+var gutil = require('gulp-util'),
+    cheerio = require('gulp-cheerio'),
+    rm = require('gulp-rm'),
+    fs = require('fs'),
+    changeCase = require('change-case'),
+    moment = require('moment'),
+    jsonpatch = require('jsonpatch'),
+    jsonfile = require('jsonfile'),
+    walk = require('tree-walk'),
+    kvp = require('key-value-pointer');
+    // CLI UI
+    Table = require('cli-table'),
+    ProgressBar = require('progress');
 
 function format(string) {
     var username = string.toLowerCase();

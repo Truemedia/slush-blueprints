@@ -29,15 +29,26 @@
     "test": "echo \"No tests\""
   },
   "dependencies": {
-    "slush": ">=1.0.0",
+    "change-case": "^2.3.0",
+    "cli-table": "^0.3.1",
     "gulp": "^3.6.2",
-    "gulp-template": "^0.1.1",
-    "gulp-install": "^0.1.4",
+    "gulp-cheerio": "^0.6.2",
     "gulp-conflict": "^0.1.1",
+    "gulp-install": "^0.1.4",
     "gulp-rename": "^1.2.0",
-    "underscore.string": "^2.3.3",
+    "gulp-rm": "^1.0.0",
+    "gulp-template": "^0.1.1",
+    "gulp-util": "^3.0.6",
+    "iniparser": "^1.0.5",
     "inquirer": "^0.4.1",
-    "iniparser": "^1.0.5"
+    "jsonfile": "^2.2.1",
+    "jsonpatch": "^1.0.1",
+    "key-value-pointer": "^0.4.1",
+    "moment": "^2.10.6",
+    "progress": "^1.1.8",
+    "slush": ">=1.0.0",
+    "tree-walk": "^0.3.0",
+    "underscore.string": "^2.3.3"
   },
   "keywords": [
     "slushgenerator"
