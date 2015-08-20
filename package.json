@@ -29,6 +29,7 @@
     "test": "echo \"No tests\""
   },
   "dependencies": {
+    "auto-plug": "^1.1.0",
     "change-case": "^2.3.0",
     "cli-table": "^0.3.1",
     "gulp": "^3.6.2",
@@ -49,6 +50,7 @@
     "progress": "^1.1.8",
     "slush": ">=1.0.0",
     "tree-walk": "^0.3.0",
+    "underscore": "^1.8.3",
     "underscore.string": "^2.3.3"
   },
   "keywords": [

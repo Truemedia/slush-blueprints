@@ -1,21 +1,21 @@
 var gulp = require('gulp'),
     gutil = require('gulp-util'),
     cheerio = require('gulp-cheerio'),
-    download = require('gulp-download'),
     rm = require('gulp-rm'),
     fs = require('fs'),
     changeCase = require('change-case'),
     moment = require('moment'),
     jsonpatch = require('jsonpatch'),
-    jsonfile = require('jsonfile'),
     walk = require('tree-walk'),
     kvp = require('key-value-pointer'),
-    // CLI UI
-    Table = require('cli-table'),
-    ProgressBar = require('progress');
+    _ = require('underscore');
+
+// CLI UI
+var Table = require('cli-table');
 
 var schema =
 {
+    cwd: null,
     list_of_things: [],
     unorganized_things: [],
     organized_things: [],
@@ -59,14 +59,6 @@ var schema =
             'timestamp',
             'timestamps'
         ]
-    },
-
-    /* Download schema from github master branch */
-    download_url: 'https://raw.githubusercontent.com/schemaorg/schemaorg/sdo-phobos/data/schema.rdfa',
-    download_schema: function()
-    {
-        return download(schema.download_url)
-            .pipe( gulp.dest('cache/') );
     },
 
     /* Convert a KVP match to a JSONpatch */
@@ -287,7 +279,7 @@ var schema =
     /* Write laravel migration */
     laravel_make_migration: function(table_name, fields_as_json)
     {
-        var file_contents = fs.readFileSync('migration_template.php', {encoding: 'utf8'});
+        var file_contents = fs.readFileSync(schema.cwd + '/templates/migration/create_table.php', {encoding: 'utf8'});
 
         if (file_contents == undefined)
         {
@@ -306,7 +298,7 @@ var schema =
         var tpl = _.template(file_contents);
         var migration_file_contents = tpl(template_data);
 
-        fs.writeFileSync('migrations/' + filename, migration_file_contents);
+        fs.writeFileSync('./migrations/' + filename, migration_file_contents);
         schema.counters.migrations++;
 
         if (schema.traditional_logging)
