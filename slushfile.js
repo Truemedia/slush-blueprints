@@ -163,6 +163,57 @@ gulp.task('default', function (done) {
         });
 });
 
+gulp.task('schema', function(done)
+{
+    try
+    {
+        schema.list_of_things = jsonfile.readFileSync(__dirname + '/cache/list_of_things.json'); 
+    }
+    catch (e)
+    {
+        throw new Error('Cannot find list of things, run the install task first');
+    }
+    
+    // Questions
+    schema.list_of_things.unshift('All*');
+    var prompts =
+    [
+        {
+            type: 'checkbox',
+            name: 'schemas',
+            message: 'Which data schemas would you like to work with for this site? (' + schema.list_of_things.length + ' options)',
+            choices: schema.list_of_things
+        },
+        {
+            type: 'checkbox',
+            name: 'templates',
+            message: 'What files would you like to generated based on the schemas you provided?',
+            choices: [
+              "Full package*",
+              "Assets",
+              "Configuration file",
+              "Controller",
+              "Command",
+              "Event",
+              "Middleware",
+              "Migration",
+              "Model",
+              "Provider",
+              "Routes",
+              "Seed",
+              "Theme"
+            ]
+        },
+    ];
+    
+    // Answers
+    inquirer.prompt(prompts, function(answers)
+    {
+        console.log(answers);
+        done();
+    });
+});
+
 gulp.task('install', function(done)
 {
     var prompts = [{
@@ -241,9 +292,10 @@ gulp.task('install', function(done)
                                 + gutil.colors.magenta(humanized_thing) + '\r';
                             gutil.log(msg);
 
-                            schema.list_of_things.push(class_name);
+                            schema.list_of_things.push(humanized_thing);
                             schema.unorganized_things.push(thing);
                         });
+                        schema.list_of_things.sort();
 
                         jsonfile.writeFileSync(schema.cwd + '/cache/unorganized_things.json', schema.unorganized_things, {spaces: 2});
                         gutil.log( gutil.colors.green('Unorganized things now cached! previous processes will not need to repeat next time') );
