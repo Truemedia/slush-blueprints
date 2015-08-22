@@ -24,7 +24,12 @@ var schema = require('./helpers/schema'),
 // CLI UI
 var ProgressBar = require('progress');
 
-function format(string) {
+function format(string)
+{
+    if (string == null)
+    {
+        string = '';
+    }
     var username = string.toLowerCase();
     return username.replace(/\s/g, '');
 }
