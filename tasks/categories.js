@@ -7,7 +7,8 @@ var gulp = require('gulp'),
     kvp = require('key-value-pointer'),
     jsonpatch = require('jsonpatch'),
     jsonpointer = require('json-pointer'),
-    mkdirp = require('mkdirp');
+    mkdirp = require('mkdirp'),
+    fs = require('fs');
 
 // Use the tradedoubler API to get a free list of product categories
 
@@ -83,8 +84,16 @@ function build_path(data, pointer, dir_name)
 	
 	// Build directory path and use to make folder
 	var folder_path = folder_names_recursive.join('/');
-	mkdirp(folder_path, function (err) {
-	    if (err) console.error(err)
-	    else gutil.log( gutil.colors.cyan('Folder ' + folder_path + ' has been created') );
+	mkdirp(folder_path, function (err)
+	{
+	    if (err)
+	    {
+	    	console.error(err);
+	    }
+	    else
+	    {
+	    	fs.closeSync(fs.openSync(folder_path + '/.gitkeep', 'w'));
+	    	gutil.log( gutil.colors.cyan('Folder ' + folder_path + ' has been created') );
+	    }
 	});
 }
