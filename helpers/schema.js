@@ -219,7 +219,7 @@ var schema =
 
                 if (show_field_handling)
                 {
-                    var msg = 'Got a matching data type for `' + field_name + '` with `' + data_type + '`, adding to valid fields'; 
+                    var msg = 'Got a matching data type for `' + field_name + '` with `' + data_type + '`, adding to valid fields';
                     gutil.log( gutil.colors.magenta(msg) );
                 }
             }
@@ -240,7 +240,7 @@ var schema =
                     valid_fields[field_name] = data_type;
                     if (show_field_handling)
                     {
-                        var msg = 'Data type was a thing, so adding reference field `' + field_name + '` with `' + data_type + '`, adding to valid fields'; 
+                        var msg = 'Data type was a thing, so adding reference field `' + field_name + '` with `' + data_type + '`, adding to valid fields';
                         gutil.log( gutil.colors.cyan(msg) );
                     }
                 }
@@ -290,7 +290,7 @@ var schema =
 
         var template_data = {
             "packageNameCamelCase": changeCase.camelCase(table_name),
-            "packageNamePascalCase": changeCase.pascalCase(table_name),             
+            "packageNamePascalCase": changeCase.pascalCase(table_name),
             "table_name": table_name,
             "fields": fields_as_json
         };
@@ -298,7 +298,7 @@ var schema =
         var tpl = _.template(file_contents);
         var migration_file_contents = tpl(template_data);
 
-        fs.writeFileSync('./migrations/' + filename, migration_file_contents);
+        fs.writeFileSync('./database/migrations/' + filename, migration_file_contents);
         schema.counters.migrations++;
 
         if (schema.traditional_logging)
