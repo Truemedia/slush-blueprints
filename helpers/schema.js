@@ -180,10 +180,18 @@ var schema =
 
         // Check which fields are native datatypes (according to laravel)
         var properties = thing['properties'],
+            parent_class = thing['sub_class'],
             show_field_handling = false
             table_fields = schema.schemaorg_to_laravel(properties, show_field_handling);
 
-        table_fields = _.extend({'id': 'bigIncrements'}, table_fields);
+        var mandatory_fields = {'id': 'bigIncrements'};
+        if (parent_class != null)
+        {
+          var parent_column = changeCase.snakeCase(parent_class) + '_id';
+          mandatory_fields[parent_column] = 'bigInteger';
+        }
+
+        table_fields = _.extend(mandatory_fields, table_fields);
         schema.laravel_make_command(table_name, table_fields);
     },
 
