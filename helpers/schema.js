@@ -2,9 +2,7 @@ var gulp = require('gulp'),
     gutil = require('gulp-util'),
     cheerio = require('gulp-cheerio'),
     rm = require('gulp-rm'),
-    fs = require('fs'),
     changeCase = require('change-case'),
-    moment = require('moment'),
     jsonpatch = require('jsonpatch'),
     walk = require('tree-walk'),
     kvp = require('key-value-pointer'),
@@ -12,6 +10,13 @@ var gulp = require('gulp'),
 
 // CLI UI
 var Table = require('cli-table');
+
+// Building options
+var framework = 'Laravel';
+if (framework == 'Laravel')
+{
+  var migration = require('./../plugins/laravel/database/migration');
+}
 
 var schema =
 {
@@ -166,8 +171,8 @@ var schema =
         }
     },
 
-    /* Make a migration */
-    make_migration: function(thing)
+    /* Make a schema */
+    make_schema: function(thing)
     {
         var table_name = changeCase.snakeCase( thing['class_name'] );
 
@@ -192,7 +197,7 @@ var schema =
         }
 
         table_fields = _.extend(mandatory_fields, table_fields);
-        schema.laravel_make_command(table_name, table_fields);
+        schema.make_command(table_name, table_fields);
     },
 
     /* Match schema primative datatypes to laravel schema datatypes */
@@ -258,8 +263,8 @@ var schema =
         return valid_fields;
     },
 
-    /* Print out command for artisan make migration or directly call API */
-    laravel_make_command: function(table_name, fields_as_json, execute)
+    /* Print out command for making migration or directly call API */
+    make_command: function(table_name, fields_as_json, execute)
     {
         if (execute == undefined)
         {
@@ -281,32 +286,15 @@ var schema =
                 gutil.log( gutil.colors.green(command) );
             }
         }
-        schema.laravel_make_migration(table_name, fields_as_json);
+        schema.make_migration(table_name, fields_as_json);
     },
 
-    /* Write laravel migration */
-    laravel_make_migration: function(table_name, fields_as_json)
+    /* Write migration */
+    make_migration: function(table_name, fields_as_json)
     {
-        var file_contents = fs.readFileSync(schema.cwd + '/templates/migration/create_table.php', {encoding: 'utf8'});
-
-        if (file_contents == undefined)
-        {
-            throw new Error('Error loading file');
-        }
-
-        var filename = moment().format('YYYY_MM_DD_HHmmss') + '_create_' + table_name + '_table.php';
-
-        var template_data = {
-            "packageNameCamelCase": changeCase.camelCase(table_name),
-            "packageNamePascalCase": changeCase.pascalCase(table_name),
-            "table_name": table_name,
-            "fields": fields_as_json
-        };
-
-        var tpl = _.template(file_contents);
-        var migration_file_contents = tpl(template_data);
-
-        fs.writeFileSync('./database/migrations/' + filename, migration_file_contents);
+      // Use plugin for file generation
+      if (migration.create(schema.cwd, table_name, fields_as_json))
+      {
         schema.counters.migrations++;
 
         if (schema.traditional_logging)
@@ -315,6 +303,7 @@ var schema =
                 + '(migration ' + schema.counters.migrations + ' of ' + schema.list_of_things.length + ')';
             gutil.log( gutil.colors.green(msg) );
         }
+      }
     }
 };
 

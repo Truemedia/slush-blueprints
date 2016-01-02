@@ -18,7 +18,7 @@ gulp.task('schema', function(done)
     {
         throw new Error('Cannot find list of things, run the install task first');
     }
-    
+
     // Questions
     list_of_things.unshift('All*');
     var prompts =
@@ -50,7 +50,7 @@ gulp.task('schema', function(done)
             ]
         },
     ];
-    
+
     // Answers
     inquirer.prompt(prompts, function(answers)
     {

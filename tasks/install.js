@@ -49,7 +49,7 @@ gulp.task('install', function(done)
                         if (cache_file != null)
                         {
                             gutil.log( gutil.colors.cyan('Cache file found (unorganized_things.json), now processing without scraping') );
-                            schema.unorganized_things = cache_file;   
+                            schema.unorganized_things = cache_file;
                         }
                         else
                         {
@@ -69,7 +69,7 @@ gulp.task('install', function(done)
                             // Get class name and parent name
                             var class_name = resource.replace(domain, ''),
                                 sub_class = ($(this).find('[property="rdfs:subClassOf"]').length !== 0) ? $(this).find('[property="rdfs:subClassOf"]').text() : null;
-                            
+
                             // Get properties (fields)
                             var properties = {};
                             $('[property="' + domain + 'domainIncludes"][href="http://schema.org/' + class_name + '"]').each( function()
@@ -116,7 +116,7 @@ gulp.task('install', function(done)
                         if (cache_file != null)
                         {
                             gutil.log( gutil.colors.cyan('Cache file found (organized_things.json), now processing without building hierachy') );
-                            schema.organized_things = cache_file;   
+                            schema.organized_things = cache_file;
                         }
                         else
                         {
@@ -146,7 +146,7 @@ gulp.task('install', function(done)
                     {
                         if (key == 'class_name')
                         {
-                            schema.make_migration(parent);
+                            schema.make_schema(parent);
                             progress_bar.tick();
 
                             if (progress_bar.complete)
