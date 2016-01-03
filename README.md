@@ -1,6 +1,6 @@
-# blueprints [![Build Status](https://secure.travis-ci.org/Truemedia/slush-blueprints.png?branch=master)](https://travis-ci.org/Truemedia/slush-blueprints) [![NPM version](https://badge-me.herokuapp.com/api/npm/slush-blueprints.png)](http://badges.enytc.com/for/npm/slush-blueprints)
+# blueprints [![NPM version](https://badge-me.herokuapp.com/api/npm/slush-blueprints.png)](http://badges.enytc.com/for/npm/slush-blueprints)
 
-> A slush generator for many web things
+> A slush generator for many web things (PHP, JS, Python, Ruby, HTML and CSS variants)
 
 
 ## Getting Started
@@ -12,17 +12,10 @@ $ npm install -g slush-blueprints
 ```
 
 ### Usage
-
-Create a new folder for your project:
-
-```bash
-$ mkdir my-slush-blueprints
-```
-
-Run the generator from within the new folder:
+Just run the generator from within whichever folder you desire:
 
 ```bash
-$ cd my-slush-blueprints && slush blueprints
+$ cd web_app && slush blueprints
 ```
 
 ## Getting To Know Slush
@@ -40,11 +33,11 @@ See the [CONTRIBUTING Guidelines](https://github.com/Truemedia/slush-blueprints/
 ## Support
 If you have any problem or suggestion please open an issue [here](https://github.com/Truemedia/slush-blueprints/issues).
 
-## License 
+## License
 
 The MIT License
 
-Copyright (c) 2015, Wade Penistone
+Copyright (c) 2016, Wade Penistone
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -66,4 +59,3 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
-
