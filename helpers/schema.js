@@ -3,6 +3,7 @@ var gulp = require('gulp'),
     cheerio = require('gulp-cheerio'),
     rm = require('gulp-rm'),
     changeCase = require('change-case'),
+    pluralize = require('pluralize'),
     jsonpatch = require('jsonpatch'),
     walk = require('tree-walk'),
     kvp = require('key-value-pointer'),
@@ -174,7 +175,8 @@ var schema =
     /* Make a schema */
     make_schema: function(thing)
     {
-        var table_name = changeCase.snakeCase( thing['class_name'] );
+        var table_name = changeCase.snakeCase( thing['class_name'] ),
+            parent_table_name = changeCase.snakeCase( thing['sub_class'] );
 
         if (schema.traditional_logging)
         {
@@ -186,8 +188,10 @@ var schema =
         // Check which fields are native datatypes (according to laravel)
         var properties = thing['properties'],
             parent_class = thing['sub_class'],
-            show_field_handling = false
-            table_fields = schema.schemaorg_to_laravel(properties, show_field_handling);
+            show_field_handling = false;
+
+        var field_handling = schema.field_handling(table_name, parent_table_name, properties, show_field_handling),
+            table_fields = field_handling['valid_fields'];
 
         var mandatory_fields = {'id': 'bigIncrements'};
         if (parent_class != null)
@@ -197,13 +201,17 @@ var schema =
         }
 
         table_fields = _.extend(mandatory_fields, table_fields);
-        schema.make_command(table_name, table_fields);
+
+        schema.make_migration(pluralize(table_name), table_fields);
+
     },
 
-    /* Match schema primative datatypes to laravel schema datatypes */
-    schemaorg_to_laravel: function(fields, show_field_handling)
+    /* Match schema primative datatypes to desired datatypes for selected data source */
+    field_handling: function(table_name, parent_table_name, fields, show_field_handling)
     {
-        var valid_fields = {};
+        var valid_fields = {},
+            invalid_fields = {};
+
         if (show_field_handling == undefined)
         {
             show_field_handling = false;
@@ -244,49 +252,59 @@ var schema =
                     gutil.log( gutil.colors.yellow(msg) );
                 }
 
-                if (schema.list_of_things.indexOf( changeCase.pascalCase(data_type) ) > -1)
-                {
-                    // Got a reference to another thing, make a reference column
-                    var field_name = changeCase.snakeCase(data_type) + '_id',
-                        data_type = 'integer';
+                var estimated_class = changeCase.upperCaseFirst( changeCase.sentenceCase(fields[field_name]) );
 
-                    valid_fields[field_name] = data_type;
-                    if (show_field_handling)
+                if (schema.list_of_things.indexOf(estimated_class) > -1)
+                {
+
+                    // Plural? create some intermediate tables (one to many, many to many) for none matched fields
+                    if (pluralize(field_name) == field_name)
                     {
-                        var msg = 'Data type was a thing, so adding reference field `' + field_name + '` with `' + data_type + '`, adding to valid fields';
-                        gutil.log( gutil.colors.cyan(msg) );
+                        var child_table_name = changeCase.snakeCase(fields[field_name]),
+                            relationship = 'one_to_many';
+
+                        schema.make_intermediate(table_name, child_table_name, field_name, relationship);
                     }
+                    else
+                    {
+                        // Got a reference to another thing, make a reference column
+                        var field_name = changeCase.snakeCase(estimated_class) + '_id',
+                            data_type = 'integer';
+
+                        valid_fields[field_name] = data_type;
+                        if (show_field_handling)
+                        {
+                            var msg = 'Data type was a thing, so adding reference field `' + field_name + '` with `' + data_type + '`, adding to valid fields';
+                            gutil.log( gutil.colors.cyan(msg) );
+                        }
+                    }
+                }
+                else
+                {
+                    // Invalid field
+                    invalid_fields[field_name] = fields[field_name];
                 }
             }
         }
 
-        return valid_fields;
+        return {
+            valid_fields: valid_fields,
+            invalid_fields: invalid_fields
+        };
     },
 
-    /* Print out command for making migration or directly call API */
-    make_command: function(table_name, fields_as_json, execute)
+    /* Make intermediates for provided table names (if possible) */
+    make_intermediate: function(parent_table_name, child_table_name, attribute_name, relationship)
     {
-        if (execute == undefined)
-        {
-            execute = false;
-        }
+        var table_name = parent_table_name + '_' + attribute_name;
+        var parent_column = parent_table_name + '_id',
+            child_column = child_table_name + '_id',
+            data_type = 'integer';
 
-        // Show command
-        if (!execute)
-        {
-            var migration_name = 'create_' + table_name + '_table';
-                table_flag = '--table=' + table_name,
-                create_flag = '--create=' + table_name;
+        var fields = {};
+        fields[child_column] = fields[parent_column] = data_type;
 
-            var command = 'php artisan migration:make ' + table_flag + ' ' + create_flag;
-
-            if (schema.traditional_logging)
-            {
-                gutil.log( gutil.colors.green('Use the following command to generate a migration for this table: ') );
-                gutil.log( gutil.colors.green(command) );
-            }
-        }
-        schema.make_migration(table_name, fields_as_json);
+        schema.make_migration(table_name, fields);
     },
 
     /* Write migration */

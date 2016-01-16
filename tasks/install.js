@@ -56,6 +56,20 @@ gulp.task('install', function(done)
                             gutil.log( gutil.colors.yellow('Cache file not found, now scraping followed by processing') );
                             throw new Exception('Could not find cache file');
                         }
+
+                        cache_file = jsonfile.readFileSync(cwd + '/cache/list_of_things.json');
+
+                        // Is it a directory?
+                        if (cache_file != null)
+                        {
+                            gutil.log( gutil.colors.cyan('Cache file found (list_of_things.json), now processing without scraping') );
+                            schema.list_of_things = cache_file;
+                        }
+                        else
+                        {
+                            gutil.log( gutil.colors.yellow('Cache file not found, now scraping followed by processing') );
+                            throw new Exception('Could not find cache file');
+                        }
                     }
                     catch (e)
                     {
