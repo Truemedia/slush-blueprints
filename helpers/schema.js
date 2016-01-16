@@ -16,7 +16,8 @@ var Table = require('cli-table');
 var framework = 'Laravel';
 if (framework == 'Laravel')
 {
-  var migration = require('./../plugins/laravel/database/migration');
+  var migration = require('./../plugins/laravel/database/migration'),
+      model = require('./../plugins/laravel/model');
 }
 
 var schema =
@@ -26,7 +27,8 @@ var schema =
     unorganized_things: [],
     organized_things: [],
     counters: {
-        migrations: 0
+        migrations: 0,
+        models: 0,
     },
     settings:
     {
@@ -202,8 +204,14 @@ var schema =
 
         table_fields = _.extend(mandatory_fields, table_fields);
 
+        // Abstractions we can make from the schema
         schema.make_migration(pluralize(table_name), table_fields);
 
+        var make_model = true;
+        if (make_model)
+        {
+            schema.make_model(changeCase.pascalCase(table_name), changeCase.pascalCase(parent_table_name), Object.keys(table_fields));
+        }
     },
 
     /* Match schema primative datatypes to desired datatypes for selected data source */
@@ -322,6 +330,23 @@ var schema =
             gutil.log( gutil.colors.green(msg) );
         }
       }
+    },
+
+    /* Write model */
+    make_model: function(model_name, parent_model_name, field_names)
+    {
+        // Use plugin for file generation
+        if (model.create(schema.cwd, model_name, parent_model_name, field_names))
+        {
+          schema.counters.models++;
+
+          if (schema.traditional_logging)
+          {
+              var msg = 'Model file ' + filename + ' created! '
+                  + '(migration ' + schema.counters.models + ' of ' + schema.list_of_things.length + ')';
+              gutil.log( gutil.colors.green(msg) );
+          }
+        }
     }
 };
 
