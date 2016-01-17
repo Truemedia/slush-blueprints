@@ -6,6 +6,9 @@ use Illuminate\Console\Command;
 
 use DateTime;
 use ReflectionClass;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use SimpleXMLElement;
 
 class ImportCommand extends Command
 {
@@ -30,110 +33,112 @@ class ImportCommand extends Command
      */
     public function handle()
     {
-      $start_dt = new DateTime('now');
-      $this->info('Intializing seeding, this will run as a model factory');
+        $start_dt = new DateTime('now');
+        $this->info('Intializing seeding, this will run as a model factory');
 
-      $schemas = ['person' => [
-          'files' => public_path('1vs1000/src/Thing/Person/**/**/**/*.hbs')
-      ]];
+        $schemas = [
+            'person' => ['files' => public_path('1vs1000/src/Thing/Person')],
+            'product' => ['files' => public_path('1vs1000/src/Thing/Product')]
+        ];
 
-      $parent_record_count = $record_count = 0;
+        $parent_record_count = $record_count = 0;
 
-      // Loop through schemas
-      foreach ($schemas as $schema => $schema_info)
-      {
-        $this->comment("Processing $schema");
-
-        // Loop through files per schema
-        $files = glob($schema_info['files']);
-        foreach ($files as $file)
+        // Loop through schemas
+        foreach ($schemas as $schema => $schema_info)
         {
-          $xml = simplexml_load_file($file);
+            $this->comment("Processing $schema");
 
-          $class_namespace = 'App\\' . ucfirst( camel_case($schema) );
-          $class_name = (new ReflectionClass($class_namespace))->getShortName();
-          $parent_class_namespace = get_parent_class($class_namespace);
-          $parent_class_name = (new ReflectionClass($parent_class_namespace))->getShortName();
-
-          // Check if classes exist
-          if (class_exists($class_namespace) && class_exists($parent_class_namespace))
-          {
-            $record = new $class_namespace;
-            $parent_record = new $parent_class_namespace;
-            $parent_attributes = $attributes = [];
-
-            // Try allocating data
-            foreach ($xml->attributes() as $attribute => $value)
+            // Loop through files per schema, searching recursively in specified paths
+            $files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator($schema_info['files']) );
+            foreach ($files as $file)
             {
-              if (in_array($attribute, $record->fillable))
-              {
-                $this->comment("$attribute is fillable for $class_name with:");
-                if ($value != null && $value != '')
+                if ($file->getExtension() != 'hbs') continue;
+                $xml = new SimpleXMLElement( \File::get($file->getPathname()) );
+
+                $class_namespace = 'App\\' . ucfirst( camel_case($schema) );
+                $class_name = (new ReflectionClass($class_namespace))->getShortName();
+                $parent_class_namespace = get_parent_class($class_namespace);
+                $parent_class_name = (new ReflectionClass($parent_class_namespace))->getShortName();
+
+                // Check if classes exist
+                if (class_exists($class_namespace) && class_exists($parent_class_namespace))
                 {
-                  $this->line($value);
+                    $record = new $class_namespace;
+                    $parent_record = new $parent_class_namespace;
+                    $parent_attributes = $attributes = [];
+
+                    // Try allocating data
+                    foreach ($xml->attributes() as $attribute => $value)
+                    {
+                        if (in_array($attribute, $record->fillable))
+                        {
+                            $this->comment("$attribute is fillable for $class_name with:");
+                            if ($value != null && $value != '')
+                            {
+                                $this->line($value);
+                            }
+                            else
+                            {
+                                $this->error('NO CONTENT');
+                            }
+                            $attributes[$attribute] = $value;
+                        }
+                        elseif (in_array($attribute, $parent_record->fillable))
+                        {
+                            $this->comment("$attribute is fillable for $parent_class_name with:");
+                            if ($value != null && $value != '')
+                            {
+                                $this->line($value);
+                            }
+                            else
+                            {
+                                $this->error('NO CONTENT');
+                            }
+                            $parent_attributes[$attribute] = $value;
+                        }
+                    }
+
+                    // If data allocated, then save
+                    if (!empty($parent_attributes))
+                    {
+                        $parent_record->fill($parent_attributes);
+                        $parent_record->save();
+
+                        $parent_id = $parent_record->id;
+                        $attributes[strtolower($parent_class_name) . '_id'] = $parent_id;
+                        $parent_record_count++;
+                        $this->info("$parent_class_name created in Database successfully!");
+                    }
+
+                    if (!empty($attributes))
+                    {
+                        $record->fill($attributes);
+                        $record->save();
+                        $record_count++;
+                        $this->info("$class_name created in Database successfully!");
+                    }
                 }
                 else
                 {
-                  $this->error('NO CONTENT');
+                    $this->error("$class_name does not exist");
                 }
-                $attributes[$attribute] = $value;
-              }
-              elseif (in_array($attribute, $parent_record->fillable))
-              {
-                $this->comment("$attribute is fillable for $parent_class_name with:");
-                if ($value != null && $value != '')
-                {
-                  $this->line($value);
-                }
-                else
-                {
-                  $this->error('NO CONTENT');
-                }
-                $parent_attributes[$attribute] = $value;
-              }
             }
-
-            // If data allocated, then save
-            if (!empty($parent_attributes))
-            {
-              $parent_record->fill($parent_attributes);
-              $parent_record->save();
-
-              $parent_id = $parent_record->id;
-              $attributes[strtolower($parent_class_name) . '_id'] = $parent_id;
-              $parent_record_count++;
-              $this->info("$parent_class_name created in Database successfully!");
-            }
-
-            if (!empty($attributes))
-            {
-              $record->fill($attributes);
-              $record->save();
-              $record_count++;
-              $this->info("$class_name created in Database successfully!");
-            }
-          }
-          else
-          {
-            $this->error("$class_name does not exist");
-          }
         }
-      }
 
-      $end_dt = new DateTime('now');
-      $time_elapsed = $start_dt->diff($end_dt);
+        $end_dt = new DateTime('now');
+        $time_elapsed = $start_dt->diff($end_dt);
 
-      $this->line("$parent_class_name created in Database successfully! ($parent_record_count total)");
-      $this->line("$class_name created in Database successfully! ($record_count total)");
+        $this->line("$parent_class_name created in Database successfully! ($parent_record_count total)");
+        $this->line("$class_name created in Database successfully! ($record_count total)");
 
-      $this->info( $time_elapsed->format('Task complete, time elapsed: %y year/s, %m month/s, %d day/s, %h hour/s, %i minute/s, %s second/s') );
+        $this->info( $time_elapsed->format('Task complete, time elapsed: %y year/s, %m month/s, %d day/s, %h hour/s, %i minute/s, %s second/s') );
 
-      $task_began_msg = 'Task began on the ' . $start_dt->format('jS F Y')
-      . ' at ' . $start_dt->format('H:i:s');
-      $task_ended_msg = 'and ended on ' . $end_dt->format('jS F Y')
-      . ' at ' . $end_dt->format('H:i:s');
+        $task_began_msg = 'Task began on the ' . $start_dt->format('jS F Y')
+        . ' at ' . $start_dt->format('H:i:s');
+        $task_ended_msg = 'and ended on ' . $end_dt->format('jS F Y')
+        . ' at ' . $end_dt->format('H:i:s');
 
-      $this->info($task_began_msg);
-      $this->info($task_ended_msg);
+        $this->info($task_began_msg);
+        $this->info($task_ended_msg);
     }
 }
