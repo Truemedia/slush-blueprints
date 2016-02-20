@@ -169,6 +169,22 @@ gulp.task('install', function(done)
                             }
                         }
                     });
+
+                    // Build routes (if required)
+                    var make_routes = true;
+                    if (make_routes)
+                    {
+                        var resources = {};
+
+                        for (thing of schema.list_of_things)
+                        {
+                            var resource = changeCase.snakeCase(thing),
+                                controller = changeCase.pascalCase(thing) + 'Controller';
+
+                            resources[resource] = controller;
+                        }
+                        schema.make_routes(resources);
+                    }
                 }))
                 .on('end', function()
                 {

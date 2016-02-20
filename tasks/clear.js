@@ -5,7 +5,10 @@ var gulp = require('gulp'),
 gulp.task('clear', function()
 {
     return gulp.src([
-			'./app/Http/Controllers/?Controller.php', './database/migrations/*.php', './app/*.php'
+			'./app/Http/Controllers/?Controller.php', // Controllers
+			'./database/migrations/*.php', // Migrations
+			'./app/*.php', // Models
+			'./app/Http/routes.php' // Routes
 		], { read: false })
         .pipe( gulpPlugins.rm() )
 });

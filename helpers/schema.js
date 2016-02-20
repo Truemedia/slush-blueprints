@@ -19,7 +19,8 @@ if (framework == 'Laravel')
 {
   var controller = require('./../plugins/laravel/app/Http/Controllers/controller'),
       migration = require('./../plugins/laravel/database/migration'),
-      model = require('./../plugins/laravel/app/model');
+      model = require('./../plugins/laravel/app/model'),
+      routes = require('./../plugins/laravel/app/Http/routes');
 }
 
 var schema =
@@ -373,6 +374,12 @@ var schema =
     make_controller: function(controller_name, parent_controller_name)
     {
         controller.create(schema.cwd, controller_name, parent_controller_name);
+    },
+
+    /* Write routes */
+    make_routes: function(resources)
+    {
+        routes.create(schema.cwd, resources);
     }
 };
 
