@@ -335,9 +335,9 @@ var schema =
     /* Make language tables for provided table name (if possible) */
     make_language_tables: function(locales, table_name, language_fields)
     {
-        for (locale of locales)
+        for (locale in locales)
         {
-            var language_table_name = table_name + '_' + locale,
+            var language_table_name = table_name + '_' + locales[locale],
                 mandatory_fields = {'parent_id': 'bigIncrements'},
                 fields = _.extend(mandatory_fields, language_fields);
 
