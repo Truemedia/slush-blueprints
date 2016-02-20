@@ -7,7 +7,8 @@ var gulp = require('gulp'),
     jsonpatch = require('jsonpatch'),
     walk = require('tree-walk'),
     kvp = require('key-value-pointer'),
-    _ = require('underscore');
+    _ = require('underscore'),
+    CountryLanguage = require('country-language');
 
 // CLI UI
 var Table = require('cli-table');
@@ -218,7 +219,8 @@ var schema =
     field_handling: function(table_name, parent_table_name, fields, show_field_handling)
     {
         var valid_fields = {},
-            invalid_fields = {};
+            invalid_fields = {},
+            natural_language_fields = {};
 
         if (show_field_handling == undefined)
         {
@@ -244,12 +246,21 @@ var schema =
                 var data_type = changeCase[transformation]( fields[field_name] ),
                     field_name = changeCase.snakeCase(field_name);
 
-                valid_fields[field_name] = data_type;
 
-                if (show_field_handling)
+                // Field that uses natural language, abstract to language tables
+                if (data_type == 'text')
                 {
-                    var msg = 'Got a matching data type for `' + field_name + '` with `' + data_type + '`, adding to valid fields';
-                    gutil.log( gutil.colors.magenta(msg) );
+                    natural_language_fields[field_name] = data_type;
+                }
+                else
+                {
+                    valid_fields[field_name] = data_type;
+
+                    if (show_field_handling)
+                    {
+                        var msg = 'Got a matching data type for `' + field_name + '` with `' + data_type + '`, adding to valid fields';
+                        gutil.log( gutil.colors.magenta(msg) );
+                    }
                 }
             }
             else
@@ -295,6 +306,12 @@ var schema =
             }
         }
 
+        // If we have any natural language fields, put them into a new language table
+        if (Object.keys(natural_language_fields).length != 0)
+        {
+            schema.make_language_tables(CountryLanguage.getLocales(true), table_name, natural_language_fields);
+        }
+
         return {
             valid_fields: valid_fields,
             invalid_fields: invalid_fields
@@ -315,38 +332,30 @@ var schema =
         schema.make_migration(table_name, fields);
     },
 
+    /* Make language tables for provided table name (if possible) */
+    make_language_tables: function(locales, table_name, language_fields)
+    {
+        for (locale of locales)
+        {
+            var language_table_name = table_name + '_' + locale,
+                mandatory_fields = {'parent_id': 'bigIncrements'},
+                fields = _.extend(mandatory_fields, language_fields);
+
+            schema.make_migration(language_table_name, fields);
+        }
+    },
+
     /* Write migration */
     make_migration: function(table_name, fields_as_json)
     {
       // Use plugin for file generation
-      if (migration.create(schema.cwd, table_name, fields_as_json))
-      {
-        schema.counters.migrations++;
-
-        if (schema.traditional_logging)
-        {
-            var msg = 'Migration file ' + filename + ' created! '
-                + '(migration ' + schema.counters.migrations + ' of ' + schema.list_of_things.length + ')';
-            gutil.log( gutil.colors.green(msg) );
-        }
-      }
+      migration.create(schema.cwd, table_name, fields_as_json);
     },
 
     /* Write model */
     make_model: function(model_name, parent_model_name, field_names)
     {
-        // Use plugin for file generation
-        if (model.create(schema.cwd, model_name, parent_model_name, field_names))
-        {
-          schema.counters.models++;
-
-          if (schema.traditional_logging)
-          {
-              var msg = 'Model file ' + filename + ' created! '
-                  + '(migration ' + schema.counters.models + ' of ' + schema.list_of_things.length + ')';
-              gutil.log( gutil.colors.green(msg) );
-          }
-        }
+        model.create(schema.cwd, model_name, parent_model_name, field_names);
     }
 };
 

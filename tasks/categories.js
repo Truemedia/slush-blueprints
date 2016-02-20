@@ -8,7 +8,7 @@ var gulp = require('gulp'),
     jsonpatch = require('jsonpatch'),
     jsonpointer = require('json-pointer'),
     mkdirp = require('mkdirp'),
-    fs = require('fs');
+    fs = require('graceful-fs');
 
 // Use the tradedoubler API to get a free list of product categories
 
@@ -81,7 +81,7 @@ function build_path(data, pointer, dir_name)
 
 		folder_names_recursive.push(category['name']);
 	}
-	
+
 	// Build directory path and use to make folder
 	var folder_path = folder_names_recursive.join('/');
 	mkdirp(folder_path, function (err)

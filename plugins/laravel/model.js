@@ -1,49 +1,75 @@
 var _ = require('underscore'),
     changeCase = require('change-case'),
-    fs = require('fs'),
-    pluralize = require('pluralize');
+    pluralize = require('pluralize'),
+    gutil = require('gulp-util'),
+    FileQueue = require('filequeue');
+
+// Queue
+var fq = new FileQueue(256);
 
 /**
  * Laravel model plugin for slush-blueprints **/
 var model =
 {
+    counter: 0,
+    traditional_logging: true,
+
   /**
    * Create a migration based on passed parameters
    */
    create: function(cwd, model_name, parent_model_name, field_names)
    {
-     var file_contents = fs.readFileSync(cwd + '/templates/Model.php', {encoding: 'utf8'});
-
-     if (file_contents == undefined)
-     {
-         throw new Error('Error loading file');
-     }
-
-     var filename = model_name + '.php';
-
-     var template_data = {
-         "modelName": model_name,
-         "parentModelName": parent_model_name,
-         "tableName": pluralize( changeCase.snakeCase(model_name) ),
-         "parentTableName": pluralize( changeCase.snakeCase(parent_model_name) ),
-         "fieldNames": field_names
-     };
-
-     var tpl = _.template(file_contents);
-     var model_file_contents = tpl(template_data);
-     var model_path = 'app';
-
-     fs.open(model_path, 'r', function(err, fd)
-     {
-       if (err && err.code=='ENOENT')
+       // Open model template file
+       fq.readFile(cwd + '/templates/Model.php', {encoding: 'utf8'}, function (error, file_contents)
        {
-         throw new Error( gutil.colors.red('Model folder does not exist (' + model_path + '), did you run this in the correct folder?') );
-       }
-     });
+           if (error) throw error;
 
-     fs.writeFileSync('./' + model_path + '/' + filename, model_file_contents);
-     return true;
+           var filename = model_name + '.php';
+
+           var template_data = {
+               "modelName": model_name,
+               "parentModelName": parent_model_name,
+               "tableName": pluralize( changeCase.snakeCase(model_name) ),
+               "parentTableName": pluralize( changeCase.snakeCase(parent_model_name) ),
+               "fieldNames": field_names
+           };
+
+           var tpl = _.template(file_contents);
+           var model_file_contents = tpl(template_data);
+           var model_path = 'app';
+
+           // Check if model folder exists (Laravel instance)
+           fq.exists(model_path, function(path_exists)
+           {
+               if (path_exists)
+               {
+                   // Write model file
+                   fq.writeFile('./' + model_path + '/' + filename, model_file_contents, function (err)
+                   {
+                       if (error) throw error;
+                       model.made(filename);
+                   });
+               }
+               else
+               {
+                   throw new Error( gutil.colors.red('Model folder does not exist (' + model_path + '), did you run this in the correct folder?') );
+               }
+           });
+       });
    },
+
+   /* Callback for model being made */
+   made: function(filename)
+   {
+       model.counter++;
+
+       if (model.traditional_logging)
+       {
+           var msg = 'Model file ' + filename + ' created! '
+               + '(Model ' + model.counter + ')';
+           gutil.log( gutil.colors.green(msg) );
+       }
+   }
 };
 
 module.exports = model;
