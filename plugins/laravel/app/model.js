@@ -20,7 +20,7 @@ var model =
    create: function(cwd, model_name, parent_model_name, field_names)
    {
        // Open model template file
-       fq.readFile(cwd + '/templates/Model.php', {encoding: 'utf8'}, function (error, file_contents)
+       fq.readFile(cwd + '/templates/app/Model.php', {encoding: 'utf8'}, function (error, file_contents)
        {
            if (error) throw error;
 

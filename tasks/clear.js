@@ -5,7 +5,7 @@ var gulp = require('gulp'),
 gulp.task('clear', function()
 {
     return gulp.src([
-			'./database/migrations/*.php', './app/*.php'
+			'./app/Http/Controllers/?Controller.php', './database/migrations/*.php', './app/*.php'
 		], { read: false })
         .pipe( gulpPlugins.rm() )
 });

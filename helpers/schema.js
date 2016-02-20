@@ -17,8 +17,9 @@ var Table = require('cli-table');
 var framework = 'Laravel';
 if (framework == 'Laravel')
 {
-  var migration = require('./../plugins/laravel/database/migration'),
-      model = require('./../plugins/laravel/model');
+  var controller = require('./../plugins/laravel/app/Http/Controllers/controller'),
+      migration = require('./../plugins/laravel/database/migration'),
+      model = require('./../plugins/laravel/app/model');
 }
 
 var schema =
@@ -178,6 +179,9 @@ var schema =
     /* Make a schema */
     make_schema: function(thing)
     {
+        var make_controller = make_model = true,
+            make_migrations = make_migration = false;
+
         var table_name = changeCase.snakeCase( thing['class_name'] ),
             parent_table_name = changeCase.snakeCase( thing['sub_class'] );
 
@@ -193,7 +197,7 @@ var schema =
             parent_class = thing['sub_class'],
             show_field_handling = false;
 
-        var field_handling = schema.field_handling(table_name, parent_table_name, properties, show_field_handling),
+        var field_handling = schema.field_handling(table_name, parent_table_name, properties, show_field_handling, make_migrations),
             table_fields = field_handling['valid_fields'];
 
         var mandatory_fields = {'id': 'bigIncrements'};
@@ -205,18 +209,23 @@ var schema =
 
         table_fields = _.extend(mandatory_fields, table_fields);
 
-        // Abstractions we can make from the schema
-        schema.make_migration(pluralize(table_name), table_fields);
-
-        var make_model = true;
+        // Go forth and make things
+        if (make_migration)
+        {
+            schema.make_migration(pluralize(table_name), table_fields);
+        }
         if (make_model)
         {
             schema.make_model(changeCase.pascalCase(table_name), changeCase.pascalCase(parent_table_name), Object.keys(table_fields));
         }
+        if (make_controller)
+        {
+            schema.make_controller(changeCase.pascalCase(table_name) + 'Controller', changeCase.pascalCase(parent_table_name) + 'Controller');
+        }
     },
 
     /* Match schema primative datatypes to desired datatypes for selected data source */
-    field_handling: function(table_name, parent_table_name, fields, show_field_handling)
+    field_handling: function(table_name, parent_table_name, fields, show_field_handling, make_migrations)
     {
         var valid_fields = {},
             invalid_fields = {},
@@ -282,7 +291,10 @@ var schema =
                         var child_table_name = changeCase.snakeCase(fields[field_name]),
                             relationship = 'one_to_many';
 
-                        schema.make_intermediate(table_name, child_table_name, field_name, relationship);
+                        if (make_migrations)
+                        {
+                            schema.make_intermediate(table_name, child_table_name, field_name, relationship);
+                        }
                     }
                     else
                     {
@@ -307,7 +319,7 @@ var schema =
         }
 
         // If we have any natural language fields, put them into a new language table
-        if (Object.keys(natural_language_fields).length != 0)
+        if (Object.keys(natural_language_fields).length != 0 && make_migrations)
         {
             schema.make_language_tables(CountryLanguage.getLocales(true), table_name, natural_language_fields);
         }
@@ -348,14 +360,19 @@ var schema =
     /* Write migration */
     make_migration: function(table_name, fields_as_json)
     {
-      // Use plugin for file generation
-      migration.create(schema.cwd, table_name, fields_as_json);
+        migration.create(schema.cwd, table_name, fields_as_json);
     },
 
     /* Write model */
     make_model: function(model_name, parent_model_name, field_names)
     {
         model.create(schema.cwd, model_name, parent_model_name, field_names);
+    },
+
+    /* Write controller */
+    make_controller: function(controller_name, parent_controller_name)
+    {
+        controller.create(schema.cwd, controller_name, parent_controller_name);
     }
 };
 
