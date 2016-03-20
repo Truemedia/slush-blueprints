@@ -134,50 +134,54 @@ var view =
      */
     create: function(cwd, context_name, parent_context_name, form_fields)
     {
-       // Open model template file
-       fq.readFile(cwd + '/templates/resources/views/thing/crudl/_form.php', {encoding: 'utf8'}, function (error, file_contents)
+        var view_files = ['_form', '_view', 'create', 'destroy', 'edit', 'list'];
+
+       // Open view template file
+       view_files.forEach( function(view_file)
        {
-           if (error) throw error;
-
-           var filename = '_form.php';
-
-           var template_data = {
-               "contextName": context_name,
-               "parentContextName": parent_context_name,
-               "formFields": form_fields,
-               "inputTypes": view.input_types
-           };
-
-           var tpl = _.template(file_contents);
-           var view_file_contents = tpl(template_data);
-
-           var view_path = 'resources/views',
-               context_path = changeCase.lowerCase(context_name);
-
-           // Check if views folder exists (Laravel instance)
-           fq.exists(view_path, function(path_exists)
+           var filename = view_file + '.php';
+           fq.readFile(cwd + '/templates/resources/views/thing/crudl/' + filename, {encoding: 'utf8'}, function (error, file_contents)
            {
-               if (path_exists)
-               {
-                   view_path = path.join(view_path, context_path);
+               if (error) throw error;
 
-                   // Create context folder if it does not exist
-                   if (!fs.existsSync(view_path))
+               var template_data = {
+                   "contextName": context_name,
+                   "parentContextName": parent_context_name,
+                   "formFields": form_fields,
+                   "inputTypes": view.input_types
+               };
+
+               var tpl = _.template(file_contents);
+               var view_file_contents = tpl(template_data);
+
+               var view_path = 'resources/views',
+                   context_path = changeCase.lowerCase(context_name);
+
+               // Check if views folder exists (Laravel instance)
+               fq.exists(view_path, function(path_exists)
+               {
+                   if (path_exists)
                    {
-                       fs.mkdirSync(view_path);
+                       view_path = path.join(view_path, context_path);
+
+                       // Create context folder if it does not exist
+                       if (!fs.existsSync(view_path))
+                       {
+                           fs.mkdirSync(view_path);
+                       }
+
+                       // Write view file
+                       fq.writeFile(path.join(view_path, filename), view_file_contents, function (err)
+                       {
+                           if (error) throw error;
+                           view.made(filename);
+                       });
                    }
-
-                   // Write view file
-                   fq.writeFile(path.join(view_path, filename), view_file_contents, function (err)
+                   else
                    {
-                       if (error) throw error;
-                       view.made(filename);
-                   });
-               }
-               else
-               {
-                   throw new Error( gutil.colors.red('Views folder does not exist (' + view_path + '), did you run this in the correct folder?') );
-               }
+                       throw new Error( gutil.colors.red('Views folder does not exist (' + view_path + '), did you run this in the correct folder?') );
+                   }
+               });
            });
        });
    },
