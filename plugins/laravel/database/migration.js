@@ -1,6 +1,7 @@
 var _ = require('underscore'),
     changeCase = require('change-case'),
     moment = require('moment'),
+    pluralize = require('pluralize'),
     gutil = require('gulp-util'),
     FileQueue = require('filequeue');
 
@@ -47,11 +48,119 @@ var migration =
             'timestamps'
     ],
 
-  /**
-   * Create a migration based on passed parameters
-   */
-   create: function(cwd, table_name, fields_as_json)
-   {
+    /**
+     * Match schema primative datatypes to desired database datatypes for selected data source
+     */
+    database_field_handling: function(table_name, parent_table_name, fields, show_field_handling, make_migrations, list_of_things)
+    {
+        var valid_fields = {},
+            invalid_fields = {},
+            natural_language_fields = {};
+
+        if (show_field_handling == undefined)
+        {
+            show_field_handling = false;
+        }
+
+        for (field_name in fields)
+        {
+            // Trial and error data type matching
+            var transformation = null;
+            for (transform in changeCase)
+            {
+                var transformed = changeCase[transform]( fields[field_name] );
+                if (migration.data_types.indexOf(transformed) > -1)
+                {
+                    transformation = transform;
+                }
+            }
+
+            if (transformation != null)
+            {
+                // Got a direct match
+                var data_type = changeCase[transformation]( fields[field_name] ),
+                    field_name = changeCase.snakeCase(field_name);
+
+
+                // Field that uses natural language, abstract to language tables
+                if (data_type == 'text')
+                {
+                    natural_language_fields[field_name] = data_type;
+                }
+                else
+                {
+                    valid_fields[field_name] = data_type;
+
+                    if (show_field_handling)
+                    {
+                        var msg = 'Got a matching data type for `' + field_name + '` with `' + data_type + '`, adding to valid fields';
+                        gutil.log( gutil.colors.magenta(msg) );
+                    }
+                }
+            }
+            else
+            {
+                if (show_field_handling)
+                {
+                    var msg = 'No direct data type found, will now try to match other criteria to determine data type of `' + data_type + '`';
+                    gutil.log( gutil.colors.yellow(msg) );
+                }
+
+                var estimated_class = changeCase.upperCaseFirst( changeCase.sentenceCase(fields[field_name]) );
+
+                if (list_of_things.indexOf(estimated_class) > -1)
+                {
+
+                    // Plural? create some intermediate tables (one to many, many to many) for none matched fields
+                    if (pluralize(field_name) == field_name)
+                    {
+                        var child_table_name = changeCase.snakeCase(fields[field_name]),
+                            relationship = 'one_to_many';
+
+                        if (make_migrations)
+                        {
+                            schema.make_intermediate(table_name, child_table_name, field_name, relationship);
+                        }
+                    }
+                    else
+                    {
+                        // Got a reference to another thing, make a reference column
+                        var field_name = changeCase.snakeCase(estimated_class) + '_id',
+                            data_type = 'integer';
+
+                        valid_fields[field_name] = data_type;
+                        if (show_field_handling)
+                        {
+                            var msg = 'Data type was a thing, so adding reference field `' + field_name + '` with `' + data_type + '`, adding to valid fields';
+                            gutil.log( gutil.colors.cyan(msg) );
+                        }
+                    }
+                }
+                else
+                {
+                    // Invalid field
+                    invalid_fields[field_name] = fields[field_name];
+                }
+            }
+        }
+
+        // If we have any natural language fields, put them into a new language table
+        if (Object.keys(natural_language_fields).length != 0 && make_migrations)
+        {
+            schema.make_language_tables(CountryLanguage.getLocales(true), table_name, natural_language_fields);
+        }
+
+        return {
+            valid_fields: valid_fields,
+            invalid_fields: invalid_fields
+        };
+    },
+
+    /**
+     * Create a migration based on passed parameters
+     */
+    create: function(cwd, table_name, fields_as_json)
+    {
        // Open migration template file
        fq.readFile(cwd + '/templates/migration/create_table.php', {encoding: 'utf8'}, function (error, file_contents)
        {

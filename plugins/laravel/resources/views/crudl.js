@@ -23,11 +23,117 @@ var view =
         'email', 'password', 'search', 'text', 'url', 'tel', 'number', 'range', 'date', 'month', 'week', 'time', 'datetime', 'datetime-local', 'color'
     ],
 
-  /**
-   * Create a view based on passed parameters
-   */
-   create: function(cwd, context_name, parent_context_name, form_fields)
-   {
+    /**
+     * Match schema primative datatypes to desired HTML form field datatypes for selected data source
+     */
+    form_field_handling: function(context_name, parent_context_name, fields, show_field_handling, list_of_things)
+    {
+        var valid_fields = [],
+            invalid_fields = [],
+            natural_language_fields = [];
+
+        if (show_field_handling == undefined)
+        {
+            show_field_handling = false;
+        }
+
+        for (field_name in fields)
+        {
+            // Trial and error data type matching
+            var transformation = null;
+            for (transform in changeCase)
+            {
+                var transformed = changeCase[transform]( fields[field_name] );
+                if (view.input_types.indexOf(transformed) > -1)
+                {
+                    transformation = transform;
+                }
+            }
+
+            if (transformation != null)
+            {
+                // Got a direct match
+                var data_type = changeCase[transformation]( fields[field_name] ),
+                    field_name = changeCase.snakeCase(field_name);
+
+
+                // Field that uses natural language, abstract to language tables
+                if (data_type == 'text')
+                {
+                    natural_language_fields.push({
+                        name: field_name, type: data_type, label: changeCase.titleCase(field_name)
+                    });
+                }
+                else
+                {
+                    valid_fields.push({
+                        name: field_name, type: data_type, label: changeCase.titleCase(field_name)
+                    });
+
+                    if (show_field_handling)
+                    {
+                        var msg = 'Got a matching data type for `' + field_name + '` with `' + data_type + '`, adding to valid fields';
+                        gutil.log( gutil.colors.magenta(msg) );
+                    }
+                }
+            }
+            else
+            {
+                if (show_field_handling)
+                {
+                    var msg = 'No direct data type found, will now try to match other criteria to determine data type of `' + data_type + '`';
+                    gutil.log( gutil.colors.yellow(msg) );
+                }
+
+                var estimated_class = changeCase.upperCaseFirst( changeCase.sentenceCase(fields[field_name]) );
+
+                if (list_of_things.indexOf(estimated_class) > -1)
+                {
+
+                    // Plural? Use a UI with multiple field instances
+                    if (pluralize(field_name) == field_name)
+                    {
+                        var field_name = changeCase.snakeCase(fields[field_name]);
+                        valid_fields.push({
+                            name: field_name, type: 'select-group', label: changeCase.titleCase(field_name)
+                        });
+                    }
+                    else
+                    {
+                        // Got a reference to another thing, make a dropdown
+                        var field_name = changeCase.snakeCase(estimated_class) + '_id';
+                        valid_fields.push({
+                            name: field_name, type: 'select', label: changeCase.titleCase(field_name)
+                        });
+                    }
+                }
+                else
+                {
+                    // Invalid field
+                    invalid_fields.push({
+                        name: field_name, type: data_type, label: changeCase.titleCase(field_name)
+                    });
+                }
+            }
+        }
+
+        // If we have any natural language fields, assign specific UI
+        if (Object.keys(natural_language_fields).length != 0)
+        {
+            // TODO: Add language selection with text UI
+        }
+
+        return {
+            valid_fields: valid_fields,
+            invalid_fields: invalid_fields
+        };
+    },
+
+    /**
+     * Create a view based on passed parameters
+     */
+    create: function(cwd, context_name, parent_context_name, form_fields)
+    {
        // Open model template file
        fq.readFile(cwd + '/templates/resources/views/thing/crudl/_form.php', {encoding: 'utf8'}, function (error, file_contents)
        {
