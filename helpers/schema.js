@@ -20,7 +20,8 @@ if (framework == 'Laravel')
   var controller = require('./../plugins/laravel/app/Http/Controllers/controller'),
       migration = require('./../plugins/laravel/database/migration'),
       model = require('./../plugins/laravel/app/model'),
-      routes = require('./../plugins/laravel/app/Http/routes');
+      routes = require('./../plugins/laravel/app/Http/routes'),
+      view = require('./../plugins/laravel/resources/views/crudl');
 }
 
 var schema =
@@ -36,40 +37,6 @@ var schema =
     settings:
     {
         traditional_logging: false, // Logging via commandline text output (no fancy UI)
-    },
-    // All primitive data types for various schema
-    data_types: {
-        laravel: [
-            'bigIncrements',
-            'bigInteger',
-            'binary',
-            'boolean',
-            'char',
-            'date',
-            'dateTime',
-            'decimal',
-            'double',
-            'enum',
-            'float',
-            'increments',
-            'integer',
-            'json',
-            'jsonb',
-            'longText',
-            'mediumInteger',
-            'mediumText',
-            'morphs',
-            'nullableTimestamps',
-            'rememberToken',
-            'smallInteger',
-            'softDeletes',
-            'string',
-            'text',
-            'time',
-            'tinyInteger',
-            'timestamp',
-            'timestamps'
-        ]
     },
 
     /* Convert a KVP match to a JSONpatch */
@@ -180,7 +147,7 @@ var schema =
     /* Make a schema */
     make_schema: function(thing)
     {
-        var make_controller = make_model = true,
+        var make_controller = make_model = make_views = true,
             make_migrations = make_migration = false;
 
         var table_name = changeCase.snakeCase( thing['class_name'] ),
@@ -198,8 +165,10 @@ var schema =
             parent_class = thing['sub_class'],
             show_field_handling = false;
 
-        var field_handling = schema.field_handling(table_name, parent_table_name, properties, show_field_handling, make_migrations),
-            table_fields = field_handling['valid_fields'];
+        var database_field_handling = schema.database_field_handling(table_name, parent_table_name, properties, show_field_handling, make_migrations),
+            table_fields = database_field_handling['valid_fields'],
+            form_field_handling = schema.form_field_handling(table_name, parent_table_name, properties, show_field_handling),
+            form_fields = form_field_handling['valid_fields'];
 
         var mandatory_fields = {'id': 'bigIncrements'};
         if (parent_class != null)
@@ -223,10 +192,14 @@ var schema =
         {
             schema.make_controller(changeCase.pascalCase(table_name) + 'Controller', changeCase.pascalCase(parent_table_name) + 'Controller');
         }
+        if (make_views)
+        {
+            schema.make_views(changeCase.pascalCase(table_name), changeCase.pascalCase(parent_table_name), form_fields);
+        }
     },
 
-    /* Match schema primative datatypes to desired datatypes for selected data source */
-    field_handling: function(table_name, parent_table_name, fields, show_field_handling, make_migrations)
+    /* Match schema primative datatypes to desired database datatypes for selected data source */
+    database_field_handling: function(table_name, parent_table_name, fields, show_field_handling, make_migrations)
     {
         var valid_fields = {},
             invalid_fields = {},
@@ -244,7 +217,7 @@ var schema =
             for (transform in changeCase)
             {
                 var transformed = changeCase[transform]( fields[field_name] );
-                if (schema.data_types.laravel.indexOf(transformed) > -1)
+                if (migration.data_types.indexOf(transformed) > -1)
                 {
                     transformation = transform;
                 }
@@ -331,6 +304,110 @@ var schema =
         };
     },
 
+    /* Match schema primative datatypes to desired HTML form field datatypes for selected data source */
+    form_field_handling: function(context_name, parent_context_name, fields, show_field_handling)
+    {
+        var valid_fields = [],
+            invalid_fields = [],
+            natural_language_fields = [];
+
+        if (show_field_handling == undefined)
+        {
+            show_field_handling = false;
+        }
+
+        for (field_name in fields)
+        {
+            // Trial and error data type matching
+            var transformation = null;
+            for (transform in changeCase)
+            {
+                var transformed = changeCase[transform]( fields[field_name] );
+                if (view.input_types.indexOf(transformed) > -1)
+                {
+                    transformation = transform;
+                }
+            }
+
+            if (transformation != null)
+            {
+                // Got a direct match
+                var data_type = changeCase[transformation]( fields[field_name] ),
+                    field_name = changeCase.snakeCase(field_name);
+
+
+                // Field that uses natural language, abstract to language tables
+                if (data_type == 'text')
+                {
+                    natural_language_fields.push({
+                        name: field_name, type: data_type, label: changeCase.titleCase(field_name)
+                    });
+                }
+                else
+                {
+                    valid_fields.push({
+                        name: field_name, type: data_type, label: changeCase.titleCase(field_name)
+                    });
+
+                    if (show_field_handling)
+                    {
+                        var msg = 'Got a matching data type for `' + field_name + '` with `' + data_type + '`, adding to valid fields';
+                        gutil.log( gutil.colors.magenta(msg) );
+                    }
+                }
+            }
+            else
+            {
+                if (show_field_handling)
+                {
+                    var msg = 'No direct data type found, will now try to match other criteria to determine data type of `' + data_type + '`';
+                    gutil.log( gutil.colors.yellow(msg) );
+                }
+
+                var estimated_class = changeCase.upperCaseFirst( changeCase.sentenceCase(fields[field_name]) );
+
+                if (schema.list_of_things.indexOf(estimated_class) > -1)
+                {
+
+                    // Plural? Use a UI with multiple field instances
+                    if (pluralize(field_name) == field_name)
+                    {
+                        var field_name = changeCase.snakeCase(fields[field_name]);
+                        valid_fields.push({
+                            name: field_name, type: 'select-group', label: changeCase.titleCase(field_name)
+                        });
+                    }
+                    else
+                    {
+                        // Got a reference to another thing, make a dropdown
+                        var field_name = changeCase.snakeCase(estimated_class) + '_id';
+                        valid_fields.push({
+                            name: field_name, type: 'select', label: changeCase.titleCase(field_name)
+                        });
+                    }
+                }
+                else
+                {
+                    // Invalid field
+                    invalid_fields.push({
+                        name: field_name, type: data_type, label: changeCase.titleCase(field_name)
+                    });
+                }
+            }
+        }
+
+        // If we have any natural language fields, assign specific UI
+        if (Object.keys(natural_language_fields).length != 0)
+        {
+            // TODO: Add language selection with text UI
+        }
+
+        return {
+            valid_fields: valid_fields,
+            invalid_fields: invalid_fields
+        };
+    },
+
     /* Make intermediates for provided table names (if possible) */
     make_intermediate: function(parent_table_name, child_table_name, attribute_name, relationship)
     {
@@ -380,6 +457,12 @@ var schema =
     make_routes: function(resources)
     {
         routes.create(schema.cwd, resources);
+    },
+
+    /* Write views */
+    make_views: function(context_name, parent_context_name, form_fields)
+    {
+        view.create(schema.cwd, context_name, parent_context_name, form_fields);
     }
 };
 

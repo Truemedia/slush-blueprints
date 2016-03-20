@@ -14,6 +14,39 @@ var migration =
     counter: 0,
     traditional_logging: true,
 
+    // Data types for migrations
+    data_types: [
+            'bigIncrements',
+            'bigInteger',
+            'binary',
+            'boolean',
+            'char',
+            'date',
+            'dateTime',
+            'decimal',
+            'double',
+            'enum',
+            'float',
+            'increments',
+            'integer',
+            'json',
+            'jsonb',
+            'longText',
+            'mediumInteger',
+            'mediumText',
+            'morphs',
+            'nullableTimestamps',
+            'rememberToken',
+            'smallInteger',
+            'softDeletes',
+            'string',
+            'text',
+            'time',
+            'tinyInteger',
+            'timestamp',
+            'timestamps'
+    ],
+
   /**
    * Create a migration based on passed parameters
    */
