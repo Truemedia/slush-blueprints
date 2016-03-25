@@ -190,7 +190,18 @@ var schema =
         }
         if (make_controller)
         {
-            schema.make_controller(changeCase.pascalCase(table_name) + 'Controller', changeCase.pascalCase(parent_table_name) + 'Controller');
+            var controller_name = changeCase.pascalCase(table_name) + 'Controller';
+
+            if (parent_table_name != '')
+            {
+                parent_controller_name = changeCase.pascalCase(parent_table_name) + 'Controller';
+            }
+            else
+            {
+                parent_controller_name = 'BaseController';
+            }
+
+            schema.make_controller(controller_name, parent_controller_name);
         }
         if (make_views)
         {
@@ -240,6 +251,7 @@ var schema =
     /* Write controller */
     make_controller: function(controller_name, parent_controller_name)
     {
+        controller.copy_base_files(schema.cwd);
         controller.create(schema.cwd, controller_name, parent_controller_name);
     },
 
@@ -252,6 +264,7 @@ var schema =
     /* Write views */
     make_views: function(context_name, parent_context_name, form_fields)
     {
+        view.copy_base_files(schema.cwd);
         view.create(schema.cwd, context_name, parent_context_name, form_fields);
     }
 };

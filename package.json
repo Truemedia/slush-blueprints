@@ -63,5 +63,8 @@
   },
   "keywords": [
     "slushgenerator"
-  ]
+  ],
+  "devDependencies": {
+    "fs-extra": "^0.26.7"
+  }
 }

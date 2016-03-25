@@ -3,7 +3,7 @@ var _ = require('underscore'),
     pluralize = require('pluralize'),
     gutil = require('gulp-util'),
     FileQueue = require('filequeue'),
-    fs = require('fs'),
+    fs = require('fs-extra'),
     path = require('path');
 
 // Queue
@@ -17,6 +17,7 @@ var view =
 {
     counter: 0,
     traditional_logging: true,
+    base_files_copied: false,
 
     // Different attributes for input type (for automatic browser UIs)
     input_types: [
@@ -127,6 +128,24 @@ var view =
             valid_fields: valid_fields,
             invalid_fields: invalid_fields
         };
+    },
+
+    /* Copy base files across */
+    copy_base_files: function(cwd)
+    {
+        if (!view.base_files_copied)
+        {
+            view.base_files_copied = true;
+            var filename = 'template.php',
+                relative_path = path.join('resources', 'views', 'layouts', 'basic');
+
+            fs.copy(path.join(cwd, 'templates', relative_path, filename), path.join('.', relative_path, filename), function (error)
+            {
+                if (error) throw error;
+                var msg = 'Base view file/s copied successfully';
+                gutil.log( gutil.colors.green(msg) );
+            });
+        }
     },
 
     /**

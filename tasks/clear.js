@@ -10,8 +10,8 @@ gulp.task('clear', function()
 			'./app/*.php', // Models
 			'./app/Http/routes.php', // Routes
 			// Views
-			'./resources/views/**/*.php',
-			'./resources/views/*'
+			'./resources/views/**/**/*.php',
+			'./resources/views/**/**/*'
 		], { read: false })
         .pipe( gulpPlugins.rm() )
 });

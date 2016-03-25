@@ -10,13 +10,19 @@ use App\Http\Controllers\Controller;
 class <%= controllerName %> extends <%= parentControllerName != '' ? parentControllerName : 'Controller' %>
 {
     /**
+     * The layout that should be used for standard HTML responses.
+	 */
+	protected $layout = 'layouts.basic.template';
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        //
+        $data = ['hello' => 'world'];
+        $this->setContent($data);
     }
 
     /**
@@ -26,7 +32,8 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
      */
     public function create()
     {
-        //
+        $data = ['hello' => 'world'];
+        $this->setContent($data);
     }
 
     /**
@@ -37,7 +44,8 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
      */
     public function store(Request $request)
     {
-        //
+        $data = ['hello' => 'world'];
+        $this->setContent($data);
     }
 
     /**
@@ -48,7 +56,8 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
      */
     public function show($id)
     {
-        //
+        $data = ['hello' => 'world'];
+        $this->setContent($data);
     }
 
     /**
@@ -59,7 +68,8 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
      */
     public function edit($id)
     {
-        //
+        $data = ['hello' => 'world'];
+        $this->setContent($data);
     }
 
     /**
@@ -71,7 +81,8 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
      */
     public function update(Request $request, $id)
     {
-        //
+        $data = ['hello' => 'world'];
+        $this->setContent($data);
     }
 
     /**
@@ -82,6 +93,7 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
      */
     public function destroy($id)
     {
-        //
+        $data = ['hello' => 'world'];
+        $this->setContent($data);
     }
 }

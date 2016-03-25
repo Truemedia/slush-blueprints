@@ -2,7 +2,9 @@ var _ = require('underscore'),
     changeCase = require('change-case'),
     pluralize = require('pluralize'),
     gutil = require('gulp-util'),
-    FileQueue = require('filequeue');
+    FileQueue = require('filequeue'),
+    fs = require('fs-extra'),
+    path = require('path');
 
 // Queue
 var fq = new FileQueue(256);
@@ -13,6 +15,7 @@ var controller =
 {
     counter: 0,
     traditional_logging: true,
+    base_files_copied: false,
 
   /**
    * Create a controller based on passed parameters
@@ -53,6 +56,25 @@ var controller =
                }
            });
        });
+   },
+
+   /* Copy base files across */
+   copy_base_files: function(cwd)
+   {
+       if (!controller.base_files_copied)
+       {
+           controller.base_files_copied = true;
+
+           var filename = 'BaseController.php',
+               relative_path = path.join('app', 'Http', 'Controllers');
+
+           fs.copy(path.join(cwd, 'templates', relative_path, filename), path.join('.', relative_path, filename), function (error)
+           {
+               if (error) throw error;
+               var msg = 'Base controller file/s copied successfully';
+               gutil.log( gutil.colors.green(msg) );
+           });
+       }
    },
 
    /* Callback for controller being made */
