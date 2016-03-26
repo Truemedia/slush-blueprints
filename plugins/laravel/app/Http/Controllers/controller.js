@@ -16,7 +16,7 @@ var controller =
     counter: 0,
     traditional_logging: true,
     base_files_copied: false,
-    layout_name: 'classic',
+    layout_name: 'basic',
 
   /**
    * Create a controller based on passed parameters

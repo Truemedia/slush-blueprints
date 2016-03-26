@@ -18,7 +18,7 @@ var view =
     counter: 0,
     traditional_logging: true,
     base_files_copied: false,
-    layout_name: 'classic',
+    layout_name: 'basic',
 
     // Different attributes for input type (for automatic browser UIs)
     input_types: [

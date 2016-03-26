@@ -108,6 +108,7 @@ class BaseController extends Controller
 				}
 
 				$this->layout->content = view($view, $data); // HTML
+				$this->layout->content->title = $this->layout->title;
 			break;
 		}
 	}
