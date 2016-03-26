@@ -16,7 +16,10 @@ class BaseController extends Controller
 	public function callAction($method, $parameters)
     {
         $this->setupLayout();
-        $this->setupViewPath($method, __NAMESPACE__, get_class($this));
+
+		$class_name = get_class($this);
+		$this->setupTitle($method, $class_name);
+        $this->setupViewPath($method, __NAMESPACE__, $class_name);
 
         $response = call_user_func_array([$this, $method], $parameters);
 
@@ -44,6 +47,10 @@ class BaseController extends Controller
 	/**
 	 * Dynamically set name of view based on information available from current scope
 	 *
+	 * @param string
+	 * @param string
+	 * @param
+
 	 */
 	protected function setupViewPath($method, $namespace, $class)
 	{
@@ -60,6 +67,18 @@ class BaseController extends Controller
 		}, compact('package', 'controller', 'view'));
 
 		$this->view = ($path['package'] != 'http' ? $path['package'] . '::' : '') . $path['controller'] . '.' . $path['view'];
+	}
+
+	/**
+	 * Setup page title
+	 *
+	 */
+	protected function setupTitle($method, $class)
+	{
+		$class = explode('\\', $class);
+		$resource = ucwords( str_replace('Controller', '', array_pop($class)) );
+
+		$this->layout->title = implode(' - ', ['CMS', $resource, $method]);
 	}
 
 	/**

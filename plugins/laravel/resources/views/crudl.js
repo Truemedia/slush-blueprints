@@ -18,6 +18,7 @@ var view =
     counter: 0,
     traditional_logging: true,
     base_files_copied: false,
+    layout_name: 'classic',
 
     // Different attributes for input type (for automatic browser UIs)
     input_types: [
@@ -137,7 +138,7 @@ var view =
         {
             view.base_files_copied = true;
             var filename = 'template.php',
-                relative_path = path.join('resources', 'views', 'layouts', 'basic');
+                relative_path = path.join('resources', 'views', 'layouts', view.layout_name);
 
             fs.copy(path.join(cwd, 'templates', relative_path, filename), path.join('.', relative_path, filename), function (error)
             {
@@ -164,6 +165,7 @@ var view =
                if (error) throw error;
 
                var template_data = {
+                   "viewFolder": changeCase.lowerCase(context_name),
                    "contextName": context_name,
                    "parentContextName": parent_context_name,
                    "formFields": form_fields,

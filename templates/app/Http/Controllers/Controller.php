@@ -12,7 +12,7 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
     /**
      * The layout that should be used for standard HTML responses.
 	 */
-	protected $layout = 'layouts.basic.template';
+	protected $layout = 'layouts.<%= layoutName %>.template';
 
     /**
      * Display a listing of the resource.

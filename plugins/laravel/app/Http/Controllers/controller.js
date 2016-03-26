@@ -16,6 +16,7 @@ var controller =
     counter: 0,
     traditional_logging: true,
     base_files_copied: false,
+    layout_name: 'classic',
 
   /**
    * Create a controller based on passed parameters
@@ -30,6 +31,7 @@ var controller =
            var filename = controller_name + '.php';
 
            var template_data = {
+               "layoutName": controller.layout_name,
                "controllerName": controller_name,
                "parentControllerName": parent_controller_name,
            };
