@@ -1,8 +1,14 @@
 <?php
-namespace Anysite\Contact\Controllers;
-use App\Http\Controllers\Controller;
+namespace App\Http\Controllers;
 
-class BaseController extends Controller {
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Routing\Controller as Controller;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
+class BaseController extends Controller
+{
+	use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
 	/**
 	 * Wrap calls to automatically return content
@@ -12,7 +18,7 @@ class BaseController extends Controller {
         $this->setupLayout();
         $this->setupViewPath($method, __NAMESPACE__, get_class($this));
 
-        $response = call_user_func_array(array($this, $method), $parameters);
+        $response = call_user_func_array([$this, $method], $parameters);
 
         if (is_null($response) && !is_null($this->layout))
         {
@@ -53,7 +59,7 @@ class BaseController extends Controller {
 			return strtolower($string);
 		}, compact('package', 'controller', 'view'));
 
-		$this->view = $path['package'] . '::' . $path['controller'] . '.' . $path['view'];
+		$this->view = ($path['package'] != 'http' ? $path['package'] . '::' : '') . $path['controller'] . '.' . $path['view'];
 	}
 
 	/**
@@ -65,12 +71,6 @@ class BaseController extends Controller {
 	 */
 	protected function setContent($data, $settings = array())
 	{
-		// Debugging
-		if (!empty($settings) && array_key_exists('debug', $settings))
-		{
-			dd( compact('data', 'view') );
-		}
-
 		// Handle request
 		switch (\Request::format())
 		{

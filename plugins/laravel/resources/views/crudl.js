@@ -153,7 +153,7 @@ var view =
      */
     create: function(cwd, context_name, parent_context_name, form_fields)
     {
-        var view_files = ['_form', '_view', 'create', 'destroy', 'edit', 'list'];
+        var view_files = ['_form', '_view', '_list', 'create', 'destroy', 'edit', 'index'];
 
        // Open view template file
        view_files.forEach( function(view_file)
