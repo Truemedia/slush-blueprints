@@ -190,7 +190,8 @@ var schema =
         }
         if (make_controller)
         {
-            var controller_name = changeCase.pascalCase(table_name) + 'Controller';
+            var controller_name = changeCase.pascalCase(table_name) + 'Controller',
+                model_name = changeCase.pascalCase(table_name);
 
             if (parent_table_name != '')
             {
@@ -201,7 +202,7 @@ var schema =
                 parent_controller_name = 'BaseController';
             }
 
-            schema.make_controller(controller_name, parent_controller_name);
+            schema.make_controller(controller_name, parent_controller_name, model_name);
         }
         if (make_views)
         {
@@ -249,10 +250,10 @@ var schema =
     },
 
     /* Write controller */
-    make_controller: function(controller_name, parent_controller_name)
+    make_controller: function(controller_name, parent_controller_name, model_name)
     {
         controller.copy_base_files(schema.cwd);
-        controller.create(schema.cwd, controller_name, parent_controller_name);
+        controller.create(schema.cwd, controller_name, parent_controller_name, model_name);
     },
 
     /* Write routes */

@@ -1,4 +1,5 @@
-<form class="form-horizontal" action="/" method="POST">
+<form class="form-horizontal" action="/<%= viewFolder %>" method="POST">
+    <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
     <fieldset>
         <h2><%= contextName %></h2>
         <% _.each(formFields, function(field) { %>

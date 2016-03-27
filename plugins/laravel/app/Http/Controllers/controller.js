@@ -21,7 +21,7 @@ var controller =
   /**
    * Create a controller based on passed parameters
    */
-   create: function(cwd, controller_name, parent_controller_name)
+   create: function(cwd, controller_name, parent_controller_name, model_name)
    {
        // Open model template file
        fq.readFile(cwd + '/templates/app/Http/Controllers/Controller.php', {encoding: 'utf8'}, function (error, file_contents)
@@ -34,6 +34,7 @@ var controller =
                "layoutName": controller.layout_name,
                "controllerName": controller_name,
                "parentControllerName": parent_controller_name,
+               "modelName": model_name
            };
 
            var tpl = _.template(file_contents);

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
+use App\<%= modelName %>;
+
 class <%= controllerName %> extends <%= parentControllerName != '' ? parentControllerName : 'Controller' %>
 {
     /**
@@ -21,8 +23,8 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
      */
     public function index()
     {
-        $data = ['hello' => 'world'];
-        $this->setContent($data);
+		$entries = <%= modelName %>::all();
+        $this->setContent( compact('entries') );
     }
 
     /**
@@ -44,8 +46,30 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
      */
     public function store(Request $request)
     {
-        $data = ['hello' => 'world'];
-        $this->setContent($data);
+		$valid = true;
+
+		if ($valid)
+		{
+			$instance = new <%= modelName %>();
+			$saved = $instance->fill( $request->only($instance->fillable) )
+				   			->save();
+
+			if ($saved)
+			{
+				$status = 'Saved successfully!';
+			}
+			else
+			{
+				$status = 'Failed to save (unknown error occured)';
+			}
+		}
+		else
+		{
+			$status = 'Validation failed';
+		}
+
+		$request->session()->flash('status', $status);
+		return redirect()->action('<%= controllerName %>@index');
     }
 
     /**
