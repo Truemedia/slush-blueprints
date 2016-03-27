@@ -140,7 +140,7 @@ var view =
             var filename = 'template.php',
                 relative_path = path.join('resources', 'views', 'layouts', view.layout_name);
 
-            fs.copy(path.join(cwd, 'templates', relative_path, filename), path.join('.', relative_path, filename), function (error)
+            fs.copy(path.join(cwd, 'templates', relative_path), path.join('.', relative_path), function (error)
             {
                 if (error) throw error;
                 var msg = 'Base view file/s copied successfully';
