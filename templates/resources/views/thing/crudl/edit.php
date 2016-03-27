@@ -6,6 +6,6 @@
         </div>
     </div>
     <div class="col-md-12">
-        <?php echo view('<%= viewFolder %>._form', ['entry' => null]); ?>
+        <?php echo view('<%= viewFolder %>._form', compact('entry')); ?>
     </div>
 </div>

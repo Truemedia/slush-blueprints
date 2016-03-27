@@ -92,8 +92,8 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
      */
     public function edit($id)
     {
-        $data = ['hello' => 'world'];
-        $this->setContent($data);
+        $entry = <%= modelName %>::find($id);
+        $this->setContent( compact('entry') );
     }
 
     /**
@@ -105,8 +105,30 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
      */
     public function update(Request $request, $id)
     {
-        $data = ['hello' => 'world'];
-        $this->setContent($data);
+        $entry = <%= modelName %>::find($id);
+
+		$valid = true;
+		if ($valid)
+		{
+			$updated = $entry->fill( $request->only($entry->fillable) )
+							 ->save();
+
+			if ($updated)
+			{
+				$status = 'Update successfully!';
+			}
+			else
+			{
+				$status = 'Failed to update (unknown error occured)';
+			}
+		}
+		else
+		{
+			$status = 'Validation failed';
+		}
+
+		$request->session()->flash('status', $status);
+		return redirect()->action('<%= controllerName %>@index');
     }
 
     /**
