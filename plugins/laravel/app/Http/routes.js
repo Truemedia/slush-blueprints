@@ -1,7 +1,8 @@
 var _ = require('underscore'),
     changeCase = require('change-case'),
-    pluralize = require('pluralize'),
     gutil = require('gulp-util'),
+    jsonfile = require('jsonfile'),
+    pluralize = require('pluralize'),
     FileQueue = require('filequeue');
 
 // Queue
@@ -12,6 +13,17 @@ var fq = new FileQueue(256);
 var routes =
 {
     traditional_logging: true,
+    base_files_copied: false,
+
+    /* Copy base files across */
+    copy_base_files: function(list_of_things)
+    {
+        if (!routes.base_files_copied)
+        {
+            routes.base_files_copied = true;
+            routes.write_list_to_json(list_of_things);
+        }
+    },
 
   /**
    * Create a routes file based on passed parameters
@@ -61,6 +73,22 @@ var routes =
            var msg = 'Routes file ' + filename + ' created!';
            gutil.log( gutil.colors.green(msg) );
        }
+   },
+
+   /* Write list of things to JSON file (used for several purposes) */
+   write_list_to_json: function(list_of_things)
+   {
+       jsonfile.writeFile('regeneration.json', list_of_things, function(error)
+       {
+           if (error != null)
+           {
+               throw new Error(error);
+           }
+           else
+           {
+               gutil.log( gutil.colors.green('Saved JSON file containing things') );
+           }
+       })
    }
 };
 

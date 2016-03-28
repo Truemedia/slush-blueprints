@@ -18,6 +18,7 @@ class BaseController extends Controller
         $this->setupLayout();
 
 		$class_name = get_class($this);
+		$this->setupInfo($method, $class_name);
 		$this->setupTitle($method, $class_name);
         $this->setupViewPath($method, __NAMESPACE__, $class_name);
 
@@ -55,10 +56,9 @@ class BaseController extends Controller
 	protected function setupViewPath($method, $namespace, $class)
 	{
 		$namespace = explode('\\', $namespace);
-		$class = explode('\\', $class);
 
 		$package = $namespace[1];
-		$controller = str_replace('Controller', '', array_pop($class));
+		$controller = str_replace('Controller', '', class_basename($class));
 		$view = $method;
 
 		$path = array_map(function($string)
@@ -75,10 +75,21 @@ class BaseController extends Controller
 	 */
 	protected function setupTitle($method, $class)
 	{
-		$class = explode('\\', $class);
-		$resource = ucwords( str_replace('Controller', '', array_pop($class)) );
-
+		$resource = ucwords( str_replace('Controller', '', class_basename($class)) );
 		$this->layout->title = implode(' - ', ['CMS', $resource, $method]);
+	}
+
+	/**
+	 * Setup info
+	 *
+	 */
+	protected function setupInfo($method, $class)
+	{
+		$resource = ucwords( str_replace('Controller', '', class_basename($class)) );
+		
+		$this->layout->things = json_decode( file_get_contents( base_path('regeneration.json') ) );
+		$this->layout->thing = $resource;
+		$this->layout->thing_path = snake_case($resource);
 	}
 
 	/**

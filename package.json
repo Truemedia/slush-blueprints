@@ -66,6 +66,7 @@
     "slushgenerator"
   ],
   "devDependencies": {
-    "fs-extra": "^0.26.7"
+    "fs-extra": "^0.26.7",
+    "jsonfile": "^2.2.3"
   }
 }

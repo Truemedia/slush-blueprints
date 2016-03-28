@@ -259,6 +259,7 @@ var schema =
     /* Write routes */
     make_routes: function(resources)
     {
+        routes.copy_base_files(schema.list_of_things);
         routes.create(schema.cwd, resources);
     },
 
