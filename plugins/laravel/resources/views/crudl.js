@@ -166,6 +166,7 @@ var view =
 
                var template_data = {
                    "viewFolder": changeCase.lowerCase(context_name),
+                   "routeIndex": changeCase.snakeCase(context_name),
                    "contextName": context_name,
                    "parentContextName": parent_context_name,
                    "formFields": form_fields,

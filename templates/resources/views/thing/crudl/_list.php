@@ -17,8 +17,8 @@
                     <?php } ?>
                 <% }); %>
                     <td>
-                        <a href="/<%= viewFolder %>/<?php echo $entry['id']; ?>/edit" class="btn btn-warning">Edit</a>
-                        <a href="/<%= viewFolder %>/<?php echo $entry['id']; ?>" class="btn btn-danger">Delete</a>
+                        <a href="/<%= routeIndex %>/<?php echo $entry['id']; ?>/edit" class="btn btn-warning">Edit</a>
+                        <a href="/<%= routeIndex %>/<?php echo $entry['id']; ?>" class="btn btn-danger">Delete</a>
                     </td>
                 </tr>
             <?php } ?>

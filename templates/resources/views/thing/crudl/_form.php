@@ -1,4 +1,4 @@
-<form class="form-horizontal" action="/<%= viewFolder %><?php echo (isset($entry['id']) ? ('/' . $entry['id']) : ''); ?>" method="POST">
+<form class="form-horizontal" action="/<%= routeIndex %><?php echo (isset($entry['id']) ? ('/' . $entry['id']) : ''); ?>" method="POST">
     <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>" />
     <input type="hidden" name="_method" value="<?php echo (isset($entry) ? 'PUT' : 'POST'); ?>" />
     <fieldset>
