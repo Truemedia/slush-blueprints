@@ -7,12 +7,20 @@
         <div class="form-group">
             <label for="<%= field.name %>"><%= field.label %></label>
             <div class="controls">
-                <% if (_.indexOf(inputTypes, field.type)) { %>
+                <% if (_.indexOf(inputTypes, field.type) > -1) { %>
                 <input name="<%= field.name %>"
                        type="<%= field.type %>"
                        placeholder="Enter <%= field.label %>"
                        class="form-control"
                        value="<?php echo (isset($entry['<%= field.name %>']) ? $entry['<%= field.name %>'] : ''); ?>" />
+                <% } else if (_.indexOf(formElements, field.type)) { %>
+                    <% if (field.type == 'select') { %>
+                        <select name="<%= field.name %>"
+                                placeholder="Enter <%= field.label %>"
+                                class="form-control">
+                            <option value="">Choose an option</option>
+                        </select>
+                    <% } %>
                 <% } else { %>
                 Unexpected UI (<%= field.name %> = <%= field.type %>)
                 <% } %>

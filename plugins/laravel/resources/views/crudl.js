@@ -22,7 +22,17 @@ var view =
 
     // Different attributes for input type (for automatic browser UIs)
     input_types: [
-        'email', 'password', 'search', 'text', 'url', 'tel', 'number', 'range', 'date', 'month', 'week', 'time', 'datetime', 'datetime-local', 'color'
+        'checkbox', 'color', 'date', 'datetime', 'datetime-local', 'email', 'month', 'number', 'password', 'radio', 'range', 'search', 'tel', 'text', 'time', 'url', 'week'
+    ],
+
+    // Input attributes which can be mapped directly to native datatypes (if not named in an identical manner)
+    native_mappings: {
+        'boolean': 'checkbox',
+    },
+
+    // HTML form elements supported by this plugin
+    form_elements: [
+        'input', 'select', 'select-group'
     ],
 
     /**
@@ -58,7 +68,6 @@ var view =
                 var data_type = changeCase[transformation]( fields[field_name] ),
                     field_name = changeCase.snakeCase(field_name);
 
-
                 // Field that uses natural language, abstract to language tables
                 if (data_type == 'text')
                 {
@@ -68,26 +77,21 @@ var view =
                 }
                 else
                 {
+                    if (show_field_handling)
+                    {
+                        var msg = 'Got a direct matching data type for `' + field_name + '` with `' + data_type + '`, adding to valid fields';
+                        gutil.log( gutil.colors.magenta(msg) );
+                    }
+
                     valid_fields.push({
                         name: field_name, type: data_type, label: changeCase.titleCase(field_name)
                     });
-
-                    if (show_field_handling)
-                    {
-                        var msg = 'Got a matching data type for `' + field_name + '` with `' + data_type + '`, adding to valid fields';
-                        gutil.log( gutil.colors.magenta(msg) );
-                    }
                 }
             }
             else
             {
-                if (show_field_handling)
-                {
-                    var msg = 'No direct data type found, will now try to match other criteria to determine data type of `' + data_type + '`';
-                    gutil.log( gutil.colors.yellow(msg) );
-                }
-
-                var estimated_class = changeCase.upperCaseFirst( changeCase.sentenceCase(fields[field_name]) );
+                var estimated_class = changeCase.upperCaseFirst( changeCase.sentenceCase(fields[field_name]) ),
+                    native_mappings = Object.keys(view.native_mappings);
 
                 if (list_of_things.indexOf(estimated_class) > -1)
                 {
@@ -108,6 +112,21 @@ var view =
                             name: field_name, type: 'select', label: changeCase.titleCase(field_name)
                         });
                     }
+                }
+                // Got a native mapping, assign and use it
+                else if (native_mappings.indexOf(changeCase.lowerCase(fields[field_name])) > -1)
+                {
+                    var data_type = view.native_mappings[changeCase.lowerCase(fields[field_name])];
+
+                    if (show_field_handling)
+                    {
+                        var msg = 'Got an indirect mapping of data type for `' + field_name + '` with `' + data_type + '`, adding to valid fields';
+                        gutil.log( gutil.colors.magenta(msg) );
+                    }
+
+                    valid_fields.push({
+                        name: field_name, type: data_type, label: changeCase.titleCase(field_name)
+                    });
                 }
                 else
                 {
@@ -170,6 +189,7 @@ var view =
                    "contextName": context_name,
                    "parentContextName": parent_context_name,
                    "formFields": form_fields,
+                   "formElements": view.form_elements,
                    "inputTypes": view.input_types
                };
 
