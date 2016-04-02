@@ -21,7 +21,7 @@ class <%= modelName %> extends <%= parentModelName != '' ? parentModelName : 'Mo
      * @var array
      */
     public $fillable = [
-        <% _.each(fieldNames, function(val) { %>'<%= val %>',
+        <% _.each(fieldNames, function(fieldName) { %>'<%= fieldName %>',
         <% }); %>
     ];
 
@@ -41,4 +41,14 @@ class <%= modelName %> extends <%= parentModelName != '' ? parentModelName : 'Mo
         return $this->belongsTo('App\<%= parentModelName %>');
     }
     <% } %>
+
+    /**
+     * Get child classes
+     */
+     <% _.each(things, function(thing) { %>
+    public function <%= thing.propertyFunctionName %>()
+    {
+        return $this->hasOne('App\<%= thing.modelName %>');
+    }
+     <% }); %>
 }

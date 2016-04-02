@@ -14,6 +14,39 @@ var model =
     counter: 0,
     traditional_logging: true,
 
+    /**
+     * Get field name excluding provided suffix
+     */
+    get_field_name_without_suffix: function(field_name, suffix)
+    {
+        return field_name.replace(suffix, '');
+    },
+
+    /**
+     * Determine class names of models and property functions included as fields
+     */
+    get_things: function(field_names)
+    {
+        var things = [],
+            identify_suffix = '_id';
+
+        for (index in field_names)
+        {
+            if (field_names[index].indexOf(identify_suffix) > -1)
+            {
+                var property_function_name = model.get_field_name_without_suffix(field_names[index], '_id'),
+                    model_name = changeCase.pascalCase(property_function_name);
+
+                things.push({
+                    "propertyFunctionName": property_function_name,
+                    "modelName": model_name
+                });
+            }
+        }
+
+        return things;
+    },
+
   /**
    * Create a migration based on passed parameters
    */
@@ -24,14 +57,16 @@ var model =
        {
            if (error) throw error;
 
-           var filename = model_name + '.php';
+           var things = model.get_things(field_names),
+               filename = model_name + '.php';
 
            var template_data = {
                "modelName": model_name,
                "parentModelName": parent_model_name,
                "tableName": pluralize( changeCase.snakeCase(model_name) ),
                "parentTableName": pluralize( changeCase.snakeCase(parent_model_name) ),
-               "fieldNames": field_names
+               "fieldNames": field_names,
+               "things": things
            };
 
            var tpl = _.template(file_contents);
