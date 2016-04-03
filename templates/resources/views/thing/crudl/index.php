@@ -7,6 +7,6 @@
         </div>
     </div>
     <div class="col-md-12">
-        <?php echo view('<%= viewFolder %>._list', compact('entries')); ?>
+        <?php echo view('<%= viewFolder %>._list', compact('entries'))->render(); ?>
     </div>
 </div>

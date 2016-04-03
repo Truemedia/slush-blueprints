@@ -36,19 +36,13 @@ class <%= modelName %> extends <%= parentModelName != '' ? parentModelName : 'Mo
     /**
      * Get parent class.
      */
-    public function <%= parentTableName %>()
-    {
-        return $this->belongsTo('App\<%= parentModelName %>');
-    }
+    public function <%= parentTableName %>() { return $this->belongsTo('App\<%= parentModelName %>'); }
     <% } %>
 
     /**
      * Get child classes
      */
      <% _.each(things, function(thing) { %>
-    public function <%= thing.propertyFunctionName %>()
-    {
-        return $this->hasOne('App\<%= thing.modelName %>');
-    }
+    public function <%= thing.propertyFunctionName %>() { return $this->hasOne('App\<%= thing.modelName %>'); }
      <% }); %>
 }

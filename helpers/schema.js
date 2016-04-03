@@ -39,6 +39,9 @@ var schema =
         traditional_logging: false, // Logging via commandline text output (no fancy UI)
     },
 
+    // Datatypes native to schemaorg
+    native_data_types: ['BooleanDate', 'DateTime', 'Number', 'Text', 'Time'],
+
     /* Convert a KVP match to a JSONpatch */
     convert_match_to_patch: function(thing_match, parent_match, thing)
     {
@@ -133,7 +136,15 @@ var schema =
 
                 // Fit into place according to hierachy
                 json_patch = schema.convert_match_to_patch(thing_match, parent_match, thing);
-                schema.organized_things = jsonpatch.apply_patch(schema.organized_things, json_patch);
+
+                try
+                {
+                    schema.organized_things = jsonpatch.apply_patch(schema.organized_things, json_patch);
+                }
+                catch (PatchApplyError)
+                {
+                    throw new Error(PatchApplyError);
+                }
             }
             else
             {
@@ -193,7 +204,7 @@ var schema =
             var controller_name = changeCase.pascalCase(table_name) + 'Controller',
                 model_name = changeCase.pascalCase(table_name);
 
-            if (parent_table_name != '')
+            if (parent_table_name != '' && schema.native_data_types.indexOf( changeCase.ucFirst(parent_table_name) ) == -1)
             {
                 parent_controller_name = changeCase.pascalCase(parent_table_name) + 'Controller';
             }
@@ -246,6 +257,11 @@ var schema =
     /* Write model */
     make_model: function(model_name, parent_model_name, field_names)
     {
+        // Avoid native datatype being declared as models
+        if (schema.native_data_types.indexOf(parent_model_name) > -1)
+        {
+            parent_model_name = 'Model';
+        }
         model.create(schema.cwd, model_name, parent_model_name, field_names);
     },
 

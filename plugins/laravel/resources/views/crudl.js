@@ -36,6 +36,21 @@ var view =
     ],
 
     /**
+     * Compose form field
+     */
+    ff: function(name, type, table_name)
+    {
+        var form_field = {
+            "name": name,
+            "type": type,
+            "label": changeCase.titleCase(name),
+        };
+        form_field.table_name = (table_name != undefined) ? table_name : null;
+
+        return form_field;
+    },
+
+    /**
      * Match schema primative datatypes to desired HTML form field datatypes for selected data source
      */
     form_field_handling: function(context_name, parent_context_name, fields, show_field_handling, list_of_things)
@@ -71,9 +86,7 @@ var view =
                 // Field that uses natural language, abstract to language tables
                 if (data_type == 'text')
                 {
-                    natural_language_fields.push({
-                        name: field_name, type: data_type, label: changeCase.titleCase(field_name)
-                    });
+                    natural_language_fields.push( view.ff(field_name, data_type) );
                 }
                 else
                 {
@@ -83,9 +96,7 @@ var view =
                         gutil.log( gutil.colors.magenta(msg) );
                     }
 
-                    valid_fields.push({
-                        name: field_name, type: data_type, label: changeCase.titleCase(field_name)
-                    });
+                    valid_fields.push( view.ff(field_name, data_type) );
                 }
             }
             else
@@ -100,17 +111,14 @@ var view =
                     if (pluralize(field_name) == field_name)
                     {
                         var field_name = changeCase.snakeCase(fields[field_name]);
-                        valid_fields.push({
-                            name: field_name, type: 'select-group', label: changeCase.titleCase(field_name)
-                        });
+                        valid_fields.push( view.ff(field_name, 'select-group') );
                     }
                     else
                     {
                         // Got a reference to another thing, make a dropdown
-                        var field_name = changeCase.snakeCase(estimated_class) + '_id';
-                        valid_fields.push({
-                            name: field_name, type: 'select', label: changeCase.titleCase(field_name)
-                        });
+                        var table_name = pluralize( changeCase.snakeCase(estimated_class) ),
+                            field_name = changeCase.snakeCase(estimated_class) + '_id';
+                        valid_fields.push( view.ff(field_name, 'select', table_name) );
                     }
                 }
                 // Got a native mapping, assign and use it
@@ -124,16 +132,12 @@ var view =
                         gutil.log( gutil.colors.magenta(msg) );
                     }
 
-                    valid_fields.push({
-                        name: field_name, type: data_type, label: changeCase.titleCase(field_name)
-                    });
+                    valid_fields.push( view.ff(field_name, data_type) );
                 }
                 else
                 {
                     // Invalid field
-                    invalid_fields.push({
-                        name: field_name, type: data_type, label: changeCase.titleCase(field_name)
-                    });
+                    invalid_fields.push( view.ff(field_name, data_type) );
                 }
             }
         }

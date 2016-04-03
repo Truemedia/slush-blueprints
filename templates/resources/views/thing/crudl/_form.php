@@ -15,11 +15,22 @@
                        value="<?php echo (isset($entry['<%= field.name %>']) ? $entry['<%= field.name %>'] : ''); ?>" />
                 <% } else if (_.indexOf(formElements, field.type)) { %>
                     <% if (field.type == 'select') { %>
-                        <select name="<%= field.name %>"
-                                placeholder="Enter <%= field.label %>"
-                                class="form-control">
-                            <option value="">Choose an option</option>
-                        </select>
+                        <?php if (
+                            isset($data_options['<%= field.table_name %>'])
+                            && $data_options['<%= field.table_name %>']->count() > 0
+                        ) { ?>
+                            <select name="<%= field.name %>"
+                                    placeholder="Enter <%= field.label %>"
+                                    class="form-control">
+                                <option value="">Choose an option</option>
+                                <?php foreach ($data_options['<%= field.table_name %>']->all() as $option) { ?>
+                                    <option value="<?php echo $option; ?>"><?php echo $option; ?></option>
+                                <?php } ?>
+                            </select>
+                            <a class="btn btn-success" href="/<%= field.table_name %>/create">Add option</a>
+                        <?php } else { ?>
+                            No options, <a href="/<%= field.table_name %>/create">why not add some?</a>
+                        <?php } ?>
                     <% } %>
                 <% } else { %>
                 Unexpected UI (<%= field.name %> = <%= field.type %>)

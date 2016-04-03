@@ -24,15 +24,15 @@
           </ul>
         </li>
       </ul>
+      <!--
       <form class="navbar-form navbar-left" role="search">
         <div class="form-group">
-          <!--
             TODO: Implement search box
             <input type="text" class="form-control" placeholder="Search">
-        -->
         </div>
         <button type="submit" class="btn btn-default">Submit</button>
       </form>
+      -->
       <ul class="nav navbar-nav navbar-right">
         <li><a href="https://github.com/Truemedia/slush-blueprints">Generated using slush blueprints</a></li>
         <li class="dropdown">

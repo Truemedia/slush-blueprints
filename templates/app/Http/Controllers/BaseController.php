@@ -86,7 +86,7 @@ class BaseController extends Controller
 	protected function setupInfo($method, $class)
 	{
 		$resource = ucwords( str_replace('Controller', '', class_basename($class)) );
-		
+
 		$this->layout->things = json_decode( file_get_contents( base_path('regeneration.json') ) );
 		$this->layout->thing = $resource;
 		$this->layout->thing_path = snake_case($resource);

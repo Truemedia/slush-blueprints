@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
+use ReflectionClass;
+use ReflectionMethod;
+
 use App\<%= modelName %>;
 
 class <%= controllerName %> extends <%= parentControllerName != '' ? parentControllerName : 'Controller' %>
@@ -15,6 +18,28 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
      * The layout that should be used for standard HTML responses.
 	 */
 	protected $layout = 'layouts.<%= layoutName %>.template';
+
+	/**
+	 * Get associated data options
+	 */
+	private function dataOptions()
+	{
+		$instance = new <%= modelName %>;
+		$reflector = new ReflectionClass('App\<%= modelName %>');
+		$data_options = [];
+
+		foreach ($reflector->getMethods(ReflectionMethod::IS_PUBLIC) as $method)
+		{
+			if (in_array($method->name . '_id', $instance->getFillable()) && $method->class == 'App\<%= modelName %>')
+			{
+				// Got a relationship, get the list of options
+				$class = 'App\\' . ucfirst( camel_case($method->name) );
+				$data_options[str_plural($method->name)] = $class::lists('id');
+			}
+    	}
+
+		return $data_options;
+	}
 
     /**
      * Display a listing of the resource.
@@ -34,8 +59,9 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
      */
     public function create()
     {
-        $data = ['hello' => 'world'];
-        $this->setContent($data);
+        $data_options = static::dataOptions();
+
+        $this->setContent( compact('data_options') );
     }
 
     /**
@@ -93,7 +119,9 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
     public function edit($id)
     {
         $entry = <%= modelName %>::find($id);
-        $this->setContent( compact('entry') );
+		$data_options = static::dataOptions();
+
+        $this->setContent( compact('entry', 'data_options') );
     }
 
     /**
