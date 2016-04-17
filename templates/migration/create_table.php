@@ -12,12 +12,22 @@ class Create<%= packageNamePascalCase %>Table extends Migration {
 	 */
 	public function up()
 	{
-		// Create the <%= table_name %> table
+		DB::statement('SET FOREIGN_KEY_CHECKS=0');
+
+		<% if (_.isArray(db_fields) && _.size(db_fields) > 0) { %>// Create the <%= table_name %> table
 		Schema::create('<%= table_name %>', function($table)
 		{
-			<% _.each(fields, function(val, key) { %>$table-><%= val %>('<%= key %>');
-			<% }); %>
-		});
+			<% _.each(db_fields, function(db_field) {
+				if (
+					(!_.isUndefined(db_field.name) && !_.isUndefined(db_field.type) && !_.isUndefined(db_field.comment)) &&
+					(db_field.name != null && db_field.type != null && db_field.comment != null) &&
+					(db_field.name != '' && db_field.type != '' && db_field.comment != '')
+				) { %>
+				<% if (db_field.parent_table != null) { %>$table->foreign('<%= db_field.name %>')->references('id')->on('<%= db_field.parent_table %>')->comment('<%= db_field.comment %>');
+				<% } else { %>$table-><%= db_field.type %>('<%= db_field.name %>')->comment('<%= db_field.comment %>');<% } %>
+			<% }
+			}); %>
+		});<% } %>
 	}
 
 	/**

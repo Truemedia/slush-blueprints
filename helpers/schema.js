@@ -158,8 +158,11 @@ var schema =
     /* Make a schema */
     make_schema: function(thing)
     {
-        var make_controller = make_model = make_views = true,
-            make_migrations = make_migration = false;
+        var make_controller = false,
+            make_migration = true,
+            make_migrations = true,
+            make_model = false,
+            make_views = false;
 
         var table_name = changeCase.snakeCase( thing['class_name'] ),
             parent_table_name = changeCase.snakeCase( thing['sub_class'] );
@@ -176,75 +179,57 @@ var schema =
             parent_class = thing['sub_class'],
             show_field_handling = false;
 
-        var database_field_handling = migration.database_field_handling(table_name, parent_table_name, properties, show_field_handling, make_migrations, schema.list_of_things),
-            table_fields = database_field_handling['valid_fields'],
-            form_field_handling = view.form_field_handling(table_name, parent_table_name, properties, show_field_handling, schema.list_of_things),
-            form_fields = form_field_handling['valid_fields'];
-
-        var mandatory_fields = {'id': 'bigIncrements'};
-        if (parent_class != null)
+        // Only create files when some fields exist
+        if (Object.keys(properties).length)
         {
-          var parent_column = changeCase.snakeCase(parent_class) + '_id';
-          mandatory_fields[parent_column] = 'bigInteger';
-        }
+            var database_field_handling = migration.database_field_handling(schema.cwd, table_name, parent_table_name, properties, show_field_handling, make_migrations, schema.list_of_things),
+                table_fields = database_field_handling['valid_fields'],
+                form_field_handling = view.form_field_handling(table_name, parent_table_name, properties, show_field_handling, schema.list_of_things),
+                form_fields = form_field_handling['valid_fields'];
 
-        table_fields = _.extend(mandatory_fields, table_fields);
-
-        // Go forth and make things
-        if (make_migration)
-        {
-            schema.make_migration(pluralize(table_name), table_fields);
-        }
-        if (make_model)
-        {
-            schema.make_model(changeCase.pascalCase(table_name), changeCase.pascalCase(parent_table_name), Object.keys(table_fields));
-        }
-        if (make_controller)
-        {
-            var controller_name = changeCase.pascalCase(table_name) + 'Controller',
-                model_name = changeCase.pascalCase(table_name);
-
-            if (parent_table_name != '' && schema.native_data_types.indexOf( changeCase.ucFirst(parent_table_name) ) == -1)
+            var mandatory_fields = [];
+            mandatory_fields.push( migration.dbf('id', 'bigIncrements', 'ID') );
+            if (parent_class != null)
             {
-                parent_controller_name = changeCase.pascalCase(parent_table_name) + 'Controller';
-            }
-            else
-            {
-                parent_controller_name = 'BaseController';
+              var parent_column = migration.dbf(changeCase.snakeCase(parent_class) + '_id', 'bigInteger', parent_class + ' ID');
+              mandatory_fields.push(parent_column);
             }
 
-            schema.make_controller(controller_name, parent_controller_name, model_name);
+            table_fields = mandatory_fields.concat(table_fields);
+
+            // Go forth and make things
+            if (make_migration)
+            {
+                schema.make_migration(pluralize(table_name), table_fields);
+            }
+            if (make_model)
+            {
+                schema.make_model(changeCase.pascalCase(table_name), changeCase.pascalCase(parent_table_name), Object.keys(table_fields));
+            }
+            if (make_controller)
+            {
+                var controller_name = changeCase.pascalCase(table_name) + 'Controller',
+                    model_name = changeCase.pascalCase(table_name);
+
+                if (parent_table_name != '' && schema.native_data_types.indexOf( changeCase.ucFirst(parent_table_name) ) == -1)
+                {
+                    parent_controller_name = changeCase.pascalCase(parent_table_name) + 'Controller';
+                }
+                else
+                {
+                    parent_controller_name = 'BaseController';
+                }
+
+                schema.make_controller(controller_name, parent_controller_name, model_name);
+            }
+            if (make_views)
+            {
+                schema.make_views(changeCase.pascalCase(table_name), changeCase.pascalCase(parent_table_name), form_fields);
+            }
         }
-        if (make_views)
+        else
         {
-            schema.make_views(changeCase.pascalCase(table_name), changeCase.pascalCase(parent_table_name), form_fields);
-        }
-    },
-
-    /* Make intermediates for provided table names (if possible) */
-    make_intermediate: function(parent_table_name, child_table_name, attribute_name, relationship)
-    {
-        var table_name = parent_table_name + '_' + attribute_name;
-        var parent_column = parent_table_name + '_id',
-            child_column = child_table_name + '_id',
-            data_type = 'integer';
-
-        var fields = {};
-        fields[child_column] = fields[parent_column] = data_type;
-
-        schema.make_migration(table_name, fields);
-    },
-
-    /* Make language tables for provided table name (if possible) */
-    make_language_tables: function(locales, table_name, language_fields)
-    {
-        for (locale in locales)
-        {
-            var language_table_name = table_name + '_' + locales[locale],
-                mandatory_fields = {'parent_id': 'bigIncrements'},
-                fields = _.extend(mandatory_fields, language_fields);
-
-            schema.make_migration(language_table_name, fields);
+            gutil.log( gutil.colors.red(thing['class_name'] + ' has no properties, this could be an issue with the schema or the application') );
         }
     },
 

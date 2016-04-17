@@ -9,6 +9,8 @@ var _ = require('underscore'),
 // Queue
 var fq = new FileQueue(256);
 
+var mapper = require('./../../../../classes/mapper');
+
 /**
  * Laravel views plugin for slush-blueprints
  * This is using CRUDL architecture with regular PHP templating
@@ -55,6 +57,7 @@ var view =
      */
     form_field_handling: function(context_name, parent_context_name, fields, show_field_handling, list_of_things)
     {
+
         var valid_fields = [],
             invalid_fields = [],
             natural_language_fields = [];
@@ -67,15 +70,7 @@ var view =
         for (field_name in fields)
         {
             // Trial and error data type matching
-            var transformation = null;
-            for (transform in changeCase)
-            {
-                var transformed = changeCase[transform]( fields[field_name] );
-                if (view.input_types.indexOf(transformed) > -1)
-                {
-                    transformation = transform;
-                }
-            }
+            var transformation = mapper.direct_datatype_transformation_match(view.input_types, fields[field_name]);
 
             if (transformation != null)
             {
@@ -101,10 +96,10 @@ var view =
             }
             else
             {
-                var estimated_class = changeCase.upperCaseFirst( changeCase.sentenceCase(fields[field_name]) ),
+                var humanized_thing = mapper.humanized_class_transformation_match(list_of_things, fields[field_name]),
                     native_mappings = Object.keys(view.native_mappings);
 
-                if (list_of_things.indexOf(estimated_class) > -1)
+                if (humanized_thing != null)
                 {
 
                     // Plural? Use a UI with multiple field instances
@@ -116,8 +111,7 @@ var view =
                     else
                     {
                         // Got a reference to another thing, make a dropdown
-                        var table_name = pluralize( changeCase.snakeCase(estimated_class) ),
-                            field_name = changeCase.snakeCase(estimated_class) + '_id';
+                        var table_name = pluralize( changeCase.snakeCase(humanized_thing) );
                         valid_fields.push( view.ff(field_name, 'select', table_name) );
                     }
                 }
