@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class Create<%= packageNamePascalCase %>Table extends Migration {
+class Create<%= table_class_name %>Table extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,7 +12,7 @@ class Create<%= packageNamePascalCase %>Table extends Migration {
 	 */
 	public function up()
 	{
-		DB::statement('SET FOREIGN_KEY_CHECKS=0');
+		DB::statement('SET FOREIGN_KEY_CHECKS = 0');
 
 		<% if (_.isArray(db_fields) && _.size(db_fields) > 0) { %>// Create the <%= table_name %> table
 		Schema::create('<%= table_name %>', function($table)
@@ -23,11 +23,13 @@ class Create<%= packageNamePascalCase %>Table extends Migration {
 					(db_field.name != null && db_field.type != null && db_field.comment != null) &&
 					(db_field.name != '' && db_field.type != '' && db_field.comment != '')
 				) { %>
-				<% if (db_field.parent_table != null) { %>$table->foreign('<%= db_field.name %>')->references('id')->on('<%= db_field.parent_table %>')->comment('<%= db_field.comment %>');
+				<% if (db_field.parent_table != null) { %>$table-><%= db_field.type %>('<%= db_field.name %>')->unsigned()->comment('<%= db_field.comment %>');
 				<% } else { %>$table-><%= db_field.type %>('<%= db_field.name %>')->comment('<%= db_field.comment %>');<% } %>
 			<% }
 			}); %>
 		});<% } %>
+
+		DB::statement('SET FOREIGN_KEY_CHECKS = 1');
 	}
 
 	/**
@@ -37,8 +39,12 @@ class Create<%= packageNamePascalCase %>Table extends Migration {
 	 */
 	public function down()
 	{
+		DB::statement('SET FOREIGN_KEY_CHECKS = 0');
+
 		// Drop the <%= table_name %> table
 		Schema::dropIfExists('<%= table_name %>');
+
+		DB::statement('SET FOREIGN_KEY_CHECKS = 1');
 	}
 
 }

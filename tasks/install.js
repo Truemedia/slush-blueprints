@@ -73,7 +73,6 @@ gulp.task('install', function(done)
                     }
                     catch (e)
                     {
-
                         // Get all the things
                         $('[typeof="rdfs:Class"]').each(function()
                         {
@@ -102,14 +101,20 @@ gulp.task('install', function(done)
                             };
 
                             var humanized_thing = changeCase.upperCaseFirst( changeCase.sentenceCase(thing.class_name) );
-                            var msg = gutil.colors.cyan('Finding things, ')
-                                + gutil.colors.green('(' + schema.unorganized_things.length + ')')
-                                + gutil.colors.yellow(' found ')
-                                + gutil.colors.magenta(humanized_thing) + '\r';
-                            gutil.log(msg);
 
-                            schema.list_of_things.push(humanized_thing);
-                            schema.unorganized_things.push(thing);
+                            // Only create if not duplicate
+                            // TODO: Merge multiple instances of same thing to avoid potential differences
+                            if (schema.list_of_things.indexOf(humanized_thing) == -1)
+                            {
+                                var msg = gutil.colors.cyan('Finding things, ')
+                                    + gutil.colors.green('(' + schema.unorganized_things.length + ')')
+                                    + gutil.colors.yellow(' found ')
+                                    + gutil.colors.magenta(humanized_thing) + '\r';
+                                gutil.log(msg);
+
+                                schema.list_of_things.push(humanized_thing);
+                                schema.unorganized_things.push(thing);
+                            }
                         });
                         schema.list_of_things.sort();
 
@@ -170,8 +175,14 @@ gulp.task('install', function(done)
                         }
                     });
 
-                    // Build routes (if required)
-                    var make_routes = true;
+                    // Build files (if requested)
+                    var make_migrations = true,
+                        make_routes = true;
+
+                    if (make_migrations)
+                    {
+                        schema.make_migrations();
+                    }
                     if (make_routes)
                     {
                         var resources = {};

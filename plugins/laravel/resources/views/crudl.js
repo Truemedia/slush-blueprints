@@ -58,9 +58,7 @@ var view =
     form_field_handling: function(context_name, parent_context_name, fields, show_field_handling, list_of_things)
     {
 
-        var valid_fields = [],
-            invalid_fields = [],
-            natural_language_fields = [];
+        var valid_fields = [], invalid_fields = [], natural_language_fields = [];
 
         if (show_field_handling == undefined)
         {
