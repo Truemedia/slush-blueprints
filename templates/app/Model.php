@@ -21,7 +21,7 @@ class <%= modelName %> extends <%= parentModelName != '' ? parentModelName : 'Mo
      * @var array
      */
     public $fillable = [
-        <% _.each(fieldNames, function(fieldName) { %>'<%= fieldName %>',
+        <% _.each(fields, function(field) { %>'<%= field.name %>',
         <% }); %>
     ];
 

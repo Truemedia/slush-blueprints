@@ -23,7 +23,7 @@ class AddForeignKeysTo<%= table_class_name %>Table extends Migration {
 					(db_field.name != null && db_field.type != null && db_field.comment != null) &&
 					(db_field.name != '' && db_field.type != '' && db_field.comment != '')
 				) { %>
-				<% if (db_field.parent_table != null) { %>$table->foreign('<%= db_field.name %>')->references('id')->on('<%= db_field.parent_table %>')->comment('<%= db_field.comment %>');<% } %>
+				<% if (db_field.parent_table != null) { %>$table->foreign('<%= db_field.name %>')->references('id')->on('<%= db_field.parent_table %>')->nullable()->comment('<%= db_field.comment %>');<% } %>
 			<% }
 			}); %>
 		});<% } %>

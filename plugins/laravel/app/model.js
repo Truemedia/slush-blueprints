@@ -25,16 +25,16 @@ var model =
     /**
      * Determine class names of models and property functions included as fields
      */
-    get_things: function(field_names)
+    get_things: function(fields)
     {
         var things = [],
             identify_suffix = '_id';
 
-        for (index in field_names)
+        for (var field of fields)
         {
-            if (field_names[index].indexOf(identify_suffix) > -1)
+            if (field.name.indexOf(identify_suffix) > -1)
             {
-                var property_function_name = model.get_field_name_without_suffix(field_names[index], '_id'),
+                var property_function_name = model.get_field_name_without_suffix(field.name, '_id'),
                     model_name = changeCase.pascalCase(property_function_name);
 
                 things.push({
@@ -50,14 +50,14 @@ var model =
   /**
    * Create a migration based on passed parameters
    */
-   create: function(cwd, model_name, parent_model_name, field_names)
+   create: function(cwd, model_name, parent_model_name, fields)
    {
        // Open model template file
        fq.readFile(cwd + '/templates/app/Model.php', {encoding: 'utf8'}, function (error, file_contents)
        {
            if (error) throw error;
 
-           var things = model.get_things(field_names),
+           var things = model.get_things(fields),
                filename = model_name + '.php';
 
            var template_data = {
@@ -65,7 +65,7 @@ var model =
                "parentModelName": parent_model_name,
                "tableName": pluralize( changeCase.snakeCase(model_name) ),
                "parentTableName": pluralize( changeCase.snakeCase(parent_model_name) ),
-               "fieldNames": field_names,
+               "fields": fields,
                "things": things
            };
 

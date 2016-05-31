@@ -59,7 +59,7 @@ var migration =
     time_step: 0, // Used to offset each migration by a second
 
     // Used to exclude tables that might have bugs in the RDFa
-    problematic_tables: ['dated_money_specification'],
+    problematic_tables: [],
 
     /**
      * Compose database field
@@ -154,7 +154,7 @@ var migration =
                         // Got a reference to another thing, make a reference column (with foreign key)
                         var parent_table_name = pluralize( changeCase.snakeCase(humanized_thing) ),
                             comment = humanized_thing + ' ID',
-                            data_type = 'BigInteger'; // All primary keys use big integer
+                            data_type = 'bigInteger'; // All primary keys use big integer
 
                         valid_fields.push( migration.dbf(field_name, data_type, comment, parent_table_name) );
 
@@ -199,8 +199,10 @@ var migration =
         var fields = [];
             table_name = parent_table_name + '_' + attribute_name;
 
-        var parent_field = migration.dbf(parent_table_name + '_id', 'BigInteger', parent_table_name + ' ID', parent_table_name);
-            child_field = migration.dbf(child_table_name + '_id', 'BigInteger', child_table_name + ' ID');
+        fields.push( migration.dbf('id', 'bigIncrements', 'Primary key') );
+
+        var parent_field = migration.dbf(parent_table_name + '_id', 'bigInteger', parent_table_name + ' ID', parent_table_name);
+            child_field = migration.dbf(child_table_name + '_id', 'bigInteger', child_table_name + ' ID');
 
         // Cache migration so that it can be built later
         fields.push(parent_field, child_field);
@@ -211,7 +213,8 @@ var migration =
     make_language_tables: function(locales, parent_table_name, language_fields)
     {
         mandatory_fields = [];
-        mandatory_fields.push( migration.dbf('parent_id', 'bigIncrements', parent_table_name + ' ID', parent_table_name) );
+        mandatory_fields.push( migration.dbf('id', 'bigIncrements', 'Primary key') );
+        mandatory_fields.push( migration.dbf('parent_id', 'bigInteger', parent_table_name + ' ID', parent_table_name) );
 
         for (locale in locales)
         {

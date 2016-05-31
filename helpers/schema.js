@@ -161,10 +161,10 @@ var schema =
     /* Make a schema */
     make_schema: function(thing)
     {
-        var make_controller = false,
+        var make_controller = true,
             make_migration = true,
-            make_model = false,
-            make_views = false;
+            make_model = true,
+            make_views = true;
 
         var table_name = changeCase.snakeCase( thing['class_name'] ),
             parent_table_name = changeCase.snakeCase( thing['sub_class'] );
@@ -206,7 +206,7 @@ var schema =
             mandatory_fields.push( migration.dbf('id', 'bigIncrements', 'ID') );
             if (parent_class != null)
             {
-              var parent_column = migration.dbf(changeCase.snakeCase(parent_class) + '_id', 'bigInteger', parent_class + ' ID');
+              var parent_column = migration.dbf(changeCase.snakeCase(parent_class) + '_id', 'bigInteger', parent_class + ' ID', pluralize( changeCase.snakeCase(parent_class) ));
               mandatory_fields.push(parent_column);
             }
 
@@ -219,7 +219,7 @@ var schema =
             }
             if (make_model)
             {
-                schema.make_model(changeCase.pascalCase(table_name), changeCase.pascalCase(parent_table_name), Object.keys(table_fields));
+                schema.make_model(changeCase.pascalCase(table_name), changeCase.pascalCase(parent_table_name), table_fields);
             }
             if (make_controller)
             {
