@@ -13,7 +13,13 @@
                 <tr>
                 <% _.each(formFields, function(field) { %>
                     <?php if (isset($entry['<%= field.name %>'])) { ?>
-                        <td><?php echo $entry['<%= field.name %>']; ?></td>
+                        <td>
+                            <% if (_.indexOf(['date', 'dateTime'], field.type) > -1) { %>
+                            <?php echo $entry['<%= field.name %>']->format('<% if (field.type == "dateTime") { %>d/m/Y H:i:s<% } else if (field.type == "date") { %>d/m/Y<% } %>'); ?>
+                            <% } else { %>
+                            <?php echo $entry['<%= field.name %>']; ?>
+                            <% } %>
+                        </td>
                     <?php } ?>
                 <% }); %>
                     <td>

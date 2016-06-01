@@ -26,6 +26,16 @@ class <%= modelName %> extends <%= parentModelName != '' ? parentModelName : 'Mo
     ];
 
     /**
+     * Date fields (can be cast using Carbon)
+     *
+     * @var array
+     */
+    protected $dates = [
+        <% _.each(fields, function(field) { %><% if (_.indexOf(['date', 'dateTime'], field.type) > -1) { %>'<%= field.name %>',<% } %>
+        <% }); %>
+    ];
+
+    /**
      * The attributes excluded from the model's JSON form.
      *
      * @var array

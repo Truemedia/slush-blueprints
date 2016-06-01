@@ -163,7 +163,7 @@ var schema =
     {
         var make_controller = (answers.components.indexOf('Controller') != -1),
             make_migration = (answers.components.indexOf('Migration') != -1),
-            make_model = (answers.components.indexOf('Controller') != -1),
+            make_model = (answers.components.indexOf('Model') != -1),
             make_views = (answers.components.indexOf('View') != -1);
 
         var table_name = changeCase.snakeCase( thing['class_name'] ),
