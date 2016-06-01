@@ -1,6 +1,5 @@
 var _ = require('underscore'),
     changeCase = require('change-case'),
-    CountryLanguage = require('country-language'),
     FileQueue = require('filequeue');
     gutil = require('gulp-util'),
     moment = require('moment'),
@@ -91,7 +90,7 @@ var migration =
     /**
      * Match schema primative datatypes to desired database datatypes for selected data source
      */
-    database_field_handling: function(cwd, table_name, parent_table_name, fields, show_field_handling, make_migrations, list_of_things)
+    database_field_handling: function(cwd, table_name, parent_table_name, fields, show_field_handling, make_migrations, list_of_things, locales)
     {
         var valid_fields = [], invalid_fields = [], natural_language_fields = [], foreign_keys = [];
 
@@ -183,7 +182,7 @@ var migration =
         // If we have any natural language fields, put them into a new language table
         if (natural_language_fields.length != 0 && make_migrations)
         {
-            migration.make_language_tables(CountryLanguage.getLocales(true), table_name, natural_language_fields);
+            migration.make_language_tables(locales, table_name, natural_language_fields);
         }
 
         return {

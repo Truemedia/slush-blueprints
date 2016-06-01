@@ -159,12 +159,12 @@ var schema =
     },
 
     /* Make a schema */
-    make_schema: function(thing)
+    make_schema: function(thing, answers)
     {
-        var make_controller = true,
-            make_migration = true,
-            make_model = true,
-            make_views = true;
+        var make_controller = (answers.components.indexOf('Controller') != -1),
+            make_migration = (answers.components.indexOf('Migration') != -1),
+            make_model = (answers.components.indexOf('Controller') != -1),
+            make_views = (answers.components.indexOf('View') != -1);
 
         var table_name = changeCase.snakeCase( thing['class_name'] ),
             parent_table_name = changeCase.snakeCase( thing['sub_class'] );
@@ -185,7 +185,7 @@ var schema =
         if (Object.keys(properties).length)
         {
             // Migrations
-            var database_field_handling = migration.database_field_handling(schema.cwd, table_name, parent_table_name, properties, show_field_handling, make_migration, schema.list_of_things),
+            var database_field_handling = migration.database_field_handling(schema.cwd, table_name, parent_table_name, properties, show_field_handling, make_migration, schema.list_of_things, answers.locales),
                 table_fields = database_field_handling['valid_fields'],
                 foreign_keys = database_field_handling['foreign_keys'];
 

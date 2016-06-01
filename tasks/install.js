@@ -4,7 +4,8 @@ var gulp = require('gulp'),
     gulpPlugins = require('auto-plug')('gulp'),
     _ = require('underscore.string'),
     inquirer = require('inquirer'),
-    path = require('path');
+    path = require('path'),
+    CountryLanguage = require('country-language');
 
 // Helpers
 var schema = require('./../helpers/schema'),
@@ -17,12 +18,88 @@ var ProgressBar = require('progress');
 
 gulp.task('install', function(done)
 {
-    var prompts = [{
-        name: 'installAgree',
-        message: 'Before you can generate things with this repo you must install the schema, is this ok?',
-        type: 'confirm',
-        default: true
-    }];
+    var prompts = [
+        {
+            name: 'installAgree',
+            message: 'Before you can generate things with this repo you must install the schema, is this ok?',
+            type: 'confirm',
+            default: true
+        },
+        {
+            type: 'checkbox',
+            name: 'components',
+            message: 'What files would you like to generated based on the schemas you provided?',
+            choices: [
+                {
+                    name: 'Full package*',
+                    checked: false
+                },
+                {
+                    name: 'Assets',
+                    checked: false
+                },
+                {
+                    name: 'Configuration file',
+                    checked: false
+                },
+                {
+                    name: 'Controller',
+                    checked: true
+                },
+                {
+                    name: 'Command',
+                    checked: false
+                },
+                {
+                    name: 'Event',
+                    checked: false
+                },
+                {
+                    name: 'Middleware',
+                    checked: false
+                },
+                {
+                    name: 'Migration',
+                    checked: true
+                },
+                {
+                    name: 'Model',
+                    checked: true
+                },
+                {
+                    name: 'Provider',
+                    checked: false
+                },
+                {
+                    name: 'Request',
+                    checked: false
+                },
+                {
+                    name: 'Routes',
+                    checked: true
+                },
+                {
+                    name: 'Seed',
+                    checked: false
+                },
+                {
+                    name: 'View',
+                    checked: true
+                }
+            ]
+        },
+        { // TODO: Build function to load all countries with en-GB pre-selected
+            type: 'checkbox',
+            name: 'locales',
+            message: 'Please select the locales your application is going to support',
+            choices: [
+                {
+                    name: 'en-GB',
+                    checked: true
+                }
+            ]
+        }
+    ];
     //Ask
     inquirer.prompt(prompts, function(answers)
     {
@@ -165,7 +242,7 @@ gulp.task('install', function(done)
                     {
                         if (key == 'class_name')
                         {
-                            schema.make_schema(parent);
+                            schema.make_schema(parent, answers);
                             progress_bar.tick();
 
                             if (progress_bar.complete)
@@ -176,14 +253,11 @@ gulp.task('install', function(done)
                     });
 
                     // Build files (if requested)
-                    var make_migrations = true,
-                        make_routes = true;
-
-                    if (make_migrations)
+                    if (answers.components.indexOf('Migration') != -1)
                     {
                         schema.make_migrations();
                     }
-                    if (make_routes)
+                    if (answers.components.indexOf('Routes') != 1)
                     {
                         var resources = {};
 
