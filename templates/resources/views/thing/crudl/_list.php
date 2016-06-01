@@ -4,7 +4,7 @@
         <table class="table table-bordered table-condensed">
             <thead>
                 <tr>
-                    <% _.each(formFields, function(field) { %><th><%= field.label %></th>
+                    <% _.each(formFields, function(field) { %><?php if (!empty( array_filter( array_column($entries->toArray(), '<%= field.name %>') ) )) { ?><th><%= field.label %></th><?php } ?>
                     <% }); %><th>Actions</th>
                 </tr>
             </thead>

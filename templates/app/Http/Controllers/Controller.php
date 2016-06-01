@@ -49,6 +49,7 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
     public function index()
     {
 		$entries = <%= modelName %>::all();
+
         $this->setContent( compact('entries') );
     }
 
