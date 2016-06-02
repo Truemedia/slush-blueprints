@@ -167,7 +167,7 @@ var view =
     /**
      * Create a view based on passed parameters
      */
-    create: function(cwd, context_name, parent_context_name, form_fields)
+    create: function(cwd, context_name, parent_context_name, form_fields, df)
     {
         var view_files = ['_form', '_view', '_list', 'create', 'destroy', 'edit', 'index'];
 
@@ -186,7 +186,8 @@ var view =
                    "parentContextName": parent_context_name,
                    "formFields": form_fields,
                    "formElements": view.form_elements,
-                   "inputTypes": view.input_types
+                   "inputTypes": view.input_types,
+                   "df": df
                };
 
                var tpl = _.template(file_contents);

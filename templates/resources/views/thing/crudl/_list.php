@@ -15,7 +15,7 @@
                     <?php if (isset($entry['<%= field.name %>'])) { ?>
                         <td>
                             <% if (_.indexOf(['date', 'dateTime'], field.type) > -1) { %>
-                            <?php echo $entry['<%= field.name %>']->format(<% if (field.type == "dateTime") { %>config('formatting.df.display.dateTime')<% } else if (field.type == "date") { %>config('formatting.df.display.date')<% } %>); ?>
+                            <?php echo $entry['<%= field.name %>']->format(<% if (field.type == "dateTime") { %>config('formatting.df.<%= df %>.display.dateTime')<% } else if (field.type == "date") { %>config('formatting.df.<%= df %>.display.date')<% } %>); ?>
                             <% } else { %>
                             <?php echo $entry['<%= field.name %>']; ?>
                             <% } %>

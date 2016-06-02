@@ -240,7 +240,7 @@ var schema =
             }
             if (make_views)
             {
-                schema.make_views(changeCase.pascalCase(table_name), changeCase.pascalCase(parent_table_name), form_fields);
+                schema.make_views(changeCase.pascalCase(table_name), changeCase.pascalCase(parent_table_name), form_fields, answers.df);
             }
         }
         else
@@ -320,10 +320,10 @@ var schema =
     },
 
     /* Write views */
-    make_views: function(context_name, parent_context_name, form_fields)
+    make_views: function(context_name, parent_context_name, form_fields, df)
     {
         view.copy_base_files(schema.cwd);
-        view.create(schema.cwd, context_name, parent_context_name, form_fields);
+        view.create(schema.cwd, context_name, parent_context_name, form_fields, df);
     }
 };
 

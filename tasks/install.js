@@ -106,6 +106,23 @@ gulp.task('install', function(done)
                     checked: true
                 }
             ]
+        },
+        {
+            type: 'list',
+            name: 'df',
+            message: 'How would you like your dates to be formatted?',
+            choices: [
+                {
+                    name: 'Default (Carbon)',
+                    value: 'default',
+                    checked: true
+                },
+                {
+                    name: 'British (en-GB)',
+                    value: 'british',
+                    checked: false
+                }
+            ]
         }
     ];
     //Ask
