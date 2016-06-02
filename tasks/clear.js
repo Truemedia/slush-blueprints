@@ -2,8 +2,13 @@ var gulp = require('gulp'),
 	gulpPlugins = require('auto-plug')('gulp');
 
 /* Clean up generated files (useful for development) */
-gulp.task('clear', ['clear-controllers', 'clear-migrations', 'clear-models', 'clear-routes', 'clear-views'], function() {
+gulp.task('clear', ['clear-configurations', 'clear-controllers', 'clear-migrations', 'clear-models', 'clear-routes', 'clear-views'], function() {
     return;
+});
+
+// Clear configuration files (generated only)
+gulp.task('clear-configurations', function() {
+	return gulp.src(['./config/formatting.php'], { read: false }).pipe( gulpPlugins.rm() );
 });
 
 // Clear controllers

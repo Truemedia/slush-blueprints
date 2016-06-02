@@ -18,7 +18,8 @@ var Table = require('cli-table');
 var framework = 'Laravel';
 if (framework == 'Laravel')
 {
-  var controller = require('./../plugins/laravel/app/Http/Controllers/controller'),
+  var config = require('./../plugins/laravel/config/config'),
+      controller = require('./../plugins/laravel/app/Http/Controllers/controller'),
       migration = require('./../plugins/laravel/database/migration'),
       model = require('./../plugins/laravel/app/model'),
       routes = require('./../plugins/laravel/app/Http/routes'),
@@ -279,6 +280,12 @@ var schema =
                 // TODO: Ignore for now (can be looked at once schema is up to date)
             }
         }
+    },
+
+    /* Make config files */
+    make_configs: function()
+    {
+        config.copy_base_files(schema.cwd);
     },
 
     /* Store migration in cache for later use */

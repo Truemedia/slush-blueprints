@@ -30,34 +30,39 @@ gulp.task('install', function(done)
             name: 'components',
             message: 'What files would you like to generated based on the schemas you provided?',
             choices: [
-                {
-                    name: 'Full package*',
-                    checked: false
-                },
-                {
-                    name: 'Assets',
-                    checked: false
-                },
+                /* Not available yet */
+                // {
+                //     name: 'Full package*',
+                //     checked: false
+                // },
+                /* Not available yet */
+                // {
+                //     name: 'Assets',
+                //     checked: false
+                // },
                 {
                     name: 'Configuration file',
-                    checked: false
+                    checked: true
                 },
                 {
                     name: 'Controller',
                     checked: true
                 },
-                {
-                    name: 'Command',
-                    checked: false
-                },
-                {
-                    name: 'Event',
-                    checked: false
-                },
-                {
-                    name: 'Middleware',
-                    checked: false
-                },
+                /* Not available yet */
+                // {
+                //     name: 'Command',
+                //     checked: false
+                // },
+                /* Not available yet */
+                // {
+                //     name: 'Event',
+                //     checked: false
+                // },
+                /* Not available yet */
+                // {
+                //     name: 'Middleware',
+                //     checked: false
+                // },
                 {
                     name: 'Migration',
                     checked: true
@@ -66,22 +71,25 @@ gulp.task('install', function(done)
                     name: 'Model',
                     checked: true
                 },
-                {
-                    name: 'Provider',
-                    checked: false
-                },
-                {
-                    name: 'Request',
-                    checked: false
-                },
+                /* Not available yet */
+                // {
+                //     name: 'Provider',
+                //     checked: false
+                // },
+                /* Not available yet */
+                // {
+                //     name: 'Request',
+                //     checked: false
+                // },
                 {
                     name: 'Routes',
                     checked: true
                 },
-                {
-                    name: 'Seed',
-                    checked: false
-                },
+                /* Not available yet */
+                // {
+                //     name: 'Seed',
+                //     checked: false
+                // },
                 {
                     name: 'View',
                     checked: true
@@ -253,6 +261,10 @@ gulp.task('install', function(done)
                     });
 
                     // Build files (if requested)
+                    if (answers.components.indexOf('Configuration file') != -1)
+                    {
+                        schema.make_configs();
+                    }
                     if (answers.components.indexOf('Migration') != -1)
                     {
                         schema.make_migrations();
