@@ -15,27 +15,18 @@ var model =
     traditional_logging: true,
 
     /**
-     * Get field name excluding provided suffix
-     */
-    get_field_name_without_suffix: function(field_name, suffix)
-    {
-        return field_name.replace(suffix, '');
-    },
-
-    /**
      * Determine class names of models and property functions included as fields
      */
     get_things: function(fields)
     {
-        var things = [],
-            identify_suffix = '_id';
+        var things = [];
 
         for (var field of fields)
         {
-            if (field.name.indexOf(identify_suffix) > -1)
+            if (field.parent_table != null)
             {
-                var property_function_name = model.get_field_name_without_suffix(field.name, '_id'),
-                    model_name = changeCase.pascalCase(property_function_name);
+                var property_function_name = field.name;
+                    model_name = changeCase.pascalCase( pluralize(field.parent_table, 1) ); // Gets singular name
 
                 things.push({
                     "propertyFunctionName": property_function_name,

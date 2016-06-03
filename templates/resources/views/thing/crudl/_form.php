@@ -23,8 +23,8 @@
                                     placeholder="Enter <%= field.label %>"
                                     class="form-control">
                                 <option value="">Choose an option</option>
-                                <?php foreach ($data_options['<%= field.table_name %>']->all() as $option) { ?>
-                                    <option value="<?php echo $option; ?>"><?php echo $option; ?></option>
+                                <?php foreach ($data_options['<%= field.table_name %>'] as $option) { ?>
+                                    <option value="<?php echo $option->id; ?>"><?php echo $option->id; ?></option>
                                 <?php } ?>
                             </select>
                             <a class="btn btn-success" href="/<%= field.table_name %>/create">Add option</a>

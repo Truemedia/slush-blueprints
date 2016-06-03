@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Schema;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -30,11 +31,26 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
 
 		foreach ($reflector->getMethods(ReflectionMethod::IS_PUBLIC) as $method)
 		{
-			if (in_array($method->name . '_id', $instance->getFillable()) && $method->class == 'App\<%= modelName %>')
+			if (in_array($method->name, $instance->getFillable()) && $method->class == 'App\<%= modelName %>')
 			{
 				// Got a relationship, get the list of options
-				$class = 'App\\' . ucfirst( camel_case($method->name) );
-				$data_options[str_plural($method->name)] = $class::lists('id');
+				$class_name = get_class( $instance->{$method->name}()->getModel() );
+				$class_instance = new $class_name();
+
+				// Model has table and migration has run
+				$table_name = $class_instance->getTable();
+				if (!isset($data_options[str_plural($table_name)]))
+				{
+					if (Schema::hasTable($table_name))
+					{
+						$data_options[str_plural($table_name)] = $class_name::all();
+					}
+					// Table does not exist, and may or may not be in a migration
+					else
+					{
+						// TODO: Decide on how this could be expanded futher
+					}
+				}
 			}
     	}
 

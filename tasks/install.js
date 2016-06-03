@@ -94,6 +94,11 @@ gulp.task('install', function(done)
                     name: 'View',
                     checked: true
                 }
+                /* Not available yet */
+                // {
+                //     name: 'Unit test',
+                //     checked: false
+                // }
             ]
         },
         { // TODO: Build function to load all countries with en-GB pre-selected
@@ -268,7 +273,7 @@ gulp.task('install', function(done)
                         if (key == 'class_name')
                         {
                             schema.make_schema(parent, answers);
-                            progress_bar.tick();
+                            //progress_bar.tick();
 
                             if (progress_bar.complete)
                             {
