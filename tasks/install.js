@@ -13,6 +13,9 @@ var schema = require('./../helpers/schema'),
     jsonfile = require('jsonfile'),
     walk = require('tree-walk');
 
+// Configs
+var defaults = require('./../config/defaults.json');
+
 // CLI UI
 var ProgressBar = require('progress');
 
@@ -101,16 +104,22 @@ gulp.task('install', function(done)
                 // }
             ]
         },
-        { // TODO: Build function to load all countries with en-GB pre-selected
+        {
             type: 'checkbox',
             name: 'locales',
             message: 'Please select the locales your application is going to support',
-            choices: [
+            choices: function()
+            {
+                var choices = [];
+                CountryLanguage.getLocales(true).forEach(function(locale)
                 {
-                    name: 'en-GB',
-                    checked: true
-                }
-            ]
+                    var choice = {'name': locale};
+                    choice.checked = (locale === defaults.locale);
+                    choices.push(choice);
+                });
+
+                return choices;
+            }
         },
         {
             type: 'list',
