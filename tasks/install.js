@@ -125,18 +125,29 @@ gulp.task('install', function(done)
             type: 'list',
             name: 'df',
             message: 'How would you like your dates to be formatted?',
-            choices: [
+            choices: function(answers)
+            {
+                // TODO: Process all locales to pre-select using reliable data source of locale date formats
+                var has_locale_for_df = (answers.locales.indexOf('en-GB') > -1);
+
+                var choices = [
+                    {
+                        name: 'Default (Carbon)',
+                        value: 'default'
+                    },
+                    {
+                        name: 'British (en-GB)',
+                        value: 'british'
+                    }
+                ];
+
+                if (has_locale_for_df)
                 {
-                    name: 'Default (Carbon)',
-                    value: 'default',
-                    checked: true
-                },
-                {
-                    name: 'British (en-GB)',
-                    value: 'british',
-                    checked: false
+                    choices.reverse();
                 }
-            ]
+
+                return choices;
+            }
         }
     ];
     //Ask
