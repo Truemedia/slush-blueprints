@@ -24,14 +24,35 @@ gulp.task('install', function(done)
     var prompts = [
         {
             name: 'installAgree',
-            message: 'Before you can generate things with this repo you must install the schema, is this ok?',
+            message: 'This library will create and possibly overwrite files in your Laravel instance. This may not be reversable, do you wish to continue?',
             type: 'confirm',
             default: true
         },
         {
-            type: 'checkbox',
+            name: 'workflow',
+            message: 'Which workflow would you like to use for generating files? Choose from the following options:',
+            type: 'list',
+            choices: [
+                {
+                    name: 'Wizard (step by step)',
+                    value: 'wizard',
+                },
+                /* Not available yet */
+                // {
+                //     name: 'Build from specification (using regenerator.json)',
+                //     value: 'specification',
+                // },
+                /* Not available yet */
+                // {
+                //     name: 'Insane (Create everything and anything possible)',
+                //     value: 'insane',
+                // }
+            ]
+        },
+        {
             name: 'components',
             message: 'What files would you like to generated based on the schemas you provided?',
+            type: 'checkbox',
             choices: [
                 /* Not available yet */
                 // {
@@ -105,9 +126,9 @@ gulp.task('install', function(done)
             ]
         },
         {
-            type: 'checkbox',
             name: 'locales',
             message: 'Please select the locales your application is going to support',
+            type: 'checkbox',
             choices: function()
             {
                 var choices = [];
@@ -122,9 +143,9 @@ gulp.task('install', function(done)
             }
         },
         {
-            type: 'list',
             name: 'df',
             message: 'How would you like your dates to be formatted?',
+            type: 'list',
             choices: function(answers)
             {
                 // TODO: Process all locales to pre-select using reliable data source of locale date formats
