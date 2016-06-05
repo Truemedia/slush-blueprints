@@ -63,14 +63,16 @@ var migration =
     /**
      * Compose database field
      */
-    dbf: function(name, type, comment, parent_table)
+    dbf: function(name, type, comment, parent_table, nullable)
     {
         var database_field = {
             "name": changeCase.snakeCase(name),
             "type": type,
             "comment": changeCase.titleCase(comment),
         };
+
         database_field.parent_table = (parent_table != undefined) ? parent_table : null;
+        database_field.nullable = (nullable != undefined) ? nullable : false;
 
         return database_field;
     },
@@ -111,7 +113,7 @@ var migration =
                 // Field that uses natural language, abstract to language tables
                 if (data_type == 'text')
                 {
-                    natural_language_fields.push( migration.dbf(field_name, data_type, 'Lang') );
+                    natural_language_fields.push( migration.dbf(field_name, data_type, 'Lang', null, true) );
                 }
                 else
                 {
@@ -182,14 +184,10 @@ var migration =
         // If we have any natural language fields, put them into a new language table
         if (natural_language_fields.length != 0 && make_migrations)
         {
-            migration.make_language_tables(locales, table_name, natural_language_fields);
+            migration.make_language_tables(locales, pluralize(table_name), natural_language_fields);
         }
 
-        return {
-            valid_fields: valid_fields,
-            invalid_fields: invalid_fields,
-            foreign_keys: foreign_keys
-        };
+        return {valid_fields, natural_language_fields, invalid_fields, foreign_keys};
     },
 
     /* Make intermediates for provided table names (if possible) */

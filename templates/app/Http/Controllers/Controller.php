@@ -43,7 +43,7 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
 				{
 					if (Schema::hasTable($table_name))
 					{
-						$data_options[str_plural($table_name)] = $class_name::all();
+						$data_options[str_plural($table_name)] = $class_name::locales()->get();
 					}
 					// Table does not exist, and may or may not be in a migration
 					else
@@ -64,7 +64,7 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
      */
     public function index()
     {
-		$entries = <%= modelName %>::all();
+		$entries = <%= modelName %>::locales()->get();
 
         $this->setContent( compact('entries') );
     }
@@ -95,24 +95,16 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
 		{
 			$instance = new <%= modelName %>();
 			$saved = $instance->fill( $request->only($instance->fillable) )
-				   			->save();
+							  ->save();
 
-			if ($saved)
-			{
-				$status = 'Saved successfully!';
-			}
-			else
-			{
-				$status = 'Failed to save (unknown error occured)';
-			}
+			list($status) = ($saved) ? ['Saved successfully!'] : ['Failed to save (unknown error occured)'];
 		}
 		else
 		{
 			$status = 'Validation failed';
 		}
 
-		$request->session()->flash('status', $status);
-		return redirect()->action('<%= controllerName %>@index');
+		return redirect()->action('<%= controllerName %>@index')->with( compact('status') );
     }
 
     /**
@@ -135,7 +127,7 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
      */
     public function edit($id)
     {
-        $entry = <%= modelName %>::find($id);
+        $entry = <%= modelName %>::find($id)->locales()->first();
 		$data_options = static::dataOptions();
 
         $this->setContent( compact('entry', 'data_options') );
@@ -150,7 +142,7 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
      */
     public function update(Request $request, $id)
     {
-        $entry = <%= modelName %>::find($id);
+        $entry = <%= modelName %>::find($id)->locales()->first();
 
 		$valid = true;
 		if ($valid)
@@ -158,22 +150,14 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
 			$updated = $entry->fill( $request->only($entry->fillable) )
 							 ->save();
 
-			if ($updated)
-			{
-				$status = 'Update successfully!';
-			}
-			else
-			{
-				$status = 'Failed to update (unknown error occured)';
-			}
+			list($status) = ($updated) ? ['Update successfully!'] : ['Failed to update (unknown error occured)'];
 		}
 		else
 		{
 			$status = 'Validation failed';
 		}
 
-		$request->session()->flash('status', $status);
-		return redirect()->action('<%= controllerName %>@index');
+		return redirect()->action('<%= controllerName %>@index')->with( compact('status') );
     }
 
     /**

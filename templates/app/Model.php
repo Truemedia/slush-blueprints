@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Schema;
 
 class <%= modelName %> extends <%= parentModelName != '' ? parentModelName : 'Model' %>
 {
@@ -54,4 +55,26 @@ class <%= modelName %> extends <%= parentModelName != '' ? parentModelName : 'Mo
      */
      <% _.each(things, function(thing) { %>public function <%= thing.propertyFunctionName %>() { return $this->hasOne('App\<%= thing.modelName %>'); }
      <% }); %>
+
+     /**
+      * Translation function
+      *
+      * @param $locale String
+      * @return \Illuminate\Database\Eloquent\Builder
+      */
+     public function scopeLocales($query, $locale = null)
+     {
+         if ($locale == null)
+         {
+             $locale = \App::getLocale();
+         }
+
+         $lang_table = $this->getTable() . '_' . str_replace('-', '_', strtolower($locale));
+         if (Schema::hasTable($lang_table))
+         {
+             $query->leftJoin($lang_table, $this->getTable() . '.' . 'id', '=', $lang_table . '.' . 'parent_id');
+         }
+
+         return $query;
+     }
 }

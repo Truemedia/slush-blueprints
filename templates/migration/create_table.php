@@ -24,7 +24,7 @@ class Create<%= table_class_name %>Table extends Migration {
 					(db_field.name != '' && db_field.type != '' && db_field.comment != '')
 				) { %>
 				<% if (db_field.parent_table != null) { %>$table-><%= db_field.type %>('<%= db_field.name %>')->unsigned()->nullable()->comment('<%= db_field.comment %>');
-				<% } else { %>$table-><%= db_field.type %>('<%= db_field.name %>')->comment('<%= db_field.comment %>');<% } %>
+				<% } else { %>$table-><%= db_field.type %>('<%= db_field.name %>')<% if (db_field.nullable) { %>->nullable()<% } %>->comment('<%= db_field.comment %>');<% } %>
 			<% }
 			}); %>
 		});<% } %>

@@ -12,7 +12,14 @@
                        type="<%= field.type %>"
                        placeholder="Enter <%= field.label %>"
                        class="form-control"
-                       value="<?php echo (isset($entry['<%= field.name %>']) ? $entry['<%= field.name %>']->format(<% if (field.type == "dateTime") { %>config('formatting.df.<%= df %>.entry.dateTime')<% } else if (field.type == "date") { %>config('formatting.df.<%= df %>.entry.date')<% } %>) : ''); ?>" />
+                       value="<?php
+                        echo (isset($entry['<%= field.name %>']) ?
+                        <% if (field.type == 'dateTime' || field.type == 'date') { %>
+                            $entry['<%= field.name %>']->format(<% if (field.type == "dateTime") { %>config('formatting.df.<%= df %>.entry.dateTime')<% } else if (field.type == "date") { %>config('formatting.df.<%= df %>.entry.date')<% } %>)
+                        <% } else { %>
+                            $entry['<%= field.name %>']
+                        <% } %>
+                        : ''); ?>" />
                 <% } else if (_.indexOf(formElements, field.type)) { %>
                     <% if (field.type == 'select') { %>
                         <?php if (

@@ -140,10 +140,7 @@ var view =
             // TODO: Add language selection with text UI
         }
 
-        return {
-            valid_fields: valid_fields,
-            invalid_fields: invalid_fields
-        };
+        return {valid_fields, natural_language_fields, invalid_fields};
     },
 
     /* Copy base files across */

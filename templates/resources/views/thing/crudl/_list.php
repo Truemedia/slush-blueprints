@@ -12,14 +12,16 @@
             <?php foreach ($entries as $entry) { ?>
                 <tr>
                 <% _.each(formFields, function(field) { %>
+                    <?php if (!empty( array_filter( array_column($entries->toArray(), '<%= field.name %>') ) )) { ?>
+                    <td>
                     <?php if (isset($entry['<%= field.name %>'])) { ?>
-                        <td>
                             <% if (_.indexOf(['date', 'dateTime'], field.type) > -1) { %>
                             <?php echo $entry['<%= field.name %>']->format(<% if (field.type == "dateTime") { %>config('formatting.df.<%= df %>.display.dateTime')<% } else if (field.type == "date") { %>config('formatting.df.<%= df %>.display.date')<% } %>); ?>
                             <% } else { %>
                             <?php echo $entry['<%= field.name %>']; ?>
                             <% } %>
-                        </td>
+                    <?php } ?>
+                    </td>
                     <?php } ?>
                 <% }); %>
                     <td>

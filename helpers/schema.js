@@ -208,7 +208,8 @@ var schema =
         // Views
         var form_field_handling = view.form_field_handling(table_name, parent_table_name, properties, show_field_handling, schema.list_of_things),
             form_fields = form_field_handling['valid_fields'];
-
+            form_fields = form_fields.concat(form_field_handling['natural_language_fields']);
+            
         var mandatory_fields = [];
         mandatory_fields.push( migration.dbf('id', 'bigIncrements', 'ID') );
         if (parent_class != null)
