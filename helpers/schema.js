@@ -22,6 +22,7 @@ if (framework == 'Laravel')
       controller = require('./../plugins/laravel/app/Http/Controllers/controller'),
       migration = require('./../plugins/laravel/database/migration'),
       model = require('./../plugins/laravel/app/model'),
+      request = require('./../plugins/laravel/app/Http/Requests/request'),
       routes = require('./../plugins/laravel/app/Http/routes'),
       view = require('./../plugins/laravel/resources/views/crudl');
 }
@@ -165,6 +166,7 @@ var schema =
         var make_controller = (answers.components.indexOf('Controller') != -1),
             make_migration = (answers.components.indexOf('Migration') != -1),
             make_model = (answers.components.indexOf('Model') != -1),
+            make_request = (answers.components.indexOf('Request') != -1),
             make_views = (answers.components.indexOf('View') != -1);
 
         var table_name = changeCase.snakeCase( thing['class_name'] ),
@@ -187,6 +189,7 @@ var schema =
         {
             make_controller = false,
             make_migration = false,
+            make_request = false,
             make_views = false;
             gutil.log( gutil.colors.red(thing['class_name'] + ' has no properties, this could be an issue with the schema or the application') );
         }
@@ -209,7 +212,7 @@ var schema =
         var form_field_handling = view.form_field_handling(table_name, parent_table_name, properties, show_field_handling, schema.list_of_things),
             form_fields = form_field_handling['valid_fields'];
             form_fields = form_fields.concat(form_field_handling['natural_language_fields']);
-            
+
         var mandatory_fields = [];
         mandatory_fields.push( migration.dbf('id', 'bigIncrements', 'ID') );
         if (parent_class != null)
@@ -220,20 +223,26 @@ var schema =
 
         table_fields = mandatory_fields.concat(table_fields);
 
-        // Go forth and make things
+        var controller_name = changeCase.pascalCase(table_name) + 'Controller',
+            model_name = changeCase.pascalCase(table_name),
+            request_name = changeCase.pascalCase(table_name) + 'Request';
+
+        /* Go forth and make things */
+        // Migrations
         if (make_migration && !(migration.problematic_tables.indexOf( pluralize(table_name) ) > -1))
         {
             schema.make_migration(pluralize(table_name), table_fields);
         }
+
+        // Models
         if (make_model)
         {
-            schema.make_model(changeCase.pascalCase(table_name), changeCase.pascalCase(parent_table_name), table_fields);
+            schema.make_model(model_name, changeCase.pascalCase(parent_table_name), table_fields);
         }
+
+        // Controllers
         if (make_controller)
         {
-            var controller_name = changeCase.pascalCase(table_name) + 'Controller',
-                model_name = changeCase.pascalCase(table_name);
-
             if (parent_table_name != '' && schema.native_data_types.indexOf( changeCase.ucFirst(parent_table_name) ) == -1)
             {
                 parent_controller_name = changeCase.pascalCase(parent_table_name) + 'Controller';
@@ -243,8 +252,16 @@ var schema =
                 parent_controller_name = 'BaseController';
             }
 
-            schema.make_controller(controller_name, parent_controller_name, model_name);
+            schema.make_controller(controller_name, parent_controller_name, model_name, request_name);
         }
+
+        // Requests
+        if (make_request)
+        {
+            schema.make_request(request_name, model_name);
+        }
+
+        // Views
         if (make_views)
         {
             schema.make_views(changeCase.pascalCase(table_name), changeCase.pascalCase(parent_table_name), form_fields, answers.df);
@@ -308,10 +325,16 @@ var schema =
     },
 
     /* Write controller */
-    make_controller: function(controller_name, parent_controller_name, model_name)
+    make_controller: function(controller_name, parent_controller_name, model_name, request_name)
     {
         controller.copy_base_files(schema.cwd);
-        controller.create(schema.cwd, controller_name, parent_controller_name, model_name);
+        controller.create(schema.cwd, controller_name, parent_controller_name, model_name, request_name);
+    },
+
+    /* Write request */
+    make_request: function(request_name, model_name)
+    {
+        request.create(schema.cwd, request_name, model_name);
     },
 
     /* Write routes */

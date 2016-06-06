@@ -1,0 +1,11 @@
+{
+    "name": "workflow",
+    "message": "Which workflow would you like to use for generating files? Choose from the following options:",
+    "type": "list",
+    "choices": [
+        {
+            "name": "Wizard (step by step)",
+            "value": "wizard"
+        }
+    ]
+}

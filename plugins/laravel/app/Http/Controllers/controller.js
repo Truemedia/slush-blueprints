@@ -21,21 +21,17 @@ var controller =
   /**
    * Create a controller based on passed parameters
    */
-   create: function(cwd, controller_name, parent_controller_name, model_name)
+   create: function(cwd, controllerName, parentControllerName, modelName, requestName)
    {
        // Open model template file
        fq.readFile(cwd + '/templates/app/Http/Controllers/Controller.php', {encoding: 'utf8'}, function (error, file_contents)
        {
            if (error) throw error;
 
-           var filename = controller_name + '.php';
+           var filename = controllerName + '.php';
 
-           var template_data = {
-               "layoutName": controller.layout_name,
-               "controllerName": controller_name,
-               "parentControllerName": parent_controller_name,
-               "modelName": model_name
-           };
+           var layoutName = controller.layout_name;
+           var template_data = {layoutName, controllerName, parentControllerName, modelName, requestName};
 
            var tpl = _.template(file_contents);
            var controller_file_contents = tpl(template_data);
@@ -50,7 +46,7 @@ var controller =
                    fq.writeFile('./' + controller_path + '/' + filename, controller_file_contents, function (error)
                    {
                        if (error) throw error;
-                       controller.made(filename);
+                       controller.created(filename);
                    });
                }
                else
@@ -80,8 +76,8 @@ var controller =
        }
    },
 
-   /* Callback for controller being made */
-   made: function(filename)
+   /* Callback for controller being created */
+   created: function(filename)
    {
        controller.counter++;
 

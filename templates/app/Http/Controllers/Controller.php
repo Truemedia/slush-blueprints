@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Schema;
 
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 use ReflectionClass;
 use ReflectionMethod;
 
 use App\<%= modelName %>;
+use App\Http\Requests\<%= requestName %> as Request;
 
-class <%= controllerName %> extends <%= parentControllerName != '' ? parentControllerName : 'Controller' %>
+class <%= controllerName %> extends BaseController
 {
     /**
      * The layout that should be used for standard HTML responses.
@@ -84,7 +83,7 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\<%= requestName %>  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -136,7 +135,7 @@ class <%= controllerName %> extends <%= parentControllerName != '' ? parentContr
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\<%= requestName %>  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */

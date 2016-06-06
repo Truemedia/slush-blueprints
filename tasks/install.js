@@ -14,7 +14,8 @@ var schema = require('./../helpers/schema'),
     walk = require('tree-walk');
 
 // Configs
-var defaults = require('./../config/defaults.json');
+var defaults = require('./../config/defaults.json'),
+    questions = require('./../config/questions.json');
 
 // CLI UI
 var ProgressBar = require('progress');
@@ -28,15 +29,7 @@ gulp.task('install', function(done)
             type: 'confirm',
             default: true
         },
-        {
-            name: 'workflow',
-            message: 'Which workflow would you like to use for generating files? Choose from the following options:',
-            type: 'list',
-            choices: [
-                {
-                    name: 'Wizard (step by step)',
-                    value: 'wizard',
-                },
+        questions,
                 /* Not available yet */
                 // {
                 //     name: 'Build from specification (using regenerator.json)',
@@ -47,8 +40,6 @@ gulp.task('install', function(done)
                 //     name: 'Insane (Create everything and anything possible)',
                 //     value: 'insane',
                 // }
-            ]
-        },
         {
             name: 'components',
             message: 'What files would you like to generated based on the schemas you provided?',
@@ -100,11 +91,10 @@ gulp.task('install', function(done)
                 //     name: 'Provider',
                 //     checked: false
                 // },
-                /* Not available yet */
-                // {
-                //     name: 'Request',
-                //     checked: false
-                // },
+                {
+                    name: 'Request',
+                    checked: true
+                },
                 {
                     name: 'Routes',
                     checked: true
