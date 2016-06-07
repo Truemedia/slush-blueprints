@@ -3,7 +3,7 @@ var gulp = require('gulp'),
 
 /* Clean up generated files (useful for development) */
 gulp.task('clear', [
-		'clear-configurations', 'clear-controllers', 'clear-migrations', 'clear-models', 'clear-routes', 'clear-requests', 'clear-views'
+		'clear-configurations', 'clear-controllers', 'clear-migrations', 'clear-models', 'clear-policies', 'clear-routes', 'clear-requests', 'clear-views'
 	], function() {
     return;
 });
@@ -26,6 +26,11 @@ gulp.task('clear-migrations', function() {
 // Clear models
 gulp.task('clear-models', function() {
 	return gulp.src(['./app/*.php'], { read: false }).pipe( gulpPlugins.rm() );
+});
+
+// Clear policies
+gulp.task('clear-policies', function() {
+	return gulp.src(['./app/Policies/*.php'], { read: false }).pipe( gulpPlugins.rm() );
 });
 
 // Clear requests

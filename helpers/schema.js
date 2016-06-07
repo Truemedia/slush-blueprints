@@ -22,6 +22,7 @@ if (framework == 'Laravel')
       controller = require('./../plugins/laravel/app/Http/Controllers/controller'),
       migration = require('./../plugins/laravel/database/migration'),
       model = require('./../plugins/laravel/app/model'),
+      policy = require('./../plugins/laravel/app/Policies/policy'),
       request = require('./../plugins/laravel/app/Http/Requests/request'),
       routes = require('./../plugins/laravel/app/Http/routes'),
       view = require('./../plugins/laravel/resources/views/crudl');
@@ -166,6 +167,7 @@ var schema =
         var make_controller = (answers.components.indexOf('Controller') != -1),
             make_migration = (answers.components.indexOf('Migration') != -1),
             make_model = (answers.components.indexOf('Model') != -1),
+            make_policy = (answers.components.indexOf('Policy') != -1),
             make_request = (answers.components.indexOf('Request') != -1),
             make_views = (answers.components.indexOf('View') != -1);
 
@@ -189,6 +191,7 @@ var schema =
         {
             make_controller = false,
             make_migration = false,
+            make_policy = false,
             make_request = false,
             make_views = false;
             gutil.log( gutil.colors.red(thing['class_name'] + ' has no properties, this could be an issue with the schema or the application') );
@@ -225,21 +228,11 @@ var schema =
 
         var controller_name = changeCase.pascalCase(table_name) + 'Controller',
             model_name = changeCase.pascalCase(table_name),
+            model_instance_name = '$' + changeCase.snakeCase(table_name),
+            policy_name = changeCase.pascalCase(table_name) + 'Policy',
             request_name = changeCase.pascalCase(table_name) + 'Request';
 
         /* Go forth and make things */
-        // Migrations
-        if (make_migration && !(migration.problematic_tables.indexOf( pluralize(table_name) ) > -1))
-        {
-            schema.make_migration(pluralize(table_name), table_fields);
-        }
-
-        // Models
-        if (make_model)
-        {
-            schema.make_model(model_name, changeCase.pascalCase(parent_table_name), table_fields);
-        }
-
         // Controllers
         if (make_controller)
         {
@@ -253,6 +246,24 @@ var schema =
             }
 
             schema.make_controller(controller_name, parent_controller_name, model_name, request_name);
+        }
+
+        // Migrations
+        if (make_migration && !(migration.problematic_tables.indexOf( pluralize(table_name) ) > -1))
+        {
+            schema.make_migration(pluralize(table_name), table_fields);
+        }
+
+        // Models
+        if (make_model)
+        {
+            schema.make_model(model_name, changeCase.pascalCase(parent_table_name), table_fields);
+        }
+
+        // Policies
+        if (make_policy)
+        {
+            schema.make_policy(policy_name, model_name, model_instance_name);
         }
 
         // Requests
@@ -307,6 +318,13 @@ var schema =
         config.copy_base_files(schema.cwd);
     },
 
+    /* Write controller */
+    make_controller: function(controller_name, parent_controller_name, model_name, request_name)
+    {
+        controller.copy_base_files(schema.cwd);
+        controller.create(schema.cwd, controller_name, parent_controller_name, model_name, request_name);
+    },
+
     /* Store migration in cache for later use */
     make_migration: function(table_name, database_fields)
     {
@@ -324,11 +342,10 @@ var schema =
         model.create(schema.cwd, model_name, parent_model_name, field_names);
     },
 
-    /* Write controller */
-    make_controller: function(controller_name, parent_controller_name, model_name, request_name)
+    /* Write policy */
+    make_policy: function(policy_name, model_name, model_instance_name)
     {
-        controller.copy_base_files(schema.cwd);
-        controller.create(schema.cwd, controller_name, parent_controller_name, model_name, request_name);
+        policy.create(schema.cwd, policy_name, model_name, model_instance_name);
     },
 
     /* Write request */

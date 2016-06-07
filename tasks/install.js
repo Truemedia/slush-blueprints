@@ -86,6 +86,10 @@ gulp.task('install', function(done)
                     name: 'Model',
                     checked: true
                 },
+                {
+                    name: 'Policy',
+                    checked: true
+                },
                 /* Not available yet */
                 // {
                 //     name: 'Provider',
