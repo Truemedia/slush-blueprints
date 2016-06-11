@@ -9,6 +9,9 @@ var _ = require('underscore'),
 // Queue
 var fq = new FileQueue(256);
 
+// Configs
+var defaults = require('./../../../../../config/defaults.json');
+
 /**
  * Laravel controller plugin for slush-blueprints **/
 var controller =
@@ -24,7 +27,7 @@ var controller =
    create: function(cwd, controllerName, parentControllerName, modelName, requestName)
    {
        // Open model template file
-       fq.readFile(cwd + '/templates/app/Http/Controllers/Controller.php', {encoding: 'utf8'}, function (error, file_contents)
+       fq.readFile(cwd + '/templates/app/Http/Controllers/Controller.php', {encoding: defaults.encoding}, function (error, file_contents)
        {
            if (error) throw error;
 

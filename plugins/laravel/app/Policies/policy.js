@@ -9,6 +9,9 @@ var _ = require('underscore'),
 // Queue
 var fq = new FileQueue(256);
 
+// Configs
+var defaults = require('./../../../../config/defaults.json');
+
 /**
  * Laravel policy plugin for slush-blueprints **/
 var policy =
@@ -22,7 +25,7 @@ var policy =
    create: function(cwd, policyName, modelName, modelInstanceName)
    {
        // Open policy template file
-       fq.readFile(cwd + '/templates/app/Policies/Policy.php', {encoding: 'utf8'}, function (error, file_contents)
+       fq.readFile(cwd + '/templates/app/Policies/Policy.php', {encoding: defaults.encoding}, function (error, file_contents)
        {
            if (error) throw error;
 

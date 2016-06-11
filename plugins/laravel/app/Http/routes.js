@@ -8,6 +8,9 @@ var _ = require('underscore'),
 // Queue
 var fq = new FileQueue(256);
 
+// Configs
+var defaults = require('./../../../../config/defaults.json');
+
 /**
  * Laravel routes plugin for slush-blueprints **/
 var routes =
@@ -34,7 +37,7 @@ var routes =
            routes_path = 'app/Http';
 
        // Open routes template file
-       fq.readFile(cwd + '/templates/' + routes_path + '/' + filename, {encoding: 'utf8'}, function (error, file_contents)
+       fq.readFile(cwd + '/templates/' + routes_path + '/' + filename, {encoding: defaults.encoding}, function (error, file_contents)
        {
            if (error) throw error;
 

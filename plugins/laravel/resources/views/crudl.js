@@ -11,6 +11,9 @@ var fq = new FileQueue(256);
 
 var mapper = require('./../../../../classes/mapper');
 
+// Configs
+var defaults = require('./../../../../config/defaults.json');
+
 /**
  * Laravel views plugin for slush-blueprints
  * This is using CRUDL architecture with regular PHP templating
@@ -172,7 +175,7 @@ var view =
        view_files.forEach( function(view_file)
        {
            var filename = view_file + '.php';
-           fq.readFile(cwd + '/templates/resources/views/thing/crudl/' + filename, {encoding: 'utf8'}, function (error, file_contents)
+           fq.readFile(cwd + '/templates/resources/views/thing/crudl/' + filename, {encoding: defaults.encoding}, function (error, file_contents)
            {
                if (error) throw error;
 

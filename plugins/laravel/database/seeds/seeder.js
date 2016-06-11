@@ -14,6 +14,9 @@ var fq = new FileQueue(256);
 
 var mapper = require('./../../../../classes/mapper');
 
+// Configs
+var defaults = require('./../../../../config/defaults.json');
+
 /**
  * Laravel seeder plugin for slush-blueprints **/
 var seeder =
@@ -38,7 +41,7 @@ var seeder =
              seeds_path = 'database/seeds';
 
          // Open seeds template file
-         fq.readFile(cwd + '/templates/' + seeds_path + '/' + filename, {encoding: 'utf8'}, function (error, file_contents)
+         fq.readFile(cwd + '/templates/' + seeds_path + '/' + filename, {encoding: defaults.encoding}, function (error, file_contents)
          {
              if (error) throw error;
 
@@ -72,7 +75,7 @@ var seeder =
     create: function(cwd, seederClass, resourceName)
     {
        // Open seeder template file
-       fq.readFile(cwd + '/templates/database/seeds/Seeder.php', {encoding: 'utf8'}, function (error, file_contents)
+       fq.readFile(cwd + '/templates/database/seeds/Seeder.php', {encoding: defaults.encoding}, function (error, file_contents)
        {
            if (error) throw error;
 

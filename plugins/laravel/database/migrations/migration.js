@@ -14,6 +14,9 @@ var fq = new FileQueue(256);
 
 var mapper = require('./../../../../classes/mapper');
 
+// Configs
+var defaults = require('./../../../../config/defaults.json');
+
 /**
  * Laravel migration plugin for slush-blueprints **/
 var migration =
@@ -237,7 +240,7 @@ var migration =
     create_table: function(cwd, table_name, db_fields)
     {
        // Open migration template file
-       fq.readFile(cwd + '/templates/database/migrations/create_table.php', {encoding: 'utf8'}, function (error, file_contents)
+       fq.readFile(cwd + '/templates/database/migrations/create_table.php', {encoding: defaults.encoding}, function (error, file_contents)
        {
            if (error) throw error;
 
@@ -274,7 +277,7 @@ var migration =
    add_foreign_keys: function(cwd, table_name, db_fields)
    {
       // Open migration template file
-      fq.readFile(cwd + '/templates/migration/add_foreign_keys.php', {encoding: 'utf8'}, function (error, file_contents)
+      fq.readFile(cwd + '/templates/database/migrations/add_foreign_keys.php', {encoding: defaults.encoding}, function (error, file_contents)
       {
           if (error) throw error;
 

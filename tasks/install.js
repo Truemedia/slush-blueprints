@@ -119,6 +119,23 @@ gulp.task('install', function(done)
 
                 return choices;
             }
+        },
+        {
+            name: 'encoding',
+            message: 'What file encoding would you like to use?',
+            type: 'list',
+            choices: function(answers)
+            {
+                // TODO: Populate list of all file encoding options
+                var choices = [];
+
+                choices.push({
+                    name: changeCase.upperCase(defaults.encoding),
+                    value: defaults.encoding
+                });
+
+                return choices;
+            }
         }
     ];
     //Ask
