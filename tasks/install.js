@@ -44,80 +44,36 @@ gulp.task('install', function(done)
             name: 'components',
             message: 'What files would you like to generated based on the schemas you provided?',
             type: 'checkbox',
-            choices: [
-                /* Not available yet */
-                // {
-                //     name: 'Full package*',
-                //     checked: false
-                // },
-                /* Not available yet */
-                // {
-                //     name: 'Assets',
-                //     checked: false
-                // },
+            choices: function()
+            {
+                var choices = [],
+                    components = [
+                        // 'Full package*',
+                        // 'Assets',
+                        'Configuration file',
+                        'Controller',
+                        // 'Command',
+                        // 'Event',
+                        // 'Middleware',
+                        'Migration',
+                        'Model',
+                        'Policy',
+                        // 'Provider',
+                        'Request',
+                        'Routes',
+                        'Seed',
+                        'View',
+                        // 'Unit test',
+                    ];
+
+                components.forEach( function(name)
                 {
-                    name: 'Configuration file',
-                    checked: true
-                },
-                {
-                    name: 'Controller',
-                    checked: true
-                },
-                /* Not available yet */
-                // {
-                //     name: 'Command',
-                //     checked: false
-                // },
-                /* Not available yet */
-                // {
-                //     name: 'Event',
-                //     checked: false
-                // },
-                /* Not available yet */
-                // {
-                //     name: 'Middleware',
-                //     checked: false
-                // },
-                {
-                    name: 'Migration',
-                    checked: true
-                },
-                {
-                    name: 'Model',
-                    checked: true
-                },
-                {
-                    name: 'Policy',
-                    checked: true
-                },
-                /* Not available yet */
-                // {
-                //     name: 'Provider',
-                //     checked: false
-                // },
-                {
-                    name: 'Request',
-                    checked: true
-                },
-                {
-                    name: 'Routes',
-                    checked: true
-                },
-                /* Not available yet */
-                // {
-                //     name: 'Seed',
-                //     checked: false
-                // },
-                {
-                    name: 'View',
-                    checked: true
-                }
-                /* Not available yet */
-                // {
-                //     name: 'Unit test',
-                //     checked: false
-                // }
-            ]
+                    var checked = true;
+                    choices.push({name, checked});
+                });
+
+                return choices;
+            }
         },
         {
             name: 'locales',
@@ -338,6 +294,20 @@ gulp.task('install', function(done)
                             resources[resource] = controller;
                         }
                         schema.make_routes(resources);
+                    }
+                    if (answers.components.indexOf('Seed') != 1)
+                    {
+                        var seeder_classes = [];
+
+                        for (thing of schema.list_of_things)
+                        {
+                            var resource = changeCase.snakeCase(thing),
+                                seeder = changeCase.pascalCase(thing) + 'Seeder';
+
+                            seeder_classes.push(seeder);
+                            schema.make_seed(seeder, resource);
+                        }
+                        schema.make_seed_runner(seeder_classes);
                     }
                 }))
                 .on('end', function()

@@ -3,7 +3,15 @@ var gulp = require('gulp'),
 
 /* Clean up generated files (useful for development) */
 gulp.task('clear', [
-		'clear-configurations', 'clear-controllers', 'clear-migrations', 'clear-models', 'clear-policies', 'clear-routes', 'clear-requests', 'clear-views'
+		'clear-configurations',
+		'clear-controllers',
+		'clear-migrations',
+		'clear-models',
+		'clear-policies',
+		'clear-routes',
+		'clear-requests',
+		'clear-seeds',
+		'clear-views'
 	], function() {
     return;
 });
@@ -41,6 +49,11 @@ gulp.task('clear-requests', function() {
 // Clear routes
 gulp.task('clear-routes', function() {
 	return gulp.src(['./app/Http/routes.php'], { read: false }).pipe( gulpPlugins.rm() );
+});
+
+// Clear seeds
+gulp.task('clear-seeds', function() {
+	return gulp.src(['./database/seeds/*.php'], { read: false }).pipe( gulpPlugins.rm() );
 });
 
 // Clear views

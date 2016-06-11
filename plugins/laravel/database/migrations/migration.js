@@ -12,7 +12,7 @@ var mc = require('memory-cache');
 // Queue
 var fq = new FileQueue(256);
 
-var mapper = require('./../../../classes/mapper');
+var mapper = require('./../../../../classes/mapper');
 
 /**
  * Laravel migration plugin for slush-blueprints **/
@@ -57,8 +57,8 @@ var migration =
     foreign_keys: [],
     time_step: 0, // Used to offset each migration by a second
 
-    // Used to exclude tables that might have bugs in the RDFa
-    problematic_tables: [],
+    // Used to exclude tables that might have bugs in the RDFa or conflicts with Laravel/Common packages
+    problematic_tables: ['roles'],
 
     /**
      * Compose database field
@@ -237,7 +237,7 @@ var migration =
     create_table: function(cwd, table_name, db_fields)
     {
        // Open migration template file
-       fq.readFile(cwd + '/templates/migration/create_table.php', {encoding: 'utf8'}, function (error, file_contents)
+       fq.readFile(cwd + '/templates/database/migrations/create_table.php', {encoding: 'utf8'}, function (error, file_contents)
        {
            if (error) throw error;
 

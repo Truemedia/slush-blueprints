@@ -2,7 +2,9 @@ var _ = require('underscore'),
     changeCase = require('change-case'),
     pluralize = require('pluralize'),
     gutil = require('gulp-util'),
-    FileQueue = require('filequeue');
+    FileQueue = require('filequeue'),
+    fs = require('fs-extra'),
+    path = require('path');
 
 // Queue
 var fq = new FileQueue(256);
@@ -13,6 +15,10 @@ var model =
 {
     counter: 0,
     traditional_logging: true,
+    base_files_copied: false,
+
+    // Used to exclude tables that might have bugs in the RDFa or conflicts with Laravel/Common packages
+    problematic_models: ['Role'],
 
     /**
      * Determine class names of models and property functions included as fields
@@ -38,8 +44,31 @@ var model =
         return things;
     },
 
+    /* Copy base files across */
+    copy_base_files: function(cwd)
+    {
+        if (!model.base_files_copied)
+        {
+            model.base_files_copied = true;
+
+            var entrust_models = ['Permission.php', 'Role.php', 'User.php'];
+                relative_path = path.join('app');
+
+            for (model_filename of entrust_models)
+            {
+                fs.copy(path.join(cwd, 'templates', relative_path, model_filename), path.join('.', relative_path, model_filename), function (error)
+                {
+                    if (error) throw error;
+                    var msg = 'Entrust model file/s copied successfully';
+                    gutil.log( gutil.colors.green(msg) );
+                });
+            }
+
+        }
+    },
+
   /**
-   * Create a migration based on passed parameters
+   * Create a model based on passed parameters
    */
    create: function(cwd, model_name, parent_model_name, fields)
    {

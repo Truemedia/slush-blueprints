@@ -20,11 +20,12 @@ if (framework == 'Laravel')
 {
   var config = require('./../plugins/laravel/config/config'),
       controller = require('./../plugins/laravel/app/Http/Controllers/controller'),
-      migration = require('./../plugins/laravel/database/migration'),
+      migration = require('./../plugins/laravel/database/migrations/migration'),
       model = require('./../plugins/laravel/app/model'),
       policy = require('./../plugins/laravel/app/Policies/policy'),
       request = require('./../plugins/laravel/app/Http/Requests/request'),
       routes = require('./../plugins/laravel/app/Http/routes'),
+      seeder = require('./../plugins/laravel/database/seeds/seeder'),
       view = require('./../plugins/laravel/resources/views/crudl');
 }
 
@@ -255,7 +256,7 @@ var schema =
         }
 
         // Models
-        if (make_model)
+        if (make_model && !(model.problematic_models.indexOf(model_name) > -1))
         {
             schema.make_model(model_name, changeCase.pascalCase(parent_table_name), table_fields);
         }
@@ -334,6 +335,7 @@ var schema =
     /* Write model */
     make_model: function(model_name, parent_model_name, field_names)
     {
+        model.copy_base_files(schema.cwd);
         // Avoid native datatype being declared as models
         if (schema.native_data_types.indexOf(parent_model_name) > -1)
         {
@@ -360,6 +362,18 @@ var schema =
         routes.copy_base_files(schema.list_of_things);
         routes.create(schema.cwd, resources);
     },
+
+    /* Write seeds */
+    make_seed_runner: function(seeder_classes)
+    {
+        seeder.copy_base_files(schema.cwd, seeder_classes);
+    },
+
+    make_seed: function(seeder_class, resource)
+    {
+        seeder.create(schema.cwd, seeder_class, resource);
+    },
+
 
     /* Write views */
     make_views: function(context_name, parent_context_name, form_fields, df)
