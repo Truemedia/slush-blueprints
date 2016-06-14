@@ -9,7 +9,7 @@
                 </tr>
             </thead>
             <tbody>
-            <?php foreach ($entries as $entry) { ?>
+            <?php $entries->each( function($entry, $index) use ($entries) { ?>
                 <tr>
                 <% _.each(formFields, function(field) { %>
                     <?php if (!empty( array_filter( array_column($entries->toArray(), '<%= field.name %>') ) )) { ?>
@@ -25,11 +25,15 @@
                     <?php } ?>
                 <% }); %>
                     <td>
-                        <a href="/<%= routeIndex %>/<?php echo $entry['id']; ?>/edit" class="btn btn-warning">Edit</a>
-                        <a href="/<%= routeIndex %>/<?php echo $entry['id']; ?>" class="btn btn-danger">Delete</a>
+                        <a href="<?php echo route('<%= routeName %>.edit', $entry->getKey()); ?>" class="btn btn-warning">
+                            Edit
+                        </a>
+                        <a href="<?php echo route('<%= routeName %>.destroy', $entry->getKey()); ?>" class="btn btn-danger">
+                            Delete
+                        </a>
                     </td>
                 </tr>
-            <?php } ?>
+            <?php }); ?>
             </tbody>
         </table>
     </div>

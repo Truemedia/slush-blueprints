@@ -20,7 +20,7 @@ class BaseController extends Controller
 		$class_name = get_class($this);
 		$this->setupInfo($method, $class_name);
 		$this->setupTitle($method, $class_name);
-        $this->setupViewPath($method, __NAMESPACE__, $class_name);
+        $this->setupViewPath();
 
         $response = call_user_func_array([$this, $method], $parameters);
 
@@ -46,27 +46,13 @@ class BaseController extends Controller
 	}
 
 	/**
-	 * Dynamically set name of view based on information available from current scope
+	 * Dynamically set name of view based on route name
 	 *
-	 * @param string
-	 * @param string
-	 * @param
-
+	 * @return void
 	 */
-	protected function setupViewPath($method, $namespace, $class)
+	protected function setupViewPath()
 	{
-		$namespace = explode('\\', $namespace);
-
-		$package = $namespace[1];
-		$controller = str_replace('Controller', '', class_basename($class));
-		$view = $method;
-
-		$path = array_map(function($string)
-		{
-			return strtolower($string);
-		}, compact('package', 'controller', 'view'));
-
-		$this->view = ($path['package'] != 'http' ? $path['package'] . '::' : '') . $path['controller'] . '.' . $path['view'];
+		$this->view = \Request::route()->getName();
 	}
 
 	/**

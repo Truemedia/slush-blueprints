@@ -2,8 +2,12 @@
 <div class="row">
     <div class="col-md-12">
         <div class="btn-group">
-            <a href="/<%= routeIndex %>/create" class="btn btn-success">Create</a>
-            <a href="/<%= routeIndex %>/delete" class="btn btn-danger">Delete all</a>
+            <a href="<?php echo route('<%= routeName %>.create'); ?>" class="btn btn-success">
+                Create
+            </a>
+            <a href="<?php //echo route('<%= routeName %>.destroy'); ?>" class="btn btn-danger">
+                Delete all
+            </a>
         </div>
     </div>
     <div class="col-md-12">

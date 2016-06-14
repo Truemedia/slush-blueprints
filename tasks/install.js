@@ -299,7 +299,7 @@ gulp.task('install', function(done)
                     {
                         schema.make_migrations();
                     }
-                    if (answers.components.indexOf('Routes') != 1)
+                    if (answers.components.indexOf('Routes') != -1)
                     {
                         var resources = {};
 
@@ -312,7 +312,7 @@ gulp.task('install', function(done)
                         }
                         schema.make_routes(resources);
                     }
-                    if (answers.components.indexOf('Seed') != 1)
+                    if (answers.components.indexOf('Seed') != -1)
                     {
                         var seeder_classes = [];
 

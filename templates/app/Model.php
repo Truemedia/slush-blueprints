@@ -22,7 +22,7 @@ class <%= modelName %> extends <%= parentModelName != '' ? parentModelName : 'Mo
      * @var array
      */
     public $fillable = [
-        <% _.each(fields, function(field) { %>'<%= field.name %>',
+        <% _.each(fields, function(field) { %><% if (field.name != 'id') { %>'<%= field.name %>',<% } %>
         <% }); %>
     ];
 
@@ -41,7 +41,9 @@ class <%= modelName %> extends <%= parentModelName != '' ? parentModelName : 'Mo
      *
      * @var array
      */
-    protected $hidden = ['id'];
+    protected $hidden = [
+        'id'
+    ];
 
     <% if (parentTableName != '') { %>
     /**
@@ -64,6 +66,7 @@ class <%= modelName %> extends <%= parentModelName != '' ? parentModelName : 'Mo
       */
      public function scopeLocales($query, $locale = null)
      {
+         // TODO: Respect model attributes
          if ($locale == null)
          {
              $locale = \App::getLocale();
@@ -72,6 +75,14 @@ class <%= modelName %> extends <%= parentModelName != '' ? parentModelName : 'Mo
          $lang_table = $this->getTable() . '_' . str_replace('-', '_', strtolower($locale));
          if (Schema::hasTable($lang_table))
          {
+             $query->select($this->getTable() . '.*');
+             foreach (\Schema::getColumnListing($lang_table) as $column_name)
+             {
+                 if ($column_name != 'id' && $column_name != 'parent_id')
+                 {
+                     $query->addSelect($lang_table . '.' . $column_name);
+                 }
+             }
              $query->leftJoin($lang_table, $this->getTable() . '.' . 'id', '=', $lang_table . '.' . 'parent_id');
          }
 
