@@ -72,6 +72,7 @@ var migration =
             "name": changeCase.snakeCase(name),
             "type": type,
             "comment": changeCase.titleCase(comment),
+            "function_name": changeCase.pascalCase(name)
         };
 
         database_field.parent_table = (parent_table != undefined) ? parent_table : null;

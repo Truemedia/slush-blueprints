@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 use Schema;
 
 class <%= modelName %> extends <%= parentModelName != '' ? parentModelName : 'Model' %>
@@ -44,6 +45,17 @@ class <%= modelName %> extends <%= parentModelName != '' ? parentModelName : 'Mo
     protected $hidden = [
         'id'
     ];
+
+    /**
+     * Mutators
+     *
+     */
+     <% _.each(fields, function(field) { %><% if (_.indexOf(['date', 'dateTime'], field.type) > -1) { %>
+    public function set<%= field.function_name %>Attribute($value)
+    {
+        $this->attributes['<%= field.name %>'] = Carbon::createFromFormat(config('formatting.df.<%= df %>.entry.date'), $value);
+    }
+    <% } %><% }); %>
 
     <% if (parentTableName != '') { %>
     /**

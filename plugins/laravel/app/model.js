@@ -73,7 +73,7 @@ var model =
   /**
    * Create a model based on passed parameters
    */
-   create: function(cwd, model_name, parent_model_name, fields)
+   create: function(cwd, model_name, parent_model_name, fields, df)
    {
        // Open model template file
        fq.readFile(cwd + '/templates/app/Model.php', {encoding: defaults.encoding}, function (error, file_contents)
@@ -89,7 +89,8 @@ var model =
                "tableName": pluralize( changeCase.snakeCase(model_name) ),
                "parentTableName": pluralize( changeCase.snakeCase(parent_model_name) ),
                "fields": fields,
-               "things": things
+               "things": things,
+               "df": df
            };
 
            var tpl = _.template(file_contents);

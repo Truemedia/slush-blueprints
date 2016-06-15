@@ -258,7 +258,7 @@ var schema =
         // Models
         if (make_model && !(model.problematic_models.indexOf(model_name) > -1))
         {
-            schema.make_model(model_name, changeCase.pascalCase(parent_table_name), table_fields);
+            schema.make_model(model_name, changeCase.pascalCase(parent_table_name), table_fields, answers.df);
         }
 
         // Policies
@@ -333,7 +333,7 @@ var schema =
     },
 
     /* Write model */
-    make_model: function(model_name, parent_model_name, field_names)
+    make_model: function(model_name, parent_model_name, field_names, df)
     {
         model.copy_base_files(schema.cwd);
         // Avoid native datatype being declared as models
@@ -341,7 +341,7 @@ var schema =
         {
             parent_model_name = 'Model';
         }
-        model.create(schema.cwd, model_name, parent_model_name, field_names);
+        model.create(schema.cwd, model_name, parent_model_name, field_names, df);
     },
 
     /* Write policy */
