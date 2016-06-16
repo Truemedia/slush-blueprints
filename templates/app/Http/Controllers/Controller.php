@@ -19,6 +19,8 @@ class <%= controllerName %> extends BaseController
 	 */
 	protected $layout = 'layouts.<%= layoutName %>.template';
 
+	protected $action_mapper = ['create' => 'store', 'edit' => 'update'];
+
 	/**
 	 * Get associated data options
 	 */
@@ -56,6 +58,17 @@ class <%= controllerName %> extends BaseController
 		return $data_options;
 	}
 
+	/**
+	 * Get form action (if applicable)
+	 */
+	private function formAction($route_name, $controller_method, $resource_id = null)
+	{
+		$form_action = route(
+			str_replace($controller_method, $this->action_mapper[$controller_method], $route_name), $resource_id
+		);
+		return $form_action;
+	}
+
     /**
      * Display a listing of the resource.
      *
@@ -71,13 +84,15 @@ class <%= controllerName %> extends BaseController
     /**
      * Show the form for creating a new resource.
      *
+	 * @param  \App\Http\Requests\<%= requestName %>  $request
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         $data_options = static::dataOptions();
+		$form_action = static::formAction($request->route()->getName(), __FUNCTION__);
 
-        $this->setContent( compact('data_options') );
+        $this->setContent( compact('data_options', 'form_action') );
     }
 
     /**
@@ -121,15 +136,17 @@ class <%= controllerName %> extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
+	 * @param  \App\Http\Requests\<%= requestName %>  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         $entry = <%= modelName %>::find($id)->locales()->first();
 		$data_options = static::dataOptions();
+		$form_action = static::formAction($request->route()->getName(), __FUNCTION__, $id);
 
-        $this->setContent( compact('entry', 'data_options') );
+        $this->setContent( compact('data_options', 'entry', 'form_action') );
     }
 
     /**

@@ -301,14 +301,23 @@ gulp.task('install', function(done)
                     }
                     if (answers.components.indexOf('Routes') != -1)
                     {
-                        var resources = {};
+                        var resources = [],
+                            controller_methods = ['create', 'destroy', 'edit', 'index', 'show', 'store', 'update'];
 
                         for (thing of schema.list_of_things)
                         {
-                            var resource = changeCase.snakeCase(thing),
+                            var path = changeCase.paramCase(thing),
                                 controller = changeCase.pascalCase(thing) + 'Controller';
 
-                            resources[resource] = controller;
+                            var names = [];
+                            controller_methods.forEach( function(method)
+                            {
+                                var unique = changeCase.snakeCase(thing) + '.' + method;
+
+                                names.push({method, unique});
+                            });
+
+                            resources.push({path, controller, names});
                         }
                         schema.make_routes(resources);
                     }

@@ -41,7 +41,7 @@ var routes =
        {
            if (error) throw error;
 
-           resources = routes.trim_route_names(resources);
+           resources = routes.trim_route_paths(resources);
            var template_data = {
                "resources": resources,
            };
@@ -70,30 +70,26 @@ var routes =
    },
 
    /* Trim routes that are longer than the route name limit (32 for laravel) */
-   trim_route_names: function(resources)
+   trim_route_paths: function(resources)
    {
-     for (route_name in resources)
+     resources.forEach( function(resource, index)
      {
          // Route to trim
-         if (route_name.length > 32)
+         if (resource.path.length > 32)
          {
              // Try sliming down by removing vowels
-             var new_route_name = route_name.replace(/[aeiou]/ig, '');
-             if (new_route_name.length > 32)
+             var new_path = resource.path.replace(/[aeiou]/ig, '');
+             if (new_path.length > 32)
              {
-                 console.log(new_route_name);
+                 console.log(new_path);
                  throw new Error('Route name is too long (32 characters max!)');
             }
             else
             {
-                var controller_name = resources[route_name];
-
-                delete resources[route_name];
-
-                resources[new_route_name] = controller_name;
+                resources[index].path = new_path;
             }
          }
-     }
+     });
 
      return resources;
    },

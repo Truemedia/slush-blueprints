@@ -43,13 +43,14 @@ var view =
     /**
      * Compose form field
      */
-    ff: function(name, type, table_name)
+    ff: function(name, type, route_name, table_name)
     {
         var form_field = {
             "name": name,
             "type": type,
             "label": changeCase.titleCase(name),
         };
+        form_field.route_name = (route_name != undefined) ? route_name : null;
         form_field.table_name = (table_name != undefined) ? table_name : null;
 
         return form_field;
@@ -112,8 +113,10 @@ var view =
                     else
                     {
                         // Got a reference to another thing, make a dropdown
-                        var table_name = pluralize( changeCase.snakeCase(humanized_thing) );
-                        valid_fields.push( view.ff(field_name, 'select', table_name) );
+                        var route_name = changeCase.snakeCase(humanized_thing),
+                            table_name = pluralize( changeCase.snakeCase(humanized_thing) );
+
+                        valid_fields.push( view.ff(field_name, 'select', route_name, table_name) );
                     }
                 }
                 // Got a native mapping, assign and use it
@@ -167,7 +170,7 @@ var view =
     /**
      * Create a view based on passed parameters
      */
-    create: function(cwd, context_name, parent_context_name, form_fields, df)
+    create: function(cwd, contextName, parentContextName, formFields, df)
     {
         var view_files = ['_form', '_view', '_list', 'create', 'destroy', 'edit', 'index'];
 
@@ -179,29 +182,23 @@ var view =
            {
                if (error) throw error;
 
-               var template_data = {
-                   "viewFolder": changeCase.lowerCase(context_name),
-                   "routeName": changeCase.snakeCase(context_name),
-                   "contextName": context_name,
-                   "parentContextName": parent_context_name,
-                   "formFields": form_fields,
-                   "formElements": view.form_elements,
-                   "inputTypes": view.input_types,
-                   "df": df
-               };
+               var viewFolder = routeName = changeCase.snakeCase(contextName),
+                   formElements = view.form_elements,
+                   inputTypes = view.input_types;
+
+               var template_data = {viewFolder, routeName, contextName, parentContextName, formFields, formElements, inputTypes, df};
 
                var tpl = _.template(file_contents);
                var view_file_contents = tpl(template_data);
 
-               var view_path = 'resources/views',
-                   context_path = changeCase.lowerCase(context_name);
+               var view_path = 'resources/views';
 
                // Check if views folder exists (Laravel instance)
                fq.exists(view_path, function(path_exists)
                {
                    if (path_exists)
                    {
-                       view_path = path.join(view_path, context_path);
+                       view_path = path.join(view_path, viewFolder);
 
                        // Create context folder if it does not exist
                        if (!fs.existsSync(view_path))

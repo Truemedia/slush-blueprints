@@ -1,4 +1,4 @@
-<form class="form-horizontal" action="/<%= routeName %><?php echo (isset($entry['id']) ? ('/' . $entry['id']) : ''); ?>" method="POST">
+<form class="form-horizontal" action="<?php echo $form_action; ?>" method="POST">
     <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>" />
     <input type="hidden" name="_method" value="<?php echo (isset($entry) ? 'PUT' : 'POST'); ?>" />
     <fieldset>
@@ -40,11 +40,11 @@
                                     <option value="<?php echo $option->id; ?>"><?php echo $option->id; ?></option>
                                 <?php } ?>
                             </select>
-                            <a class="btn btn-success" href="/<%= field.table_name %>/create">
+                            <a class="btn btn-success" href="<?php echo route('<%= field.route_name %>.create'); ?>">
                                 <?php echo _("Add option"); ?>
                             </a>
                         <?php } else { ?>
-                            <?php echo _("No options,"); ?> <a href="/<%= field.table_name %>/create"><?php echo _("why not add some?"); ?></a>
+                            <?php echo _("No options,"); ?> <a href="<?php echo route('<%= field.route_name %>.create'); ?>"><?php echo _("why not add some?"); ?></a>
                         <?php } ?>
                     <% } %>
                 <% } else { %>

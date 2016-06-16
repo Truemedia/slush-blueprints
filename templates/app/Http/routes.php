@@ -11,5 +11,7 @@
 |
 */
 
-<% _.each(resources, function(controller, resource) { %>Route::resource('<%= resource %>', '<%= controller %>');
+<% _.each(resources, function(resource) { %>Route::resource('<%= resource.path %>', '<%= resource.controller %>', ['names' => [
+    <% _.each(resource.names, function(name) { %>'<%= name.method %>' => '<%= name.unique %>',<% }); %>
+]]);
 <% }); %>

@@ -8,6 +8,6 @@
         </div>
     </div>
     <div class="col-md-12">
-        <?php echo view('<%= viewFolder %>._form', compact('entry', 'data_options'))->render(); ?>
+        <?php echo view('<%= viewFolder %>._form', compact('data_options', 'entry', 'form_action'))->render(); ?>
     </div>
 </div>
