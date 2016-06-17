@@ -1,30 +1,38 @@
-# blueprints [![NPM version](https://badge-me.herokuapp.com/api/npm/slush-blueprints.png)](http://badges.enytc.com/for/npm/slush-blueprints)
-
-> A slush generator for many web things (PHP, JS, Python, Ruby, HTML and CSS variants)
+> A slush generator for many web things (PHP, JS, Python, Ruby, HTML and CSS variants), optimized for Laravel
 
 
 ## Getting Started
 
-Install `slush-blueprints` globally:
+Install `slush-regenerator` globally:
 
 ```bash
-$ npm install -g slush-blueprints
+$ npm install -g slush-regenerator
 ```
 
 ### Usage
-Just run the generator from within whichever folder you desire:
+Just run the generator from within a Laravel website folder:
 
 ```bash
-$ cd web_app && slush blueprints
+$ cd site.app && slush regenerator:install
 ```
 
-## Getting To Know Slush
+## Getting To Know Regenerator
 
-Slush is a tool that uses Gulp for project scaffolding.
+Regenerator is a tool that you can use on new or existing Laravel websites (currently supporting 5.2+).
 
-Slush does not contain anything "out of the box", except the ability to locate installed slush generators and to run them with liftoff.
+It allows you to generate code for almost any aspect of the application. Currently you can generate the following:
+* Configuration files
+* Controllers
+* Commands
+* Migrations
+* Models
+* Policies
+* Requests
+* Routes
+* Seeds
+* Views (Currently only PHP/HTML files as .php)
 
-To find out more about Slush, check out the [documentation](https://github.com/klei/slush).
+(I plan to support more features to build but they are either a work in progress, or have been rejected due to low priority on implementation)
 
 ## Contributing
 
