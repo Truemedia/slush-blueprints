@@ -52,7 +52,7 @@ class BaseController extends Controller
 	 */
 	protected function setupViewPath()
 	{
-		$this->view = \Request::route()->getName();
+		$this->view = 'pages.' . \Request::route()->getName();
 	}
 
 	/**

@@ -171,13 +171,14 @@ var view =
      */
     create: function(cwd, contextName, parentContextName, formFields, df)
     {
-        var view_files = ['_form', '_view', '_list', 'create', 'destroy', 'edit', 'index'];
+        var view_files = ['_form', '_view', '_list', 'create', 'destroy', 'edit', 'index'],
+            relative_path = 'resources/views';
 
        // Open view template file
        view_files.forEach( function(view_file)
        {
            var filename = view_file + '.php';
-           fq.readFile(cwd + '/templates/resources/views/thing/crudl/' + filename, {encoding: defaults.encoding}, function (error, file_contents)
+           fq.readFile(path.join(cwd, 'templates', relative_path, 'thing', 'crudl', filename), {encoding: defaults.encoding}, function (error, file_contents)
            {
                if (error) throw error;
 
@@ -190,14 +191,19 @@ var view =
                var tpl = _.template(file_contents);
                var view_file_contents = tpl(template_data);
 
-               var view_path = 'resources/views';
-
                // Check if views folder exists (Laravel instance)
-               fq.exists(view_path, function(path_exists)
+               fq.exists(path.join('.', relative_path), function(path_exists)
                {
                    if (path_exists)
                    {
-                       view_path = path.join(view_path, viewFolder);
+                       var pages_path = path.join('.', relative_path, 'pages'),
+                           view_path = path.join(pages_path, viewFolder);
+
+                       // Create pages folder if it does not exist
+                       if (!fs.existsSync(pages_path))
+                       {
+                           fs.mkdirSync(pages_path);
+                       }
 
                        // Create context folder if it does not exist
                        if (!fs.existsSync(view_path))
@@ -214,7 +220,7 @@ var view =
                    }
                    else
                    {
-                       throw new Error( gutil.colors.red('Views folder does not exist (' + view_path + '), did you run this in the correct folder?') );
+                       throw new Error( gutil.colors.red('Views folder does not exist (' + relative_path + '), did you run this in the correct folder?') );
                    }
                });
            });
