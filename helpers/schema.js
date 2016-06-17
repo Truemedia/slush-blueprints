@@ -249,7 +249,7 @@ var schema =
                 parent_controller_name = 'BaseController';
             }
 
-            schema.make_controller(controller_name, parent_controller_name, model_name, request_name);
+            schema.make_controller(controller_name, parent_controller_name, model_name, request_name, answers.theme);
         }
 
         // Migrations
@@ -279,7 +279,7 @@ var schema =
         // Views
         if (make_views)
         {
-            schema.make_views(changeCase.pascalCase(table_name), changeCase.pascalCase(parent_table_name), form_fields, answers.df);
+            schema.make_views(changeCase.pascalCase(table_name), changeCase.pascalCase(parent_table_name), form_fields, answers);
         }
     },
 
@@ -329,10 +329,10 @@ var schema =
     },
 
     /* Write controller */
-    make_controller: function(controller_name, parent_controller_name, model_name, request_name)
+    make_controller: function(controller_name, parent_controller_name, model_name, request_name, layout)
     {
         controller.copy_base_files(schema.cwd);
-        controller.create(schema.cwd, controller_name, parent_controller_name, model_name, request_name);
+        controller.create(schema.cwd, controller_name, parent_controller_name, model_name, request_name, layout);
     },
 
     /* Write kernel */
@@ -391,10 +391,10 @@ var schema =
 
 
     /* Write views */
-    make_views: function(context_name, parent_context_name, form_fields, df)
+    make_views: function(context_name, parent_context_name, form_fields, answers)
     {
-        view.copy_base_files(schema.cwd);
-        view.create(schema.cwd, context_name, parent_context_name, form_fields, df);
+        view.copy_base_files(schema.cwd, answers.theme);
+        view.create(schema.cwd, context_name, parent_context_name, form_fields, answers.df);
     }
 };
 

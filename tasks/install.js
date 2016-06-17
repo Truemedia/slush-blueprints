@@ -29,7 +29,7 @@ gulp.task('install', function(done)
             type: 'confirm',
             default: true
         },
-        questions,
+        questions[0],
                 /* Not available yet */
                 // {
                 //     name: 'Build from specification (using regenerator.json)',
@@ -136,7 +136,8 @@ gulp.task('install', function(done)
 
                 return choices;
             }
-        }
+        },
+        questions[1]
     ];
     //Ask
     inquirer.prompt(prompts, function(answers)

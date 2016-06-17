@@ -9,7 +9,7 @@
 	</head>
 	<body id="layout">
 		<header>
-			<?php echo view('layouts.basic._nav', compact('things', 'thing', 'thing_path')); ?>
+			<?php echo view('layouts.bootstrap._nav', compact('things', 'thing', 'thing_path')); ?>
 		</header>
 		<div class="panel panel-primary" style="margin: 0 20px;">
 			<div class="panel-heading">

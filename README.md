@@ -9,8 +9,13 @@ Install `slush-regenerator` globally:
 $ npm install -g slush-regenerator
 ```
 
+### Dependencies
+This tool is only compatible with the following web stack, make sure these criteria are met or else you will experience problems when you load up your site:
+* [Laravel 5.2*](https://laravel.com/docs/5.2)
+* [Entrust](https://github.com/Zizaco/entrust)
+
 ### Usage
-Just run the generator from within a Laravel website folder:
+Just run the generator from within the Laravel powered website folder:
 
 ```bash
 $ cd site.app && slush regenerator:install

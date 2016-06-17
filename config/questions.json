@@ -1,3 +1,4 @@
+[
 {
     "name": "workflow",
     "message": "Which workflow would you like to use for generating files? Choose from the following options:",
@@ -8,4 +9,20 @@
             "value": "wizard"
         }
     ]
+},
+{
+    "name": "theme",
+    "message": "Pick a theme",
+    "type": "list",
+    "choices": [
+        {
+            "name": "Bootstrap (3.3.6)",
+            "value": "bootstrap"
+        },
+        {
+            "name": "Barebones (No styling)",
+            "value": "barebones"
+        }
+    ]
 }
+]

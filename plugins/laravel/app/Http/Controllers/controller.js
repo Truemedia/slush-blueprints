@@ -19,22 +19,19 @@ var controller =
     counter: 0,
     traditional_logging: true,
     base_files_copied: false,
-    layout_name: 'basic',
 
   /**
    * Create a controller based on passed parameters
    */
-   create: function(cwd, controllerName, parentControllerName, modelName, requestName)
+   create: function(cwd, controllerName, parentControllerName, modelName, requestName, layoutName)
    {
        // Open model template file
        fq.readFile(cwd + '/templates/app/Http/Controllers/Controller.php', {encoding: defaults.encoding}, function (error, file_contents)
        {
            if (error) throw error;
 
-           var filename = controllerName + '.php';
-
-           var layoutName = controller.layout_name;
-           var template_data = {layoutName, controllerName, parentControllerName, modelName, requestName};
+           var filename = controllerName + '.php',
+               template_data = {layoutName, controllerName, parentControllerName, modelName, requestName};
 
            var tpl = _.template(file_contents);
            var controller_file_contents = tpl(template_data);

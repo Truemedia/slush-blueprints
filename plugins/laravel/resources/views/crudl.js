@@ -23,7 +23,6 @@ var view =
     counter: 0,
     traditional_logging: true,
     base_files_copied: false,
-    layout_name: 'basic',
 
     // Different attributes for input type (for automatic browser UIs)
     input_types: [
@@ -150,13 +149,13 @@ var view =
     },
 
     /* Copy base files across */
-    copy_base_files: function(cwd)
+    copy_base_files: function(cwd, layout_name)
     {
         if (!view.base_files_copied)
         {
             view.base_files_copied = true;
             var filename = 'template.php',
-                relative_path = path.join('resources', 'views', 'layouts', view.layout_name);
+                relative_path = path.join('resources', 'views', 'layouts', layout_name);
 
             fs.copy(path.join(cwd, 'templates', relative_path), path.join('.', relative_path), function (error)
             {
