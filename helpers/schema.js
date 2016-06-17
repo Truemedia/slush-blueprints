@@ -18,7 +18,8 @@ var Table = require('cli-table');
 var framework = 'Laravel';
 if (framework == 'Laravel')
 {
-  var config = require('./../plugins/laravel/config/config'),
+  var command = require('./../plugins/laravel/app/Console/Commands/command'),
+      config = require('./../plugins/laravel/config/config'),
       controller = require('./../plugins/laravel/app/Http/Controllers/controller'),
       migration = require('./../plugins/laravel/database/migrations/migration'),
       model = require('./../plugins/laravel/app/model'),
@@ -165,7 +166,8 @@ var schema =
     /* Make a schema */
     make_schema: function(thing, answers)
     {
-        var make_controller = (answers.components.indexOf('Controller') != -1),
+        var make_command = (answers.components.indexOf('Command') != -1),
+            make_controller = (answers.components.indexOf('Controller') != -1),
             make_migration = (answers.components.indexOf('Migration') != -1),
             make_model = (answers.components.indexOf('Model') != -1),
             make_policy = (answers.components.indexOf('Policy') != -1),
@@ -190,6 +192,7 @@ var schema =
         // Avoid creating certain files when no fields exist
         if (!Object.keys(properties).length)
         {
+            make_command = false,
             make_controller = false,
             make_migration = false,
             make_policy = false,
@@ -313,6 +316,12 @@ var schema =
         }
     },
 
+    /* Write command */
+    make_command: function(command_name, signature, description, model_name)
+    {
+        command.create(schema.cwd, command_name, signature, description, model_name);
+    },
+
     /* Make config files */
     make_configs: function()
     {
@@ -324,6 +333,12 @@ var schema =
     {
         controller.copy_base_files(schema.cwd);
         controller.create(schema.cwd, controller_name, parent_controller_name, model_name, request_name);
+    },
+
+    /* Write kernel */
+    make_kernel: function(commands)
+    {
+        command.copy_base_files(schema.cwd, commands);
     },
 
     /* Store migration in cache for later use */

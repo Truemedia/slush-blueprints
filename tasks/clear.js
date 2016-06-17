@@ -3,6 +3,7 @@ var gulp = require('gulp'),
 
 /* Clean up generated files (useful for development) */
 gulp.task('clear', [
+		'clear-commands',
 		'clear-configurations',
 		'clear-controllers',
 		'clear-migrations',
@@ -14,6 +15,11 @@ gulp.task('clear', [
 		'clear-views'
 	], function() {
     return;
+});
+
+// Clear commands
+gulp.task('clear-commands', function() {
+	return gulp.src(['./app/Console/Kernel.php', './app/Console/Commands/*Command.php'], { read: false }).pipe( gulpPlugins.rm() );
 });
 
 // Clear configuration files (generated only)

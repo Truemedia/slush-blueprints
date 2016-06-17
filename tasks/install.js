@@ -52,7 +52,7 @@ gulp.task('install', function(done)
                         // 'Assets',
                         'Configuration file',
                         'Controller',
-                        // 'Command',
+                        'Command',
                         // 'Event',
                         // 'Middleware',
                         'Migration',
@@ -291,6 +291,22 @@ gulp.task('install', function(done)
                     });
 
                     // Build files (if requested)
+                    if (answers.components.indexOf('Command') != -1)
+                    {
+                        var commands = [];
+
+                        for (thing of schema.list_of_things)
+                        {
+                            var command = changeCase.pascalCase(thing) + 'Command',
+                                description = ''; // TODO: Do something with this
+                                model = changeCase.pascalCase(thing),
+                                signature = changeCase.paramCase(thing);
+
+                            commands.push(command);
+                            schema.make_command(command, signature, description, model);
+                        }
+                        schema.make_kernel(commands);
+                    }
                     if (answers.components.indexOf('Configuration file') != -1)
                     {
                         schema.make_configs();
