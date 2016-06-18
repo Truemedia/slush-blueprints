@@ -25,25 +25,32 @@ var controller =
    */
    create: function(cwd, controllerName, parentControllerName, modelName, requestName, layoutName)
    {
+       var filename = controllerName + '.php',
+           relative_path = path.join('app', 'Http', 'Controllers');
+
        // Open model template file
-       fq.readFile(cwd + '/templates/app/Http/Controllers/Controller.php', {encoding: defaults.encoding}, function (error, file_contents)
+       fq.readFile(path.join(cwd, 'templates', relative_path, 'Resources', 'Controller.php'), {encoding: defaults.encoding}, function (error, file_contents)
        {
            if (error) throw error;
 
-           var filename = controllerName + '.php',
-               template_data = {layoutName, controllerName, parentControllerName, modelName, requestName};
-
+           var template_data = {layoutName, controllerName, parentControllerName, modelName, requestName};
            var tpl = _.template(file_contents);
            var controller_file_contents = tpl(template_data);
-           var controller_path = 'app/Http/Controllers';
 
            // Check if controller folder exists (Laravel instance)
-           fq.exists(controller_path, function(path_exists)
+           fq.exists(path.join('.', relative_path), function(path_exists)
            {
                if (path_exists)
                {
+                   // Create Resources folder if it does not exist
+                   var resource_controllers_path = path.join('.', relative_path, 'Resources');
+                   if (!fs.existsSync(resource_controllers_path))
+                   {
+                       fs.mkdirSync(resource_controllers_path);
+                   }
+
                    // Write controller file
-                   fq.writeFile('./' + controller_path + '/' + filename, controller_file_contents, function (error)
+                   fq.writeFile(path.join(resource_controllers_path, filename), controller_file_contents, function (error)
                    {
                        if (error) throw error;
                        controller.created(filename);
@@ -51,7 +58,7 @@ var controller =
                }
                else
                {
-                   throw new Error( gutil.colors.red('Controller folder does not exist (' + controller_path + '), did you run this in the correct folder?') );
+                   throw new Error( gutil.colors.red('Controller folder does not exist (' + relative_path + '), did you run this in the correct folder?') );
                }
            });
        });
@@ -64,10 +71,17 @@ var controller =
        {
            controller.base_files_copied = true;
 
-           var filename = 'BaseController.php',
-               relative_path = path.join('app', 'Http', 'Controllers');
+           var relative_path = path.join('app', 'Http', 'Controllers', 'Core'),
+               src_path = path.join(cwd, 'templates', relative_path),
+               dest_path = path.join('.', relative_path);
 
-           fs.copy(path.join(cwd, 'templates', relative_path, filename), path.join('.', relative_path, filename), function (error)
+           // Create Resources folder if it does not exist
+           if (!fs.existsSync(dest_path))
+           {
+               fs.mkdirSync(dest_path);
+           }
+
+           fs.copy(src_path, dest_path, function (error)
            {
                if (error) throw error;
                var msg = 'Base controller file/s copied successfully';

@@ -154,13 +154,23 @@ var view =
         if (!view.base_files_copied)
         {
             view.base_files_copied = true;
-            var filename = 'template.php',
-                relative_path = path.join('resources', 'views', 'layouts', layout_name);
+            var view_path =  path.join('resources', 'views'),
+                layout_path = path.join(view_path, 'layouts', layout_name),
+                pages_path = path.join(view_path, 'pages');
 
-            fs.copy(path.join(cwd, 'templates', relative_path), path.join('.', relative_path), function (error)
+            // Layout
+            fs.copy(path.join(cwd, 'templates', layout_path), path.join('.', layout_path), function (error)
             {
                 if (error) throw error;
-                var msg = 'Base view file/s copied successfully';
+                var msg = 'Layout file/s copied successfully';
+                gutil.log( gutil.colors.green(msg) );
+            });
+
+            // Core pages
+            fs.copy(path.join(cwd, 'templates', pages_path, 'admin'), path.join('.', pages_path, 'admin'), function (error)
+            {
+                if (error) throw error;
+                var msg = 'Core page file/s copied successfully';
                 gutil.log( gutil.colors.green(msg) );
             });
         }
@@ -178,7 +188,7 @@ var view =
        view_files.forEach( function(view_file)
        {
            var filename = view_file + '.php';
-           fq.readFile(path.join(cwd, 'templates', relative_path, 'thing', 'crudl', filename), {encoding: defaults.encoding}, function (error, file_contents)
+           fq.readFile(path.join(cwd, 'templates', relative_path, 'pages', 'resource', filename), {encoding: defaults.encoding}, function (error, file_contents)
            {
                if (error) throw error;
 

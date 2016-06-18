@@ -11,7 +11,14 @@
 |
 */
 
-<% _.each(resources, function(resource) { %>Route::resource('<%= resource.path %>', '<%= resource.controller %>', ['names' => [
+// Core controllers
+Route::any('/', [
+    'as' => 'admin.index',
+    'uses' => 'Core\AdminController@index'
+]);
+
+// Resource controllers
+<% _.each(resources, function(resource) { %>Route::resource('<%= resource.path %>', 'Resources\<%= resource.controller %>', ['names' => [
     <% _.each(resource.names, function(name) { %>'<%= name.method %>' => '<%= name.unique %>',<% }); %>
 ]]);
 <% }); %>

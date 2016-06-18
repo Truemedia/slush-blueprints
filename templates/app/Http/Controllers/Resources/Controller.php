@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Resources;
 
 use Schema;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Core\BaseController;
 
 use ReflectionClass;
 use ReflectionMethod;

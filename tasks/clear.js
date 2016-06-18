@@ -29,7 +29,7 @@ gulp.task('clear-configurations', function() {
 
 // Clear controllers
 gulp.task('clear-controllers', function() {
-	return gulp.src(['./app/Http/Controllers/*.php'], { read: false }).pipe( gulpPlugins.rm() );
+	return gulp.src(['./app/Http/Controllers/{Core,Resources}/*Controller.php'], { read: false }).pipe( gulpPlugins.rm() );
 });
 
 // Clear migrations
@@ -64,5 +64,5 @@ gulp.task('clear-seeds', function() {
 
 // Clear views
 gulp.task('clear-views', function() {
-	return gulp.src(['./resources/views/**/**/*.php', './resources/views/**/**/*'], { read: false }).pipe( gulpPlugins.rm() );
+	return gulp.src(['./resources/views/layouts/**/*.php', './resources/views/pages/**/**/*.php'], { read: false }).pipe( gulpPlugins.rm() );
 });
