@@ -25,15 +25,17 @@ var controller =
    */
    create: function(cwd, controllerName, parentControllerName, modelName, requestName, layoutName)
    {
-       var filename = controllerName + '.php',
+       var resourceName = modelName; // TODO: Trim down this logic
+
+       var filename = 'AdminController.php',
            relative_path = path.join('app', 'Http', 'Controllers');
 
-       // Open model template file
-       fq.readFile(path.join(cwd, 'templates', relative_path, 'Resources', 'Controller.php'), {encoding: defaults.encoding}, function (error, file_contents)
+       // Open controller template file
+       fq.readFile(path.join(cwd, 'templates', relative_path, 'Resources', filename), {encoding: defaults.encoding}, function (error, file_contents)
        {
            if (error) throw error;
 
-           var template_data = {layoutName, controllerName, parentControllerName, modelName, requestName};
+           var template_data = {layoutName, controllerName, parentControllerName, modelName, resourceName, requestName};
            var tpl = _.template(file_contents);
            var controller_file_contents = tpl(template_data);
 
@@ -49,8 +51,15 @@ var controller =
                        fs.mkdirSync(resource_controllers_path);
                    }
 
+                   // Create resource specific folder if it does not exist
+                   var resource_controller_path = path.join(resource_controllers_path, resourceName);
+                   if (!fs.existsSync(resource_controller_path))
+                   {
+                       fs.mkdirSync(resource_controller_path);
+                   }
+
                    // Write controller file
-                   fq.writeFile(path.join(resource_controllers_path, filename), controller_file_contents, function (error)
+                   fq.writeFile(path.join(resource_controller_path, filename), controller_file_contents, function (error)
                    {
                        if (error) throw error;
                        controller.created(filename);

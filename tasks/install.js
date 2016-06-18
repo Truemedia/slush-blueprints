@@ -324,17 +324,18 @@ gulp.task('install', function(done)
                         for (thing of schema.list_of_things)
                         {
                             var path = changeCase.paramCase(thing),
-                                controller = changeCase.pascalCase(thing) + 'Controller';
+                                controller = changeCase.pascalCase(thing) + 'Controller',
+                                name = changeCase.pascalCase(thing);
 
                             var names = [];
                             controller_methods.forEach( function(method)
                             {
-                                var unique = changeCase.snakeCase(thing) + '.' + method;
+                                var unique = changeCase.snakeCase(thing) + '.admin.' + method;
 
                                 names.push({method, unique});
                             });
 
-                            resources.push({path, controller, names});
+                            resources.push({path, controller, name, names});
                         }
                         schema.make_routes(resources);
                     }

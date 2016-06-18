@@ -112,7 +112,7 @@ var view =
                     else
                     {
                         // Got a reference to another thing, make a dropdown
-                        var route_name = changeCase.snakeCase(humanized_thing),
+                        var route_name = changeCase.snakeCase(humanized_thing) + '.admin',
                             table_name = pluralize( changeCase.snakeCase(humanized_thing) );
 
                         valid_fields.push( view.ff(field_name, 'select', route_name, table_name) );
@@ -182,17 +182,17 @@ var view =
     create: function(cwd, contextName, parentContextName, formFields, df)
     {
         var view_files = ['_form', '_view', '_list', 'create', 'destroy', 'edit', 'index'],
-            relative_path = 'resources/views';
+            relative_path = path.join('resources', 'views');
 
        // Open view template file
        view_files.forEach( function(view_file)
        {
            var filename = view_file + '.php';
-           fq.readFile(path.join(cwd, 'templates', relative_path, 'pages', 'resource', filename), {encoding: defaults.encoding}, function (error, file_contents)
+           fq.readFile(path.join(cwd, 'templates', relative_path, 'pages', 'resource', 'admin', filename), {encoding: defaults.encoding}, function (error, file_contents)
            {
                if (error) throw error;
 
-               var viewFolder = routeName = changeCase.snakeCase(contextName),
+               var viewFolder = routeName = changeCase.snakeCase(contextName) + '.admin',
                    formElements = view.form_elements,
                    inputTypes = view.input_types;
 
@@ -207,7 +207,8 @@ var view =
                    if (path_exists)
                    {
                        var pages_path = path.join('.', relative_path, 'pages'),
-                           view_path = path.join(pages_path, viewFolder);
+                           view_path = path.join(pages_path, changeCase.snakeCase(contextName)),
+                           admin_path = path.join(view_path, 'admin');
 
                        // Create pages folder if it does not exist
                        if (!fs.existsSync(pages_path))
@@ -221,8 +222,14 @@ var view =
                            fs.mkdirSync(view_path);
                        }
 
+                       // Create admin folder if it does not exist
+                       if (!fs.existsSync(admin_path))
+                       {
+                           fs.mkdirSync(admin_path);
+                       }
+
                        // Write view file
-                       fq.writeFile(path.join(view_path, filename), view_file_contents, function (err)
+                       fq.writeFile(path.join(admin_path, filename), view_file_contents, function (err)
                        {
                            if (error) throw error;
                            view.made(filename);

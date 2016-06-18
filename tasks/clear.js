@@ -11,14 +11,14 @@ gulpPlugins.addsrc = require('gulp-add-src');
 var pipelines = {
 	commands: lazypipe().pipe(gulpPlugins.addsrc.append, ['./app/Console/Kernel.php', './app/Console/Commands/*Command.php']),
 	configurations: lazypipe().pipe(gulpPlugins.addsrc.append, ['./config/formatting.php']),
-	controllers: lazypipe().pipe(gulpPlugins.addsrc.append, ['./app/Http/Controllers/{Core,Resources}/*Controller.php']),
+	controllers: lazypipe().pipe(gulpPlugins.addsrc.append, ['./app/Http/Controllers/Core/*Controller.php', './app/Http/Controllers/Resources/**/*Controller.php']),
 	migrations: lazypipe().pipe(gulpPlugins.addsrc.append, ['./database/migrations/*.php']),
 	models: lazypipe().pipe(gulpPlugins.addsrc.append, ['./app/*.php']),
 	policies: lazypipe().pipe(gulpPlugins.addsrc.append, ['./app/Policies/*.php']),
 	requests: lazypipe().pipe(gulpPlugins.addsrc.append, ['./app/Http/Requests/*.php', '!./app/Http/Requests/Request.php']),
 	routes: lazypipe().pipe(gulpPlugins.addsrc.append, ['./app/Http/routes.php']),
 	seeds: lazypipe().pipe(gulpPlugins.addsrc.append, ['./database/seeds/*.php']),
-	views: lazypipe().pipe(gulpPlugins.addsrc.append, ['./resources/views/layouts/**/*.php', './resources/views/pages/**/**/*.php'])
+	views: lazypipe().pipe(gulpPlugins.addsrc.append, ['./resources/views/layouts/**/*.php', './resources/views/pages/**/**/**/*.php'])
 };
 
 // Cleanse function

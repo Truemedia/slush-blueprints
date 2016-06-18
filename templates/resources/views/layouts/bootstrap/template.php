@@ -19,7 +19,7 @@
 			</div>
   			<div id="all_things" class="panel-body collapse">
 			<?php foreach ($things as $thing) { ?>
-				<a href="/<?php echo snake_case( str_replace(' ', '', ucwords($thing)) ); ?>"><?php echo $thing; ?></a> &nbsp;
+				<a href="/admin/<?php echo snake_case( str_replace(' ', '', ucwords($thing)) ); ?>"><?php echo $thing; ?></a> &nbsp;
 			<?php } ?>
   			</div>
 		</div>

@@ -12,13 +12,13 @@
 */
 
 // Core controllers
-Route::any('/', [
-    'as' => 'admin.index',
-    'uses' => 'Core\AdminController@index'
-]);
 
-// Resource controllers
-<% _.each(resources, function(resource) { %>Route::resource('<%= resource.path %>', 'Resources\<%= resource.controller %>', ['names' => [
-    <% _.each(resource.names, function(name) { %>'<%= name.method %>' => '<%= name.unique %>',<% }); %>
-]]);
-<% }); %>
+// Resource controllers (admin)
+Route::group(['prefix' => 'admin'], function () {
+    Route::any('/', ['as' => 'admin.index', 'uses' => 'Core\AdminController@index']);
+
+    <% _.each(resources, function(resource) { %>Route::resource('<%= resource.path %>', 'Resources\<%= resource.name %>\AdminController', ['names' => [
+        <% _.each(resource.names, function(name) { %>'<%= name.method %>' => '<%= name.unique %>',<% }); %>
+    ]]);
+    <% }); %>
+});

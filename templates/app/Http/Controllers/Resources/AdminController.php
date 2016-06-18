@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Resources;
+namespace App\Http\Controllers\Resources\<%= resourceName %>;
 
 use Schema;
 
@@ -12,7 +12,7 @@ use ReflectionMethod;
 use App\<%= modelName %>;
 use App\Http\Requests\<%= requestName %> as Request;
 
-class <%= controllerName %> extends BaseController
+class AdminController extends BaseController
 {
     /**
      * The layout that should be used for standard HTML responses.
