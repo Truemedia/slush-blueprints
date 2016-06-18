@@ -71,6 +71,9 @@
   ],
   "devDependencies": {
     "fs-extra": "^0.26.7",
-    "jsonfile": "^2.2.3"
+    "gulp-add-src": "^0.2.0",
+    "jsonfile": "^2.2.3",
+    "lazypipe": "^1.0.1",
+    "yargs": "^4.7.1"
   }
 }

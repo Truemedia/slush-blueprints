@@ -34,7 +34,7 @@
       </form>
       -->
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="https://github.com/Truemedia/slush-blueprints">Generated using slush regenerator</a></li>
+        <li><a href="https://github.com/Truemedia/slush-blueprints" target="_blank">Generated using slush regenerator</a></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Settings <span class="caret"></span></a>
           <ul class="dropdown-menu">
