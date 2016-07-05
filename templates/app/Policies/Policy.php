@@ -15,7 +15,7 @@ class <%= policyName %>
      */
     public function index(User $user)
     {
-		return false;
+		return $user->can('<%= resourceName %>.' . __FUNCTION__);
     }
 
     /**
@@ -26,7 +26,7 @@ class <%= policyName %>
      */
     public function create()
     {
-        return false;
+        return $user->can('<%= resourceName %>.' . __FUNCTION__);
     }
 
     /**
@@ -37,7 +37,7 @@ class <%= policyName %>
      */
     public function store(User $user)
     {
-        return false;
+        return $user->can('<%= resourceName %>.' . __FUNCTION__);
     }
 
     /**
@@ -49,7 +49,7 @@ class <%= policyName %>
      */
     public function show(User $user, <%= modelName %> <%= modelInstanceName %>)
     {
-        return $user->id === <%= modelInstanceName %>->user_id;
+        return ($user->id === <%= modelInstanceName %>->user_id || $user->can('<%= resourceName %>.' . __FUNCTION__));
     }
 
     /**
@@ -61,7 +61,7 @@ class <%= policyName %>
      */
     public function edit(User $user, <%= modelName %> <%= modelInstanceName %>)
     {
-        return $user->id === <%= modelInstanceName %>->user_id;
+        return ($user->id === <%= modelInstanceName %>->user_id || $user->can('<%= resourceName %>.' . __FUNCTION__));
     }
 
     /**
@@ -73,7 +73,7 @@ class <%= policyName %>
      */
     public function update(User $user, <%= modelName %> <%= modelInstanceName %>)
     {
-        return $user->id === <%= modelInstanceName %>->user_id;
+        return ($user->id === <%= modelInstanceName %>->user_id || $user->can('<%= resourceName %>.' . __FUNCTION__));
     }
 
     /**
@@ -85,6 +85,6 @@ class <%= policyName %>
      */
     public function destroy(User $user, <%= modelName %> <%= modelInstanceName %>)
     {
-        return $user->id === <%= modelInstanceName %>->user_id;
+        return ($user->id === <%= modelInstanceName %>->user_id || $user->can('<%= resourceName %>.' . __FUNCTION__));
     }
 }

@@ -10,11 +10,16 @@ gulpPlugins.addsrc = require('gulp-add-src');
 // Pipelines
 var pipelines = {
 	commands: lazypipe().pipe(gulpPlugins.addsrc.append, ['./app/Console/Kernel.php', './app/Console/Commands/*Command.php']),
-	configurations: lazypipe().pipe(gulpPlugins.addsrc.append, ['./config/formatting.php']),
+	configurations: lazypipe().pipe(gulpPlugins.addsrc.append, [
+		'./config/*.php', '!./config/{app,auth,broadcasting,cache,compile,database,filesystems,mail,queue,services,session,view}.php'
+	]), // Avoid deleting other configurations until functionality in place
 	controllers: lazypipe().pipe(gulpPlugins.addsrc.append, ['./app/Http/Controllers/Core/*Controller.php', './app/Http/Controllers/Resources/**/*Controller.php']),
 	migrations: lazypipe().pipe(gulpPlugins.addsrc.append, ['./database/migrations/*.php']),
 	models: lazypipe().pipe(gulpPlugins.addsrc.append, ['./app/*.php']),
 	policies: lazypipe().pipe(gulpPlugins.addsrc.append, ['./app/Policies/*.php']),
+	providers: lazypipe().pipe(gulpPlugins.addsrc.append, [
+		'./app/Providers/*.php', '!./app/Providers/{App,Event,Route}ServiceProvider.php'
+	]), // Avoid deleting other providers until functionality in place
 	requests: lazypipe().pipe(gulpPlugins.addsrc.append, ['./app/Http/Requests/*.php', '!./app/Http/Requests/Request.php']),
 	routes: lazypipe().pipe(gulpPlugins.addsrc.append, ['./app/Http/routes.php']),
 	seeds: lazypipe().pipe(gulpPlugins.addsrc.append, ['./database/seeds/*.php']),
@@ -49,6 +54,7 @@ gulp.task('clear', [
 		'clear-migrations',
 		'clear-models',
 		'clear-policies',
+		'clear-providers',
 		'clear-routes',
 		'clear-requests',
 		'clear-seeds',
@@ -57,32 +63,14 @@ gulp.task('clear', [
     return;
 });
 
-// Clear commands
-gulp.task('clear-commands', function() { return cleanse('commands') });
-
-// Clear configuration files (generated only)
-gulp.task('clear-configurations', function() { return cleanse('configurations') });
-
-// Clear controllers
-gulp.task('clear-controllers', function() { return cleanse('controllers') });
-
-// Clear migrations
-gulp.task('clear-migrations', function() { return cleanse('migrations') });
-
-// Clear models
-gulp.task('clear-models', function() { return cleanse('models') });
-
-// Clear policies
-gulp.task('clear-policies', function() { return cleanse('policies') });
-
-// Clear requests
-gulp.task('clear-requests', function() { return cleanse('requests') });
-
-// Clear routes
-gulp.task('clear-routes', function() { return cleanse('routes') });
-
-// Clear seeds
-gulp.task('clear-seeds', function() { return cleanse('seeds') });
-
-// Clear views
-gulp.task('clear-views', function() { return cleanse('views') });
+gulp.task('clear-commands', function() { return cleanse('commands') }); // Clear commands
+gulp.task('clear-configurations', function() { return cleanse('configurations') }); // Clear configuration files
+gulp.task('clear-controllers', function() { return cleanse('controllers') }); // Clear controllers
+gulp.task('clear-migrations', function() { return cleanse('migrations') }); // Clear migrations
+gulp.task('clear-models', function() { return cleanse('models') }); // Clear models
+gulp.task('clear-policies', function() { return cleanse('policies') }); // Clear policies
+gulp.task('clear-providers', function() { return cleanse('providers') }); // Clear policies
+gulp.task('clear-requests', function() { return cleanse('requests') }); // Clear requests
+gulp.task('clear-routes', function() { return cleanse('routes') }); // Clear routes
+gulp.task('clear-seeds', function() { return cleanse('seeds') }); // Clear seeds
+gulp.task('clear-views', function() { return cleanse('views') }); // Clear views

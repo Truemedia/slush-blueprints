@@ -21,13 +21,17 @@ class AdminController extends BaseController
 
 	protected $action_mapper = ['create' => 'store', 'edit' => 'update'];
 
+	protected $model = 'App\<%= modelName %>';
+
+	protected $resource = '<%= resourceName %>';
+
 	/**
 	 * Get associated data options
 	 */
 	private function dataOptions()
 	{
 		$instance = new <%= modelName %>;
-		$reflector = new ReflectionClass('App\<%= modelName %>');
+		$reflector = new ReflectionClass($this->model);
 		$data_options = [];
 
 		foreach ($reflector->getMethods(ReflectionMethod::IS_PUBLIC) as $method)
@@ -118,7 +122,7 @@ class AdminController extends BaseController
 			$status = 'Validation failed';
 		}
 
-		return redirect()->action('<%= controllerName %>@index')->with( compact('status') );
+		return redirect()->route('<%= resourceName %>.admin.index')->with( compact('status') );
     }
 
     /**
@@ -173,7 +177,7 @@ class AdminController extends BaseController
 			$status = 'Validation failed';
 		}
 
-		return redirect()->action('<%= controllerName %>@index')->with( compact('status') );
+		return redirect()->route('<%= resourceName %>.admin.index')->with( compact('status') );
     }
 
     /**

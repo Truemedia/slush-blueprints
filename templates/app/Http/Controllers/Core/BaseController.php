@@ -10,25 +10,45 @@ class BaseController extends Controller
 {
 	use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+	protected $model = null;
+	protected $resource = null;
+
 	/**
 	 * Wrap calls to automatically return content
 	 */
 	public function callAction($method, $parameters)
     {
-        $this->setupLayout();
+		// Only authorize if authenticated
+		if (\Auth::user() != null)
+		{
+			// Handle authorization
+			if (isset($parameters[$this->resource]))
+			{
+				$instance = call_user_func([$this->model, 'findOrFail'], $parameters[$this->resource]);
+			}
+			else
+			{
+				$instance = new $this->model();
+			}
 
+			$this->authorize($method, $instance);
+		}
+
+		// Helper
 		$class_name = get_class($this);
+
+		// Setup controller prerequisites
+        $this->setupLayout();
 		$this->setupInfo($method, $class_name);
 		$this->setupTitle($method, $class_name);
         $this->setupViewPath();
 
+		// Handle response
         $response = call_user_func_array([$this, $method], $parameters);
-
         if (is_null($response) && !is_null($this->layout))
         {
             $response = $this->layout;
         }
-
         return $response;
     }
 

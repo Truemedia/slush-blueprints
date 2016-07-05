@@ -24,6 +24,7 @@ if (framework == 'Laravel')
       migration = require('./../plugins/laravel/database/migrations/migration'),
       model = require('./../plugins/laravel/app/model'),
       policy = require('./../plugins/laravel/app/Policies/policy'),
+      provider = require('./../plugins/laravel/app/Providers/provider'),
       request = require('./../plugins/laravel/app/Http/Requests/request'),
       routes = require('./../plugins/laravel/app/Http/routes'),
       seeder = require('./../plugins/laravel/database/seeds/seeder'),
@@ -389,6 +390,11 @@ var schema =
         seeder.create(schema.cwd, seeder_class, resource);
     },
 
+    /* Write providers */
+    make_providers: function(policies)
+    {
+        provider.create_auth_provider(schema.cwd, policies);
+    },
 
     /* Write views */
     make_views: function(context_name, parent_context_name, form_fields, answers)

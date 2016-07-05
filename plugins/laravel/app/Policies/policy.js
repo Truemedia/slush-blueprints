@@ -22,7 +22,7 @@ var policy =
   /**
    * Create a policy based on passed parameters
    */
-   create: function(cwd, policyName, modelName, modelInstanceName)
+   create: function(cwd, policyName, modelName, modelInstanceName, resourceName)
    {
        // Open policy template file
        fq.readFile(cwd + '/templates/app/Policies/Policy.php', {encoding: defaults.encoding}, function (error, file_contents)
@@ -30,7 +30,7 @@ var policy =
            if (error) throw error;
 
            var filename = policyName + '.php';
-               template_data = {policyName, modelName, modelInstanceName};
+               template_data = {policyName, modelName, modelInstanceName, resourceName};
 
            var tpl = _.template(file_contents);
            var policy_file_contents = tpl(template_data);

@@ -13,8 +13,17 @@
 
 // Core controllers
 
+// Authentication routes
+Route::group(['prefix' => 'auth'], function() {
+    Route::get('login', ['as' => 'auth.login.get', 'uses' => 'Auth\AuthController@getLogin']);
+    Route::post('login', ['as' => 'auth.login.post', 'uses' => 'Auth\AuthController@postLogin']);
+    Route::get('logout', ['as' => 'auth.logout', 'uses' => 'Auth\AuthController@getLogout']);
+    Route::get('register', ['as' => 'auth.register.get', 'uses' => 'Auth\AuthController@getRegister']);
+    Route::post('register', ['as' => 'auth.register.post', 'uses' => 'Auth\AuthController@postRegister']);
+});
+
 // Resource controllers (admin)
-Route::group(['prefix' => 'admin'], function () {
+Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function() {
     Route::any('/', ['as' => 'admin.index', 'uses' => 'Core\AdminController@index']);
 
     <% _.each(resources, function(resource) { %>Route::resource('<%= resource.path %>', 'Resources\<%= resource.name %>\AdminController', ['names' => [

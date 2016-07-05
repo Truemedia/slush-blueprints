@@ -58,7 +58,7 @@ gulp.task('install', function(done)
                         'Migration',
                         'Model',
                         'Policy',
-                        // 'Provider',
+                        'Provider',
                         'Request',
                         'Routes',
                         'Seed',
@@ -68,7 +68,7 @@ gulp.task('install', function(done)
 
                 components.forEach( function(name)
                 {
-                    var checked = true;
+                    var checked = false;
                     choices.push({name, checked});
                 });
 
@@ -315,6 +315,19 @@ gulp.task('install', function(done)
                     if (answers.components.indexOf('Migration') != -1)
                     {
                         schema.make_migrations();
+                    }
+                    if (answers.components.indexOf('Provider') != -1)
+                    {
+                        var policies = {};
+
+                        for (thing of schema.list_of_things)
+                        {
+                            var model = changeCase.pascalCase(thing),
+                                policy = changeCase.pascalCase(thing) + 'Policy';
+
+                            policies[policy] = model;
+                        }
+                        schema.make_providers(policies);
                     }
                     if (answers.components.indexOf('Routes') != -1)
                     {
