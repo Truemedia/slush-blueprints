@@ -2,10 +2,19 @@ var argv = require('yargs').argv,
 	gulp = require('gulp'),
 	gulpPlugins = require('auto-plug')('gulp'),
 	gutil = require('gulp-util'),
-	lazypipe = require('lazypipe');
+	lazypipe = require('lazypipe'),
+	path = require('path');
 
 // Badly named plugin
 gulpPlugins.addsrc = require('gulp-add-src');
+
+// Paths
+var root = '.';
+var paths = {
+	handler: path.join(root, 'app', 'Exceptions'),
+	view: path.join(root, 'resources', 'views')
+};
+// TODO: Clean up pipelines with paths
 
 // Pipelines
 var pipelines = {
@@ -14,6 +23,7 @@ var pipelines = {
 		'./config/*.php', '!./config/{app,auth,broadcasting,cache,compile,database,filesystems,mail,queue,services,session,view}.php'
 	]), // Avoid deleting other configurations until functionality in place
 	controllers: lazypipe().pipe(gulpPlugins.addsrc.append, ['./app/Http/Controllers/Core/*Controller.php', './app/Http/Controllers/Resources/**/*Controller.php']),
+	handlers: lazypipe().pipe(gulpPlugins.addsrc.append, [path.join(paths.handler, 'Handler.php')]),
 	migrations: lazypipe().pipe(gulpPlugins.addsrc.append, ['./database/migrations/*.php']),
 	models: lazypipe().pipe(gulpPlugins.addsrc.append, ['./app/*.php']),
 	policies: lazypipe().pipe(gulpPlugins.addsrc.append, ['./app/Policies/*.php']),
@@ -23,7 +33,9 @@ var pipelines = {
 	requests: lazypipe().pipe(gulpPlugins.addsrc.append, ['./app/Http/Requests/*.php', '!./app/Http/Requests/Request.php']),
 	routes: lazypipe().pipe(gulpPlugins.addsrc.append, ['./app/Http/routes.php']),
 	seeds: lazypipe().pipe(gulpPlugins.addsrc.append, ['./database/seeds/*.php']),
-	views: lazypipe().pipe(gulpPlugins.addsrc.append, ['./resources/views/layouts/**/*.php', './resources/views/pages/**/**/**/*.php'])
+	views: lazypipe().pipe(gulpPlugins.addsrc.append, [
+		path.join(paths.view, 'layouts', '**', '*.php'), path.join(paths.view, 'pages', '**', '**', '*.php'), path.join(paths.view, 'errors', '*.php')
+	])
 };
 
 // Cleanse function
@@ -51,6 +63,7 @@ gulp.task('clear', [
 		'clear-commands',
 		'clear-configurations',
 		'clear-controllers',
+		'clear-handlers',
 		'clear-migrations',
 		'clear-models',
 		'clear-policies',
@@ -66,6 +79,7 @@ gulp.task('clear', [
 gulp.task('clear-commands', function() { return cleanse('commands') }); // Clear commands
 gulp.task('clear-configurations', function() { return cleanse('configurations') }); // Clear configuration files
 gulp.task('clear-controllers', function() { return cleanse('controllers') }); // Clear controllers
+gulp.task('clear-handlers', function() { return cleanse('handlers') }); // Clear handlers
 gulp.task('clear-migrations', function() { return cleanse('migrations') }); // Clear migrations
 gulp.task('clear-models', function() { return cleanse('models') }); // Clear models
 gulp.task('clear-policies', function() { return cleanse('policies') }); // Clear policies

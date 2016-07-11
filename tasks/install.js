@@ -55,6 +55,7 @@ gulp.task('install', function(done)
                         'Command',
                         // 'Event',
                         // 'Middleware',
+                        'Handler',
                         'Migration',
                         'Model',
                         'Policy',
@@ -311,6 +312,10 @@ gulp.task('install', function(done)
                     if (answers.components.indexOf('Configuration file') != -1)
                     {
                         schema.make_configs();
+                    }
+                    if (answers.components.indexOf('Handler') != -1)
+                    {
+                        schema.make_handlers();
                     }
                     if (answers.components.indexOf('Migration') != -1)
                     {

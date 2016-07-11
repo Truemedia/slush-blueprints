@@ -156,7 +156,8 @@ var view =
             view.base_files_copied = true;
             var view_path =  path.join('resources', 'views'),
                 layout_path = path.join(view_path, 'layouts', layout_name),
-                pages_path = path.join(view_path, 'pages');
+                pages_path = path.join(view_path, 'pages'),
+                error_path = path.join(view_path, 'errors');
 
             // Layout
             fs.copy(path.join(cwd, 'templates', layout_path), path.join('.', layout_path), function (error)
@@ -171,6 +172,14 @@ var view =
             {
                 if (error) throw error;
                 var msg = 'Core page file/s copied successfully';
+                gutil.log( gutil.colors.green(msg) );
+            });
+
+            // Handler pages
+            fs.copy(path.join(cwd, 'templates', error_path), path.join('.', error_path), function (error)
+            {
+                if (error) throw error;
+                var msg = 'Handler page file/s copied successfully';
                 gutil.log( gutil.colors.green(msg) );
             });
         }

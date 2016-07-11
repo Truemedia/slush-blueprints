@@ -21,6 +21,7 @@ if (framework == 'Laravel')
   var command = require('./../plugins/laravel/app/Console/Commands/command'),
       config = require('./../plugins/laravel/config/config'),
       controller = require('./../plugins/laravel/app/Http/Controllers/controller'),
+      handler = require('./../plugins/laravel/app/Exceptions/handler'),
       migration = require('./../plugins/laravel/database/migrations/migration'),
       model = require('./../plugins/laravel/app/model'),
       policy = require('./../plugins/laravel/app/Policies/policy'),
@@ -334,6 +335,21 @@ var schema =
     {
         controller.copy_base_files(schema.cwd);
         controller.create(schema.cwd, controller_name, parent_controller_name, model_name, request_name, layout);
+    },
+
+    /* Make handlers */
+    make_handlers: function()
+    {
+        // TODO: Choose handlers as question
+        var handlers = [
+            {
+                exception: 'NotFoundHttpException',
+                statusCode: '404',
+                pageTitle: '404 Page Not Found',
+                viewFile: 'errors.404'
+            }
+        ];
+        handler.copy_base_files(schema.cwd, handlers);
     },
 
     /* Write kernel */

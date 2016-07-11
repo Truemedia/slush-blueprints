@@ -11,6 +11,7 @@
     </div>
 
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <?php if (isset($thing_path) && isset($thing)) { ?>
       <ul class="nav navbar-nav">
         <li class="active">
             <a href="/<?php echo $thing_path; ?>"><?php echo $thing; ?> <span class="sr-only">(current)</span></a>
@@ -24,6 +25,7 @@
           </ul>
         </li>
       </ul>
+      <?php } ?>
       <!--
       <form class="navbar-form navbar-left" role="search">
         <div class="form-group">
