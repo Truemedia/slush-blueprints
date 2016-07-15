@@ -20,7 +20,7 @@ var defaults = require('./../config/defaults.json'),
 // CLI UI
 var ProgressBar = require('progress');
 
-gulp.task('install', function(done)
+gulp.task('generate', function(done)
 {
     var prompts = [
         {
