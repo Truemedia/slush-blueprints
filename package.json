@@ -1,23 +1,23 @@
 {
-  "name": "slush-blueprints",
-  "description": "A slush generator for many web things",
+  "name": "slush-regenerator",
+  "description": "A slush generator for many website things (Optimized for Laravel 5.2)",
   "version": "0.1.1",
-  "homepage": "https://github.com/Truemedia/slush-blueprints",
+  "homepage": "https://github.com/Truemedia/slush-regenerator",
   "author": {
     "name": "Wade Penistone",
     "email": "wadespackages@yahoo.com"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/Truemedia/slush-blueprints.git"
+    "url": "git://github.com/Truemedia/slush-regenerator.git"
   },
   "bugs": {
-    "url": "https://github.com/Truemedia/slush-blueprints/issues"
+    "url": "https://github.com/Truemedia/slush-regenerator/issues"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/Truemedia/slush-blueprints/blob/master/LICENSE"
+      "url": "https://github.com/Truemedia/slush-regenerator/blob/master/LICENSE"
     }
   ],
   "main": "slushfile.js",
@@ -67,7 +67,7 @@
     "underscore.string": "^2.3.3"
   },
   "keywords": [
-    "slushgenerator"
+    "slushgenerator", "laravel", "schemaorg"
   ],
   "devDependencies": {
     "fs-extra": "^0.26.7",
