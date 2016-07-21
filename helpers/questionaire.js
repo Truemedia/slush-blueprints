@@ -7,7 +7,7 @@ var changeCase = require('change-case'),
 
 var questionaire = {
     /* Ask questions */
-    ask: function(defaults) {
+    ask: function(settings) {
         var prompts = [
             {
                 name: 'installAgree',
@@ -19,12 +19,12 @@ var questionaire = {
                 name: 'username',
                 message: 'What username would you like for the Super Admin?',
                 type: 'input',
-                default: defaults.userName
+                default: settings.userName
             },
             {
                 name: 'email',
                 message: 'What email will be used for the Super Admin?',
-                default: defaults.authorEmail
+                default: settings.authorEmail
             },
             questions[0],
                     /* Not available yet */
@@ -83,7 +83,7 @@ var questionaire = {
                     CountryLanguage.getLocales(true).forEach(function(locale)
                     {
                         var choice = {'name': locale};
-                        choice.checked = (locale === defaults.locale);
+                        choice.checked = (locale === settings.locale);
                         choices.push(choice);
                     });
 
@@ -128,8 +128,8 @@ var questionaire = {
                     var choices = [];
 
                     choices.push({
-                        name: changeCase.upperCase(defaults.encoding),
-                        value: defaults.encoding
+                        name: changeCase.upperCase(settings.encoding),
+                        value: settings.encoding
                     });
 
                     return choices;

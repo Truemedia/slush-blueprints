@@ -24,22 +24,30 @@ function format(string)
     return username.replace(/\s/g, '');
 }
 
-var defaults = (function () {
+var defaults = require('./../config/defaults.json');
+
+// Settings
+// TODO: Abstract to settings helper
+var settings = (function () {
+
     var homeDir = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE,
         workingDirName = process.cwd().split('/').pop().split('\\').pop(),
         osUserName = homeDir && homeDir.split('/').pop() || 'root',
         configFile = homeDir + '/.gitconfig',
         user = {};
+
     if (require('fs').existsSync(configFile)) {
         user = require('iniparser').parseSync(configFile).user;
     }
-    return {
-        homeDir: homeDir,
-        vendorName: 'regeneration',
-        packageName: workingDirName,
-        userName: format(user.name) || osUserName,
-        authorEmail: user.email || 'john.doe@website.com'
-    };
+
+    var vendorName = 'regeneration',
+        packageName = workingDirName,
+        userName = format(user.name) || osUserName,
+        authorEmail = user.email || 'john.doe@website.com',
+        locale = defaults.locale,
+        encoding = defaults.encoding;
+
+    return {homeDir, vendorName, packageName, userName, authorEmail, locale, encoding};
 })();
 
 // CLI UI
@@ -48,7 +56,7 @@ var ProgressBar = require('progress');
 gulp.task('generate', function(done)
 {
     // Ask
-    inquirer.prompt(questionaire.ask(defaults), function(answers)
+    inquirer.prompt(questionaire.ask(settings), function(answers)
     {
         if (answers.installAgree)
         {
