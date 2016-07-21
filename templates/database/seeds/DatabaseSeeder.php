@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
 
         <% _.each(seedClasses, function(seedClass) { %>$this->call(<%= seedClass %>::class);
         <% }); %>
+        $this->call(SuperAdminSeeder::class);
 
         Model::reguard();
     }

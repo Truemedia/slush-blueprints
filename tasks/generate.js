@@ -10,11 +10,37 @@ var gulp = require('gulp'),
 var schema = require('./../helpers/schema'),
     questionaire = require('./../helpers/questionaire'),
     changeCase = require('change-case'),
+    generatePassword = require('password-generator'),
     jsonfile = require('jsonfile'),
     walk = require('tree-walk');
 
-// Configs
-var defaults = require('./../config/defaults.json');
+function format(string)
+{
+    if (string == null)
+    {
+        string = '';
+    }
+    var username = string.toLowerCase();
+    return username.replace(/\s/g, '');
+}
+
+var defaults = (function () {
+    var homeDir = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE,
+        workingDirName = process.cwd().split('/').pop().split('\\').pop(),
+        osUserName = homeDir && homeDir.split('/').pop() || 'root',
+        configFile = homeDir + '/.gitconfig',
+        user = {};
+    if (require('fs').existsSync(configFile)) {
+        user = require('iniparser').parseSync(configFile).user;
+    }
+    return {
+        homeDir: homeDir,
+        vendorName: 'regeneration',
+        packageName: workingDirName,
+        userName: format(user.name) || osUserName,
+        authorEmail: user.email || 'john.doe@website.com'
+    };
+})();
 
 // CLI UI
 var ProgressBar = require('progress');
@@ -22,7 +48,7 @@ var ProgressBar = require('progress');
 gulp.task('generate', function(done)
 {
     // Ask
-    inquirer.prompt(questionaire.ask(), function(answers)
+    inquirer.prompt(questionaire.ask(defaults), function(answers)
     {
         if (answers.installAgree)
         {
@@ -250,7 +276,13 @@ gulp.task('generate', function(done)
                             seeder_classes.push(seeder);
                             schema.make_seed(seeder, resource);
                         }
-                        schema.make_seed_runner(seeder_classes);
+
+                        var username = answers.username,
+                            email = answers.email,
+                            password = generatePassword();
+
+                        var super_admin = {username, email, password};
+                        schema.make_seed_runner(seeder_classes, super_admin);
                     }
                 }))
                 .on('end', function()

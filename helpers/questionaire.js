@@ -7,13 +7,24 @@ var changeCase = require('change-case'),
 
 var questionaire = {
     /* Ask questions */
-    ask: function() {
+    ask: function(defaults) {
         var prompts = [
             {
                 name: 'installAgree',
                 message: 'This library will create and possibly overwrite files in your Laravel instance. This may not be reversable, do you wish to continue?',
                 type: 'confirm',
                 default: true
+            },
+            {
+                name: 'username',
+                message: 'What username would you like for the Super Admin?',
+                type: 'input',
+                default: defaults.userName
+            },
+            {
+                name: 'email',
+                message: 'What email will be used for the Super Admin?',
+                default: defaults.authorEmail
             },
             questions[0],
                     /* Not available yet */
