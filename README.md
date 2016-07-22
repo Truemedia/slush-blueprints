@@ -18,7 +18,7 @@ This tool is only compatible with the following web stack, make sure these crite
 Just run the generator from within the Laravel powered website folder:
 
 ```bash
-$ cd site.app && slush regenerator:install
+$ cd site.app && slush regenerator:generate
 ```
 
 ## Getting To Know Regenerator
@@ -41,10 +41,10 @@ It allows you to generate code for almost any aspect of the application. Current
 
 ## Contributing
 
-See the [CONTRIBUTING Guidelines](https://github.com/Truemedia/slush-blueprints/blob/master/CONTRIBUTING.md)
+See the [CONTRIBUTING Guidelines](https://github.com/Truemedia/slush-regenerator/blob/master/CONTRIBUTING.md)
 
 ## Support
-If you have any problem or suggestion please open an issue [here](https://github.com/Truemedia/slush-blueprints/issues).
+If you have any problem or suggestion please open an issue [here](https://github.com/Truemedia/slush-regenerator/issues).
 
 ## License
 
