@@ -3,6 +3,7 @@ var _ = require('underscore'),
     FileQueue = require('filequeue');
     gutil = require('gulp-util'),
     moment = require('moment'),
+    path = require('path'),
     pluralize = require('pluralize'),
     redis = require('redis');
 
@@ -26,7 +27,7 @@ var seeder =
     base_files_copied: false,
 
     /* Copy base files across */
-    copy_base_files: function(cwd, seedClasses)
+    copy_base_files: function(cwd, seedClasses, superAdmin)
      {
          if (!seeder.base_files_copied)
          {
@@ -37,34 +38,49 @@ var seeder =
              return;
          }
 
-         var filename = 'DatabaseSeeder.php',
-             seeds_path = 'database/seeds';
+         var filenames = ['DatabaseSeeder', 'SuperAdminSeeder'],
+             ext = '.php',
+             relative_path = path.join('database', 'seeds');
 
-         // Open seeds template file
-         fq.readFile(cwd + '/templates/' + seeds_path + '/' + filename, {encoding: defaults.encoding}, function (error, file_contents)
+         // Open seeds template files
+         filenames.forEach( function(filename)
          {
-             if (error) throw error;
+             var file = filename + ext;
 
-             var template_data = {seedClasses};
-             var tpl = _.template(file_contents);
-             var seeder_file_contents = tpl(template_data);
-
-             // Check if seeds folder exists (Laravel instance)
-             fq.exists(seeds_path, function(path_exists)
+             fq.readFile(path.join(cwd, 'templates', relative_path, file), {encoding: defaults.encoding}, function (error, file_contents)
              {
-                 if (path_exists)
+                 if (error) throw error;
+
+                 var template_data = {};
+                 switch (filename)
                  {
-                     // Write seeder file
-                     fq.writeFile('./' + seeds_path + '/' + filename, seeder_file_contents, function (err)
+                     case 'DatabaseSeeder':
+                        template_data = {seedClasses};
+                     break;
+                     case 'SuperAdminSeeder':
+                        template_data = {superAdmin};
+                     break;
+                 }
+                 var tpl = _.template(file_contents);
+                 var seeder_file_contents = tpl(template_data);
+
+                 // Check if seeds folder exists (Laravel instance)
+                 fq.exists(relative_path, function(path_exists)
+                 {
+                     if (path_exists)
                      {
-                         if (error) throw error;
-                         seeder.created(filename);
-                     });
-                 }
-                 else
-                 {
-                     throw new Error( gutil.colors.red('Seeds folder does not exist (' + seeds_path + '), did you run this in the correct folder?') );
-                 }
+                         // Write seeder file
+                         fq.writeFile(path.join('.', relative_path, file), seeder_file_contents, function (err)
+                         {
+                             if (error) throw error;
+                             seeder.created(filename);
+                         });
+                     }
+                     else
+                     {
+                         throw new Error( gutil.colors.red(`Seeds folder does not exist (${relative_path}), did you run this in the correct folder?`) );
+                     }
+                 });
              });
          });
      },
@@ -74,6 +90,8 @@ var seeder =
      */
     create: function(cwd, seederClass, resourceName)
     {
+        var relative_path = path.join('database', 'seeds');
+
        // Open seeder template file
        fq.readFile(cwd + '/templates/database/seeds/Seeder.php', {encoding: defaults.encoding}, function (error, file_contents)
        {

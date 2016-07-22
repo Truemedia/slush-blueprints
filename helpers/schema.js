@@ -396,9 +396,9 @@ var schema =
     },
 
     /* Write seeds */
-    make_seed_runner: function(seeder_classes)
+    make_seed_runner: function(seeder_classes, super_admin)
     {
-        seeder.copy_base_files(schema.cwd, seeder_classes);
+        seeder.copy_base_files(schema.cwd, seeder_classes, super_admin);
     },
 
     make_seed: function(seeder_class, resource)
