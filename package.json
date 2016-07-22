@@ -1,7 +1,7 @@
 {
   "name": "slush-regenerator",
   "description": "A slush generator for many website things (Optimized for Laravel 5.2)",
-  "version": "0.1.1",
+  "version": "0.2.1",
   "homepage": "https://github.com/Truemedia/slush-regenerator",
   "author": {
     "name": "Wade Penistone",
