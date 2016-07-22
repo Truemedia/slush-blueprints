@@ -101,7 +101,7 @@ gulp.task('default', function (done) {
                         {
                             // This is a weird file to deal with
                             case '_packageNameCapsServiceProvider':
-                                replacements.push('vendorNameCaps', 'packageNameCaps'); 
+                                replacements.push('vendorNameCaps', 'packageNameCaps');
                             break;
 
                             case '_packageNameCaps':
@@ -126,7 +126,7 @@ gulp.task('default', function (done) {
                             replacements.forEach( function(item)
                             {
                                 var find = '_' + item;
-                                var replace = data[item]; 
+                                var replace = data[item];
 
                                 dir = dir.replace(find, replace);
                                 name = name.replace(find, replace);
