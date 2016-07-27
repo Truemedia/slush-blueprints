@@ -56,7 +56,7 @@ var ProgressBar = require('progress');
 gulp.task('generate', function(done)
 {
     // Ask
-    inquirer.prompt(questionaire.ask(settings), function(answers)
+    inquirer.prompt(questionaire.ask(settings)).then( function(answers)
     {
         if (answers.installAgree)
         {
