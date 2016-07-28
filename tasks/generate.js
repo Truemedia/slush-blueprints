@@ -7,7 +7,7 @@ var gulp = require('gulp'),
     path = require('path');
 
 // Helpers
-var schema = require('./../helpers/schema'),
+var intermediate = require('./../helpers/intermediate'),
     questionaire = require('./../helpers/questionaire'),
     changeCase = require('change-case'),
     generatePassword = require('password-generator'),
@@ -64,10 +64,10 @@ gulp.task('generate', function(done)
 
             // TODO: Download schema if not already exists
             // var schema_download_urls = ['https://raw.githubusercontent.com/schemaorg/schemaorg/sdo-phobos/data/schema.rdfa'];
-            // gulpPlugins.download(schema.download_url)
+            // gulpPlugins.download(intermediate.download_url)
                 // .pipe( gulp.dest('cache/') )
             var cwd = path.join(__dirname, '..');
-            schema.cwd = cwd;
+            intermediate.cwd = cwd;
 
             gulp.src(cwd + '/data/schema.rdfa')
                 .pipe(gulpPlugins.cheerio(function ($, file)
@@ -81,7 +81,7 @@ gulp.task('generate', function(done)
                         if (cache_file != null)
                         {
                             gutil.log( gutil.colors.cyan('Cache file found (unorganized_things.json), now processing without scraping') );
-                            schema.unorganized_things = cache_file;
+                            intermediate.unorganized_things = cache_file;
                         }
                         else
                         {
@@ -95,7 +95,7 @@ gulp.task('generate', function(done)
                         if (cache_file != null)
                         {
                             gutil.log( gutil.colors.cyan('Cache file found (list_of_things.json), now processing without scraping') );
-                            schema.list_of_things = cache_file;
+                            intermediate.list_of_things = cache_file;
                         }
                         else
                         {
@@ -136,27 +136,27 @@ gulp.task('generate', function(done)
 
                             // Only create if not duplicate
                             // TODO: Merge multiple instances of same thing to avoid potential differences
-                            if (schema.list_of_things.indexOf(humanized_thing) == -1)
+                            if (intermediate.list_of_things.indexOf(humanized_thing) == -1)
                             {
                                 var msg = gutil.colors.cyan('Finding things, ')
-                                    + gutil.colors.green('(' + schema.unorganized_things.length + ')')
+                                    + gutil.colors.green('(' + intermediate.unorganized_things.length + ')')
                                     + gutil.colors.yellow(' found ')
                                     + gutil.colors.magenta(humanized_thing) + '\r';
                                 gutil.log(msg);
 
-                                schema.list_of_things.push(humanized_thing);
-                                schema.unorganized_things.push(thing);
+                                intermediate.list_of_things.push(humanized_thing);
+                                intermediate.unorganized_things.push(thing);
                             }
                         });
-                        schema.list_of_things.sort();
+                        intermediate.list_of_things.sort();
 
-                        jsonfile.writeFileSync(schema.cwd + '/cache/unorganized_things.json', schema.unorganized_things, {spaces: 2});
+                        jsonfile.writeFileSync(intermediate.cwd + '/cache/unorganized_things.json', intermediate.unorganized_things, {spaces: 2});
                         gutil.log( gutil.colors.green('Unorganized things now cached! previous processes will not need to repeat next time') );
-                        jsonfile.writeFileSync(schema.cwd + '/cache/list_of_things.json', schema.list_of_things, {spaces: 2});
+                        jsonfile.writeFileSync(intermediate.cwd + '/cache/list_of_things.json', intermediate.list_of_things, {spaces: 2});
                         gutil.log( gutil.colors.green('List of things now cached! previous processes will not need to repeat next time') );
                     }
 
-                    gutil.log( gutil.colors.yellow('Found ' + schema.unorganized_things.length + ' things, now organizing them into a hierachy structure') );
+                    gutil.log( gutil.colors.yellow('Found ' + intermediate.unorganized_things.length + ' things, now organizing them into a hierachy structure') );
 
                     // Use cache if available
                     try
@@ -167,7 +167,7 @@ gulp.task('generate', function(done)
                         if (cache_file != null)
                         {
                             gutil.log( gutil.colors.cyan('Cache file found (organized_things.json), now processing without building hierachy') );
-                            schema.organized_things = cache_file;
+                            intermediate.organized_things = cache_file;
                         }
                         else
                         {
@@ -177,27 +177,27 @@ gulp.task('generate', function(done)
                     }
                     catch (e)
                     {
-                        schema.organized_things = schema.unorganized_things;
-                        schema.unorganized_things.forEach( function(thing) { schema.organize_thing(thing) } );
+                        intermediate.organized_things = intermediate.unorganized_things;
+                        intermediate.unorganized_things.forEach( function(thing) { intermediate.organize_thing(thing) } );
 
-                        jsonfile.writeFileSync(cwd + '/cache/organized_things.json', schema.organized_things, {spaces: 2});
+                        jsonfile.writeFileSync(cwd + '/cache/organized_things.json', intermediate.organized_things, {spaces: 2});
                         gutil.log( gutil.colors.green('Organized things now cached! previous processes will not need to repeat next time') );
                     }
 
                     // Migration creation progress bar
                     var progress_bar = new ProgressBar('Creating migrations :bar :percent complete (:current/:total) created in :elapsed secs', {
-                        total: schema.unorganized_things.length, width: 18
+                        total: intermediate.unorganized_things.length, width: 18
                     });
 
                     // Unset to save memory
-                    schema.unorganized_things = undefined;
+                    intermediate.unorganized_things = undefined;
 
                     // Walk the organized tree and build everything in the process
-                    walk.preorder(schema.organized_things, function(value, key, parent)
+                    walk.preorder(intermediate.organized_things, function(value, key, parent)
                     {
                         if (key == 'class_name')
                         {
-                            schema.make_schema(parent, answers);
+                            intermediate.make_schema(parent, answers);
                             //progress_bar.tick();
 
                             if (progress_bar.complete)
@@ -212,7 +212,7 @@ gulp.task('generate', function(done)
                     {
                         var commands = [];
 
-                        for (thing of schema.list_of_things)
+                        for (thing of intermediate.list_of_things)
                         {
                             var command = changeCase.pascalCase(thing) + 'Command',
                                 description = ''; // TODO: Do something with this
@@ -220,41 +220,41 @@ gulp.task('generate', function(done)
                                 signature = changeCase.paramCase(thing);
 
                             commands.push(command);
-                            schema.make_command(command, signature, description, model);
+                            intermediate.make_command(command, signature, description, model);
                         }
-                        schema.make_kernel(commands);
+                        intermediate.make_kernel(commands);
                     }
                     if (answers.components.indexOf('Configuration file') != -1)
                     {
-                        schema.make_configs();
+                        intermediate.make_configs();
                     }
                     if (answers.components.indexOf('Handler') != -1)
                     {
-                        schema.make_handlers();
+                        intermediate.make_handlers();
                     }
                     if (answers.components.indexOf('Migration') != -1)
                     {
-                        schema.make_migrations();
+                        intermediate.make_migrations();
                     }
                     if (answers.components.indexOf('Provider') != -1)
                     {
                         var policies = {};
 
-                        for (thing of schema.list_of_things)
+                        for (thing of intermediate.list_of_things)
                         {
                             var model = changeCase.pascalCase(thing),
                                 policy = changeCase.pascalCase(thing) + 'Policy';
 
                             policies[policy] = model;
                         }
-                        schema.make_providers(policies);
+                        intermediate.make_providers(policies);
                     }
                     if (answers.components.indexOf('Routes') != -1)
                     {
                         var resources = [],
                             controller_methods = ['create', 'destroy', 'edit', 'index', 'show', 'store', 'update'];
 
-                        for (thing of schema.list_of_things)
+                        for (thing of intermediate.list_of_things)
                         {
                             var path = changeCase.paramCase(thing),
                                 controller = changeCase.pascalCase(thing) + 'Controller',
@@ -270,19 +270,19 @@ gulp.task('generate', function(done)
 
                             resources.push({path, controller, name, names});
                         }
-                        schema.make_routes(resources);
+                        intermediate.make_routes(resources);
                     }
                     if (answers.components.indexOf('Seed') != -1)
                     {
                         var seeder_classes = [];
 
-                        for (thing of schema.list_of_things)
+                        for (thing of intermediate.list_of_things)
                         {
                             var resource = changeCase.snakeCase(thing),
                                 seeder = changeCase.pascalCase(thing) + 'Seeder';
 
                             seeder_classes.push(seeder);
-                            schema.make_seed(seeder, resource);
+                            intermediate.make_seed(seeder, resource);
                         }
 
                         var username = answers.username,
@@ -290,7 +290,7 @@ gulp.task('generate', function(done)
                             password = generatePassword();
 
                         var super_admin = {username, email, password};
-                        schema.make_seed_runner(seeder_classes, super_admin);
+                        intermediate.make_seed_runner(seeder_classes, super_admin);
                     }
                 }))
                 .on('end', function()

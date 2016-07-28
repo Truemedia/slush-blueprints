@@ -32,7 +32,7 @@ if (framework == 'Laravel')
       view = require('./../plugins/laravel/resources/views/crudl');
 }
 
-var schema =
+var intermediate =
 {
     cwd: null,
     list_of_things: [],
@@ -62,7 +62,7 @@ var schema =
         // TODO: Use replace instead of copy and remove once JSONpatch library is fixed
         // var json_patch = [{ "op": "move", "from": thing_path, "path": parent_path }];
 
-        schema.organized_things = jsonpatch.apply_patch(schema.organized_things, [{ "op": "copy", "from": thing_path, "path": parent_path }]);
+        intermediate.organized_things = jsonpatch.apply_patch(intermediate.organized_things, [{ "op": "copy", "from": thing_path, "path": parent_path }]);
         var json_patch = [{ "op": "remove", "path": thing_path }];
 
         return json_patch;
@@ -79,14 +79,14 @@ var schema =
             var thing_match = false,
                 parent_match = false;
 
-            var thing_match_found = kvp(schema.organized_things).query(function (node) {
+            var thing_match_found = kvp(intermediate.organized_things).query(function (node) {
                 if (node.key == 'class_name' && node.value == class_name) {
                     thing_match = node;
                     return true;
                 }
             });
 
-            var parent_match_found = kvp(schema.organized_things).query(function (node) {
+            var parent_match_found = kvp(intermediate.organized_things).query(function (node) {
                 if (node.key == 'class_name' && node.value == sub_class) {
                     parent_match = node;
                     return true;
@@ -145,11 +145,11 @@ var schema =
                 }
 
                 // Fit into place according to hierachy
-                json_patch = schema.convert_match_to_patch(thing_match, parent_match);
+                json_patch = intermediate.convert_match_to_patch(thing_match, parent_match);
 
                 try
                 {
-                    schema.organized_things = jsonpatch.apply_patch(schema.organized_things, json_patch);
+                    intermediate.organized_things = jsonpatch.apply_patch(intermediate.organized_things, json_patch);
                 }
                 catch (PatchApplyError)
                 {
@@ -179,7 +179,7 @@ var schema =
         var table_name = changeCase.snakeCase( thing['class_name'] ),
             parent_table_name = changeCase.snakeCase( thing['sub_class'] );
 
-        if (schema.traditional_logging)
+        if (intermediate.traditional_logging)
         {
             var msg = 'Creating migration for ' + thing['class_name'] + ' Thing, table name will be called `' + table_name + '`.';
                 msg += ' Now determining field names and types';
@@ -204,7 +204,7 @@ var schema =
         }
 
         // Migrations
-        var database_field_handling = migration.database_field_handling(schema.cwd, table_name, parent_table_name, properties, show_field_handling, make_migration, schema.list_of_things, answers.locales),
+        var database_field_handling = migration.database_field_handling(intermediate.cwd, table_name, parent_table_name, properties, show_field_handling, make_migration, intermediate.list_of_things, answers.locales),
             table_fields = database_field_handling['valid_fields'],
             foreign_keys = database_field_handling['foreign_keys'];
 
@@ -218,7 +218,7 @@ var schema =
         }
 
         // Views
-        var form_field_handling = view.form_field_handling(table_name, parent_table_name, properties, show_field_handling, schema.list_of_things),
+        var form_field_handling = view.form_field_handling(table_name, parent_table_name, properties, show_field_handling, intermediate.list_of_things),
             form_fields = form_field_handling['valid_fields'];
             form_fields = form_fields.concat(form_field_handling['natural_language_fields']);
 
@@ -242,7 +242,7 @@ var schema =
         // Controllers
         if (make_controller)
         {
-            if (parent_table_name != '' && schema.native_data_types.indexOf( changeCase.ucFirst(parent_table_name) ) == -1)
+            if (parent_table_name != '' && intermediate.native_data_types.indexOf( changeCase.ucFirst(parent_table_name) ) == -1)
             {
                 parent_controller_name = changeCase.pascalCase(parent_table_name) + 'Controller';
             }
@@ -251,37 +251,37 @@ var schema =
                 parent_controller_name = 'BaseController';
             }
 
-            schema.make_controller(controller_name, parent_controller_name, model_name, request_name, answers.theme);
+            intermediate.make_controller(controller_name, parent_controller_name, model_name, request_name, answers.theme);
         }
 
         // Migrations
         if (make_migration && !(migration.problematic_tables.indexOf( pluralize(table_name) ) > -1))
         {
-            schema.make_migration(pluralize(table_name), table_fields);
+            intermediate.make_migration(pluralize(table_name), table_fields);
         }
 
         // Models
         if (make_model && !(model.problematic_models.indexOf(model_name) > -1))
         {
-            schema.make_model(model_name, changeCase.pascalCase(parent_table_name), table_fields, answers.df);
+            intermediate.make_model(model_name, changeCase.pascalCase(parent_table_name), table_fields, answers.df);
         }
 
         // Policies
         if (make_policy)
         {
-            schema.make_policy(policy_name, model_name, model_instance_name);
+            intermediate.make_policy(policy_name, model_name, model_instance_name);
         }
 
         // Requests
         if (make_request)
         {
-            schema.make_request(request_name, model_name);
+            intermediate.make_request(request_name, model_name);
         }
 
         // Views
         if (make_views)
         {
-            schema.make_views(changeCase.pascalCase(table_name), changeCase.pascalCase(parent_table_name), form_fields, answers);
+            intermediate.make_views(changeCase.pascalCase(table_name), changeCase.pascalCase(parent_table_name), form_fields, answers);
         }
     },
 
@@ -292,7 +292,7 @@ var schema =
             var db_fields = mc.get(table_name);
             if (db_fields != null) {
                 console.log(table_name, 'being created');
-                migration.create_table(schema.cwd, table_name, db_fields);
+                migration.create_table(intermediate.cwd, table_name, db_fields);
             }
             else {
                 throw new Error('Cache not set for following table: ' + table_name);
@@ -309,7 +309,7 @@ var schema =
             if (db_fields != null && !(processed_foreign_keys.indexOf(table_name) > -1))
             {
                 console.log(table_name, 'being modified');
-                migration.add_foreign_keys(schema.cwd, table_name, db_fields);
+                migration.add_foreign_keys(intermediate.cwd, table_name, db_fields);
             }
             else
             {
@@ -321,20 +321,20 @@ var schema =
     /* Write command */
     make_command: function(command_name, signature, description, model_name)
     {
-        command.create(schema.cwd, command_name, signature, description, model_name);
+        command.create(intermediate.cwd, command_name, signature, description, model_name);
     },
 
     /* Make config files */
     make_configs: function()
     {
-        config.copy_base_files(schema.cwd);
+        config.copy_base_files(intermediate.cwd);
     },
 
     /* Write controller */
     make_controller: function(controller_name, parent_controller_name, model_name, request_name, layout)
     {
-        controller.copy_base_files(schema.cwd);
-        controller.create(schema.cwd, controller_name, parent_controller_name, model_name, request_name, layout);
+        controller.copy_base_files(intermediate.cwd);
+        controller.create(intermediate.cwd, controller_name, parent_controller_name, model_name, request_name, layout);
     },
 
     /* Make handlers */
@@ -349,13 +349,13 @@ var schema =
                 viewFile: 'errors.404'
             }
         ];
-        handler.copy_base_files(schema.cwd, handlers);
+        handler.copy_base_files(intermediate.cwd, handlers);
     },
 
     /* Write kernel */
     make_kernel: function(commands)
     {
-        command.copy_base_files(schema.cwd, commands);
+        command.copy_base_files(intermediate.cwd, commands);
     },
 
     /* Store migration in cache for later use */
@@ -367,57 +367,57 @@ var schema =
     /* Write model */
     make_model: function(model_name, parent_model_name, field_names, df)
     {
-        model.copy_base_files(schema.cwd);
+        model.copy_base_files(intermediate.cwd);
         // Avoid native datatype being declared as models
-        if (schema.native_data_types.indexOf(parent_model_name) > -1)
+        if (intermediate.native_data_types.indexOf(parent_model_name) > -1)
         {
             parent_model_name = 'Model';
         }
-        model.create(schema.cwd, model_name, parent_model_name, field_names, df);
+        model.create(intermediate.cwd, model_name, parent_model_name, field_names, df);
     },
 
     /* Write policy */
     make_policy: function(policy_name, model_name, model_instance_name)
     {
-        policy.create(schema.cwd, policy_name, model_name, model_instance_name);
+        policy.create(intermediate.cwd, policy_name, model_name, model_instance_name);
     },
 
     /* Write request */
     make_request: function(request_name, model_name)
     {
-        request.create(schema.cwd, request_name, model_name);
+        request.create(intermediate.cwd, request_name, model_name);
     },
 
     /* Write routes */
     make_routes: function(resources)
     {
-        routes.copy_base_files(schema.list_of_things);
-        routes.create(schema.cwd, resources);
+        routes.copy_base_files(intermediate.list_of_things);
+        routes.create(intermediate.cwd, resources);
     },
 
     /* Write seeds */
     make_seed_runner: function(seeder_classes, super_admin)
     {
-        seeder.copy_base_files(schema.cwd, seeder_classes, super_admin);
+        seeder.copy_base_files(intermediate.cwd, seeder_classes, super_admin);
     },
 
     make_seed: function(seeder_class, resource)
     {
-        seeder.create(schema.cwd, seeder_class, resource);
+        seeder.create(intermediate.cwd, seeder_class, resource);
     },
 
     /* Write providers */
     make_providers: function(policies)
     {
-        provider.create_auth_provider(schema.cwd, policies);
+        provider.create_auth_provider(intermediate.cwd, policies);
     },
 
     /* Write views */
     make_views: function(context_name, parent_context_name, form_fields, answers)
     {
-        view.copy_base_files(schema.cwd, answers.theme);
-        view.create(schema.cwd, context_name, parent_context_name, form_fields, answers.df);
+        view.copy_base_files(intermediate.cwd, answers.theme);
+        view.create(intermediate.cwd, context_name, parent_context_name, form_fields, answers.df);
     }
 };
 
-module.exports = schema;
+module.exports = intermediate;
