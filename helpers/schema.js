@@ -7,9 +7,9 @@ var schema = {
         {
             return (options.indexOf(option) > -1);
         },
-        first: function(ci)
+        first: function(pi)
         {
-            return (ci == 0);
+            return (pi == 0);
         }
     },
 
@@ -19,53 +19,53 @@ var schema = {
         /* Flag prediction submethods */
         flag: {
             // Primary key
-            pk: function (ci, cn, cts) {
+            pk: function (pi, pn, pts) {
                 return (
-                    schema.is.first(ci) && schema.is.possibly('id', cn) && schema.is.possibly('integer', cts)
+                    schema.is.first(pi) && schema.is.possibly('id', pn) && schema.is.possibly('integer', pts)
                 );
             },
             // Not null
-            nn: function (ci, cn, cts) {
-                return !schema.is.possibly('null', cts);
+            nn: function (pi, pn, pts) {
+                return !schema.is.possibly('null', pts);
             },
             // Unique
-            uq: function (ci, cn, cts) {
+            uq: function (pi, pn, pts) {
                 return (
-                    schema.predict.flag.pk(ci, cn, cts) && schema.predict.flag.nn(ci, cn, cts)
+                    schema.predict.flag.pk(pi, pn, pts) && schema.predict.flag.nn(pi, pn, pts)
                 );
             },
             // Binary (file)
             // TODO: Implement
-            bin: function (ci, cn, cts) {
+            bin: function (pi, pn, pts) {
                 return false;
             },
             // Unsigned
-            un: function (ci, cn, cts) {
-                return schema.is.possibly('integer', cts);
+            un: function (pi, pn, pts) {
+                return schema.is.possibly('integer', pts);
             },
             // Zero filled
             // TODO: Implement
-            zf: function (ci, cn, cts) {
+            zf: function (pi, pn, pts) {
                 return false;
             },
             // Auto increment
-            ai: function (ci, cn, cts) {
-                return schema.predict.flag.pk(ci, cn, cts);
+            ai: function (pi, pn, pts) {
+                return schema.predict.flag.pk(pi, pn, pts);
             },
             // Generated column
             // TODO: Implement
-            g: function (ci, cn, cts) {
+            g: function (pi, pn, pts) {
                 return false;
             }
         },
 
         /* Column flag prediction based on patterns */
-        flags: function(column_index, column_name, column_types) {
+        flags: function(property_index, property_name, property_types) {
             var column_options = {};
 
             for (flag in schema.predict.flag)
             {
-                column_options[flag] = schema.predict.flag[flag](column_index, column_name, column_types);
+                column_options[flag] = schema.predict.flag[flag](property_index, property_name, property_types);
             }
 
             return column_options;
