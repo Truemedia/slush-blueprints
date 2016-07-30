@@ -1,7 +1,7 @@
 var gulp = require('gulp'),
     gulpPlugins = require('auto-plug')('gulp');
 
-var schema = require('./../helpers/schema');
+var schema = require('./../plugins/laravel/database/migrations/schema');
 
 gulp.task('schema', function()
 {
