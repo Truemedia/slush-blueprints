@@ -1,5 +1,30 @@
-/* Schema helper */
-var schema = {
+// Dependencies
+var path = require('path'),
+    File = require('vinyl');
+
+var migration = {
+
+    /**
+      * Generate a Laravel migration using data provided
+      */
+    generate: function(jsonSchema)
+    {
+        // Iterate properties in schema
+        var columns = jsonSchema.items.properties;
+
+        Object.keys(columns).forEach( function(column_name, column_index) {
+            var column_types = columns[column_name].type;
+
+            console.log(column_name);
+            var flags = migration.predict.flags(column_index, column_name, column_types);
+            console.log(flags);
+        });
+
+        return new File({
+            contents: new Buffer('hello world'),
+            path: path.join('.', 'migration.php')
+        });
+    },
 
     /* Observation functions */
     is: {
@@ -21,17 +46,17 @@ var schema = {
             // Primary key
             pk: function (pi, pn, pts) {
                 return (
-                    schema.is.first(pi) && schema.is.possibly('id', pn) && schema.is.possibly('integer', pts)
+                    migration.is.first(pi) && migration.is.possibly('id', pn) && migration.is.possibly('integer', pts)
                 );
             },
             // Not null
             nn: function (pi, pn, pts) {
-                return !schema.is.possibly('null', pts);
+                return !migration.is.possibly('null', pts);
             },
             // Unique
             uq: function (pi, pn, pts) {
                 return (
-                    schema.predict.flag.pk(pi, pn, pts) && schema.predict.flag.nn(pi, pn, pts)
+                    migration.predict.flag.pk(pi, pn, pts) && migration.predict.flag.nn(pi, pn, pts)
                 );
             },
             // Binary (file)
@@ -41,7 +66,7 @@ var schema = {
             },
             // Unsigned
             un: function (pi, pn, pts) {
-                return schema.is.possibly('integer', pts);
+                return migration.is.possibly('integer', pts);
             },
             // Zero filled
             // TODO: Implement
@@ -50,7 +75,7 @@ var schema = {
             },
             // Auto increment
             ai: function (pi, pn, pts) {
-                return schema.predict.flag.pk(pi, pn, pts);
+                return migration.predict.flag.pk(pi, pn, pts);
             },
             // Generated column
             // TODO: Implement
@@ -63,9 +88,9 @@ var schema = {
         flags: function(property_index, property_name, property_types) {
             var column_options = {};
 
-            for (flag in schema.predict.flag)
+            for (flag in migration.predict.flag)
             {
-                column_options[flag] = schema.predict.flag[flag](property_index, property_name, property_types);
+                column_options[flag] = migration.predict.flag[flag](property_index, property_name, property_types);
             }
 
             return column_options;
@@ -73,4 +98,4 @@ var schema = {
     }
 };
 
-module.exports = schema;
+module.exports = migration;

@@ -79,5 +79,7 @@
     "laravel",
     "schemaorg"
   ],
-  "devDependencies": {}
+  "devDependencies": {
+    "gulp-debug": "^2.1.2"
+  }
 }
