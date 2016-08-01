@@ -4,8 +4,7 @@ var through2 = require('through2');
     gulpPlugins = require('auto-plug')('gulp'),
     PluginError = gulpPlugins.util.PluginError;
 
-// Helper files
-var migration = require('./lib/migration');
+var build = require('./generate/build');
 
 const PLUGIN_NAME = 'slush-regenerator:generate-migration';
 
@@ -27,11 +26,19 @@ function plugin()
         var jsonSchema = JSON.parse( file.contents.toString() );
 
         // Push generated file to stream
-        this.push( migration.generate(jsonSchema) );
+        this.push( ingest(jsonSchema) );
         cb(null, file);
     });
 
     return stream;
+}
+
+/**
+  * Observe provided data, predict potential approach, advise changes, build files, incorporate into site
+  */
+function ingest(jsonSchema)
+{
+    return build.generate(jsonSchema);
 }
 
 
