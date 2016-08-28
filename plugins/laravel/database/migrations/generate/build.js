@@ -1,31 +1,88 @@
 // Dependencies
-var path = require('path'),
-    File = require('vinyl');
+var changeCase = require('change-case'),
+    File = require('vinyl'),
+    fs = require('fs');
+    moment = require('moment');
+    path = require('path');
 
-var predict = require('./predict');
+// Plugin libs
+var defaults = require('./../defaults.json'),
+    predict = require('./predict');
 
 var build = {
     /**
-      * Generate a Laravel migration using data provided
+     * Format table column
+     *
+     * @param {string} name - Column name
+     * @param {string} type - Column datatype
+     * @param {boolean} flags - Column flags
+     * @param {string} comment - Column comment
+     * @param {string} parentTable - Name of parent table, column is relevant to
+     */
+    ftc: function(name, type, flags, comment, parentTable) {
+        var name = changeCase.snakeCase(name),
+            type = changeCase.camelCase(type),
+            comment = changeCase.titleCase(comment);
+
+        var column = {name, type, flags, comment};
+        column.parentTable = (parentTable != undefined) ? parentTable : null;
+
+        return column;
+    },
+
+    /**
+      * Generate filename from provided parameters
+      *
+      * @param {Moment} instance - MomentJS instance
+      * @param {string} table_name - Name of database table
+      * @param {string} mode - Mode relevant to context of a magic migration
       */
-    generate: function(jsonSchema)
-    {
+    filename: function(migration_moment, table_name, mode) {
+        if (mode == undefined)
+        {
+            mode = 'create';
+        }
+
+        var migration_datetime = migration_moment.format('YYYY_MM_DD_HHmmss');
+
+        var filename = `${migration_datetime}_${mode}_${table_name}_table.php`;
+        return filename;
+    },
+
+    /**
+      * Extract template data from jsonSchema
+      *
+      * @param {json} jsonSchema - JSONschema instance
+      */
+    templateData: function(jsonSchema) {
         // Iterate properties in schema
         var properties = jsonSchema.items.properties;
 
+        var tableName = predict.tableName(jsonSchema),
+            columns = [];
+
         Object.keys(properties).forEach( function(property_name, property_index) {
             var property_types = properties[property_name].type;
+            if (!(property_types instanceof Array)) {
+                property_types = [property_types];
+            }
 
-            console.log(property_name);
-            var flags = predict.flags(property_index, property_name, property_types);
-            console.log(flags);
+            var column = predict.column(property_index, property_name, property_types, properties);
+            columns.push(column);
         });
 
-        return new File({
-            contents: new Buffer('hello world'),
-            path: path.join('.', 'migration.php')
-        });
+        var tableClassName = changeCase.pascalCase(tableName);
+        return {tableClassName, tableName, columns};
     },
+
+    /**
+      * Get template path
+      *
+      * @param {string} file - Filename
+      */
+    templatePath: function(filename) {
+        return path.join(__dirname, '..', 'templates', filename);
+    }
 };
 
 module.exports = build;

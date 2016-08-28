@@ -1,5 +1,11 @@
 // Dependencies
-var through2 = require('through2');
+var through2 = require('through2'),
+    defaults = require('./defaults.json'),
+    File = require('vinyl'),
+    source = require('vinyl-source-stream'),
+    fs = require('fs'),
+    moment = require('moment'),
+    _ = require('underscore'),
     gulp = require('gulp'),
     gulpPlugins = require('auto-plug')('gulp'),
     PluginError = gulpPlugins.util.PluginError;
@@ -25,20 +31,29 @@ function plugin()
         // Grab schema to work with
         var jsonSchema = JSON.parse( file.contents.toString() );
 
-        // Push generated file to stream
-        this.push( ingest(jsonSchema) );
-        cb(null, file);
+        // Create read stream to handle templating
+        var templateFile = fs.createReadStream( build.templatePath('create_table.php') );
+        templateFile.on('data', function(templateFileContents)
+        {
+            // Templating function
+            var tpl = _.template( templateFileContents.toString(defaults.encoding) ),
+                templateData = build.templateData(jsonSchema),
+                fileContents = tpl(templateData).toString();
+
+            // Push generated file to stream
+            var migrationFile = new File({ // build.file
+                contents: new Buffer(fileContents, defaults.encoding),
+                path: build.filename(new moment(), templateData.tableName, 'create')
+            });
+            stream.push(migrationFile);
+
+            // Callback
+            cb(null, file);
+        });
+
     });
 
     return stream;
-}
-
-/**
-  * Observe provided data, predict potential approach, advise changes, build files, incorporate into site
-  */
-function ingest(jsonSchema)
-{
-    return build.generate(jsonSchema);
 }
 
 
