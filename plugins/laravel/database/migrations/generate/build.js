@@ -53,12 +53,13 @@ var build = {
       * Extract template data from jsonSchema
       *
       * @param {json} jsonSchema - JSONschema instance
+      * @param {json} options - Preconfigured options
       */
-    templateData: function(jsonSchema) {
+    templateData: function(jsonSchema, options) {
         // Iterate properties in schema
         var properties = jsonSchema.items.properties;
 
-        var tableName = predict.tableName(jsonSchema),
+        var tableName = (options.tableName != undefined) ? options.tableName : predict.tableName(jsonSchema),
             columns = [];
 
         Object.keys(properties).forEach( function(property_name, property_index) {

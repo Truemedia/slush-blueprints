@@ -8,7 +8,8 @@ var through2 = require('through2'),
     _ = require('underscore'),
     gulp = require('gulp'),
     gulpPlugins = require('auto-plug')('gulp'),
-    PluginError = gulpPlugins.util.PluginError;
+    PluginError = gulpPlugins.util.PluginError,
+    argv = require('yargs').argv;
 
 var build = require('./generate/build');
 
@@ -31,13 +32,19 @@ function plugin()
         // Grab schema to work with
         var jsonSchema = JSON.parse( file.contents.toString() );
 
+        // Commandline options
+        var options = {
+            tableName: (argv['table-name'] != undefined && typeof argv['table-name'] === 'string') ? argv['table-name'] : null,
+
+        };
+
         // Create read stream to handle templating
         var templateFile = fs.createReadStream( build.templatePath('create_table.php') );
         templateFile.on('data', function(templateFileContents)
         {
             // Templating function
             var tpl = _.template( templateFileContents.toString(defaults.encoding) ),
-                templateData = build.templateData(jsonSchema),
+                templateData = build.templateData(jsonSchema, options),
                 fileContents = tpl(templateData).toString();
 
             // Push generated file to stream
