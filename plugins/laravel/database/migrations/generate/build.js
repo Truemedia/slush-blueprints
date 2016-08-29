@@ -1,9 +1,10 @@
 // Dependencies
 var changeCase = require('change-case'),
     File = require('vinyl'),
-    fs = require('fs');
-    moment = require('moment');
+    fs = require('fs'),
+    moment = require('moment'),
     path = require('path');
+    argv = require('yargs').argv;
 
 // Plugin libs
 var defaults = require('./../defaults.json'),
@@ -83,6 +84,27 @@ var build = {
       */
     templatePath: function(filename) {
         return path.join(__dirname, '..', 'templates', filename);
+    },
+
+    /**
+      * Build options
+      *
+      */
+    options: function() {
+
+        // Defaults
+        var options = {
+            tableName: null
+        };
+
+        if (argv['table'] != undefined && typeof argv['table'] === 'string') {
+            options.tableName = argv['table'];
+        }
+        else if (argv['create'] != undefined && typeof argv['create'] === 'string') {
+            options.tableName = argv['create'];
+        };
+
+        return options;
     }
 };
 
