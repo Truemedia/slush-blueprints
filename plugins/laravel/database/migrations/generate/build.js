@@ -4,7 +4,6 @@ var changeCase = require('change-case'),
     fs = require('fs'),
     moment = require('moment'),
     path = require('path');
-    argv = require('yargs').argv;
 
 // Plugin libs
 var defaults = require('./../defaults.json'),
@@ -90,20 +89,10 @@ var build = {
       * Build options
       *
       */
-    options: function() {
+    options: function(args) {
+        var tableName = (args['table'] != undefined && typeof args['table'] === 'string') ? args['table'] : null;
 
-        // Defaults
-        var options = {
-            tableName: null
-        };
-
-        if (argv['table'] != undefined && typeof argv['table'] === 'string') {
-            options.tableName = argv['table'];
-        }
-        else if (argv['create'] != undefined && typeof argv['create'] === 'string') {
-            options.tableName = argv['create'];
-        };
-
+        var options = {tableName};
         return options;
     }
 };
