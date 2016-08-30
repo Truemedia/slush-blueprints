@@ -53,13 +53,13 @@ var build = {
       * Extract template data from jsonSchema
       *
       * @param {json} jsonSchema - JSONschema instance
-      * @param {json} options - Preconfigured options
+      * @param {json} settings - Preconfigured options
       */
-    templateData: function(jsonSchema, options) {
+    templateData: function(jsonSchema, settings) {
         // Iterate properties in schema
         var properties = jsonSchema.items.properties;
 
-        var tableName = (options.tableName != undefined) ? options.tableName : predict.tableName(jsonSchema),
+        var tableName = (settings.tableName != undefined) ? settings.tableName : predict.tableName(jsonSchema),
             columns = [];
 
         Object.keys(properties).forEach( function(property_name, property_index) {
@@ -86,14 +86,14 @@ var build = {
     },
 
     /**
-      * Build options
+      * Build settings
       *
       */
-    options: function(args) {
-        var tableName = (args['table'] != undefined && typeof args['table'] === 'string') ? args['table'] : null;
+    settings: function(options) {
+        var tableName = (options['table'] != undefined && typeof options['table'] === 'string') ? options['table'] : null;
 
-        var options = {tableName};
-        return options;
+        var settings = {tableName};
+        return settings;
     }
 };
 

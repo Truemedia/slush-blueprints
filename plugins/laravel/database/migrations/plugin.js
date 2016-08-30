@@ -14,25 +14,12 @@ var build = require('./generate/build');
 
 // Overview
 const PLUGIN_NAME = 'slush-regenerator:generate-migration';
-var yargs = require('yargs')
-    .command(gulpPlugins.util.colors.yellow(`${PLUGIN_NAME}`), 'Generate a migration using JSON Schema file or via commandline options')
-    .example(`${PLUGIN_NAME} --table=users`, 'Generate a migration for table called users')
-    .alias('table', 'create')
-    .nargs('table', null)
-    .describe('table', 'Table name for migration to generate')
-    .help('h')
-    .alias('h', 'help');
 
 /**
   * Plugin level function
   */
-function plugin()
+function plugin(options)
 {
-    // Trigger overview
-    if (yargs.argv.h) {
-        yargs.showHelp();
-    }
-
     var stream = through2.obj( function(file, enc, cb) {
         // Deal with potential issues
         if (file.isNull()) {
@@ -43,10 +30,8 @@ function plugin()
         }
 
         // Grab schema to work with
-        var jsonSchema = JSON.parse( file.contents.toString() );
-
-        // Commandline options
-        var options = build.options(yargs.argv);
+        var jsonSchema = JSON.parse( file.contents.toString() ),
+            settings = build.settings(options);
 
         // Create read stream to handle templating
         var templateFile = fs.createReadStream( build.templatePath('create_table.php') );
@@ -54,7 +39,7 @@ function plugin()
         {
             // Templating function
             var tpl = _.template( templateFileContents.toString(defaults.encoding) ),
-                templateData = build.templateData(jsonSchema, options),
+                templateData = build.templateData(jsonSchema, settings),
                 fileContents = tpl(templateData).toString();
 
             // Push generated file to stream
