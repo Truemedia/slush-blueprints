@@ -1,3 +1,5 @@
+var Rx = require('rx');
+
 var questionaire = {
     /* Ask questions */
     ask: function(args) {
@@ -12,6 +14,26 @@ var questionaire = {
                 name: 'table',
                 type: 'text',
                 message: 'Name of table?'
+            },
+            {
+                name: 'columns',
+                type: 'confirm',
+                message: 'Would you like to create any columns for this migration?'
+            },
+            {
+                name: 'columnName',
+                type: 'text',
+                message: 'Name of column?'
+                // when: function(answers) {
+                //     if (answers.columns) {
+                //         prompts.push({
+                //             name: 'new',
+                //             type: 'text',
+                //             message: 'Yup'
+                //         });
+                //         return true;
+                //     }
+                // }
             }
         ];
 
@@ -21,7 +43,32 @@ var questionaire = {
     /* Skip questions */
     skip: function(args) {
         return [];
+    },
+
+    /* Questions for creating column */
+    column: function() {
+        inquirer.prompt([
+        {
+            name: 'columnName',
+            type: 'text',
+            message: 'Name of column?'
+        },
+        {
+            name: 'askAgain',
+            type: 'confirm',
+            message: 'Would you like to create any more columns for this migration?',
+        }
+        ]).then(function (answers) {
+        output.push(answers.columnName);
+        if (answers.askAgain) {
+          questionaire.column();
+        } else {
+          console.log('Your favorite TV Shows:', output.join(', '));
+        }
+      });
     }
 };
+
+var output = [];
 
 module.exports = questionaire;

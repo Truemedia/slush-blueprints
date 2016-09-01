@@ -1,6 +1,10 @@
+"use strict";
 var gulp = require('gulp'),
     gulpPlugins = require('auto-plug')('gulp'),
-    inquirer = require('inquirer');
+    inquirer = require('inquirer'),
+    requireDir = require('require-dir'),
+    path = require('path'),
+    pointer = require('json-pointer');
     // TODO: Load this from plugin dynamically
     const PLUGIN_NAME = 'slush-regenerator:generate-migration';
     var yargs = require('yargs')
@@ -15,8 +19,11 @@ var gulp = require('gulp'),
         .help('h')
         .alias('h', 'help');
 
-var migration = require('./../plugins/laravel/database/migrations/plugin');
-var questionaire = require('./../plugins/laravel/database/migrations/generate/questionaire');
+var regeneratorPlugins = requireDir(path.join(__dirname, '..', 'plugins'), { recurse: true });
+
+var autoload_tasks = {
+    "generate-migration": "/laravel/database/migrations"
+};
 
 // Help dialogue
 if (yargs.argv.h) {
@@ -24,12 +31,18 @@ if (yargs.argv.h) {
 }
 
 /* Generate */
-function generate(context, done) {
+function generate(jsonpath, done) {
+    var blueprint = pointer.get(regeneratorPlugins, jsonpath);
+
     // Ask questions?
-    inquirer.prompt(
-        (yargs.argv.w) ? questionaire.ask(yargs.argv) : questionaire.skip(yargs.argv)
-    ).then( function(options)
+    var prompts = ((yargs.argv.w) ? blueprint.generate.questionaire.ask(yargs.argv) : blueprint.generate.questionaire.skip(yargs.argv))
+    inquirer.prompt(prompts)
+    .then( function(options)
     {
+        if (options.columns) {
+            blueprint.generate.questionaire.column();
+        }
+
         // Command-line mode only
         if (Object.keys(options).length === 0 && options.constructor === Object) {
             options = yargs.argv;
@@ -37,7 +50,7 @@ function generate(context, done) {
 
         // Run stream
         gulp.src(['./*.schema.json'])
-            .pipe( migration(options) )
+            .pipe( blueprint.plugin(options) )
             .pipe( gulp.dest('./') )
             .on('end', function()
             {
@@ -46,4 +59,7 @@ function generate(context, done) {
     });
 }
 
-gulp.task('generate-migration', function(done) { generate('migration', done) }); // Generate migration/s
+// Autoload
+for (var task in autoload_tasks) {
+    gulp.task(task, function(done) { generate(autoload_tasks[task], done) }); // Generate migration/s
+}
