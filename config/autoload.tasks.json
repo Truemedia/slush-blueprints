@@ -1,0 +1,3 @@
+{
+    "generate-migration": "/laravel/database/migrations"
+}

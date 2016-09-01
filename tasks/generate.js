@@ -19,11 +19,9 @@ var gulp = require('gulp'),
         .help('h')
         .alias('h', 'help');
 
-var regeneratorPlugins = requireDir(path.join(__dirname, '..', 'plugins'), { recurse: true });
-
-var autoload_tasks = {
-    "generate-migration": "/laravel/database/migrations"
-};
+// Automatically map plugins and tasks
+var regeneratorPlugins = requireDir(path.join(__dirname, '..', 'plugins'), { recurse: true }),
+    autoloadTasks = require('./../config/autoload.tasks.json');
 
 // Help dialogue
 if (yargs.argv.h) {
@@ -60,6 +58,6 @@ function generate(jsonpath, done) {
 }
 
 // Autoload
-for (var task in autoload_tasks) {
-    gulp.task(task, function(done) { generate(autoload_tasks[task], done) }); // Generate migration/s
+for (var task in autoloadTasks) {
+    gulp.task(task, function(done) { generate(autoloadTasks[task], done) }); // Generate migration/s
 }
