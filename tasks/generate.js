@@ -57,7 +57,7 @@ function generate(jsonpath, done) {
     });
 }
 
-// Autoload
+// Autoload tasks
 for (var task in autoloadTasks) {
-    gulp.task(task, function(done) { generate(autoloadTasks[task], done) }); // Generate migration/s
+    gulp.task(task, function(done) { generate(autoloadTasks[task], done) });
 }
