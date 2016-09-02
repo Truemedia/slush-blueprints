@@ -10,7 +10,7 @@ var through2 = require('through2'),
     gulpPlugins = require('auto-plug')('gulp'),
     PluginError = gulpPlugins.util.PluginError;
 
-var build = require('./generate/build');
+var blueprint = require('./blueprint/build');
 
 // Overview
 const PLUGIN_NAME = 'slush-regenerator:generate-migration';
@@ -31,21 +31,21 @@ function plugin(options)
 
         // Grab schema to work with
         var jsonSchema = JSON.parse( file.contents.toString() ),
-            settings = build.settings(options);
+            settings = blueprint.settings(options);
 
         // Create read stream to handle templating
-        var templateFile = fs.createReadStream( build.templatePath('create_table.php') );
+        var templateFile = fs.createReadStream( blueprint.templatePath('create_table.php') );
         templateFile.on('data', function(templateFileContents)
         {
             // Templating function
             var tpl = _.template( templateFileContents.toString(defaults.encoding) ),
-                templateData = build.templateData(jsonSchema, settings),
+                templateData = blueprint.templateData(jsonSchema, settings),
                 fileContents = tpl(templateData).toString();
 
             // Push generated file to stream
-            var migrationFile = new File({ // build.file
+            var migrationFile = new File({ // blueprint.file
                 contents: new Buffer(fileContents, defaults.encoding),
-                path: build.filename(new moment(), templateData.tableName, 'create')
+                path: blueprint.filename(new moment(), templateData.tableName, 'create')
             });
             stream.push(migrationFile);
 

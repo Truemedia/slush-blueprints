@@ -30,15 +30,17 @@ if (yargs.argv.h) {
 
 /* Generate */
 function generate(jsonpath, done) {
-    var blueprint = pointer.get(regeneratorPlugins, jsonpath);
+    var context = pointer.get(regeneratorPlugins, jsonpath),
+        blueprint = context.blueprint,
+        plugin = context.plugin;
 
     // Ask questions?
-    var prompts = ((yargs.argv.w) ? blueprint.generate.questionaire.ask(yargs.argv) : blueprint.generate.questionaire.skip(yargs.argv))
+    var prompts = ((yargs.argv.w) ? blueprint.questionaire.ask(yargs.argv) : blueprint.questionaire.skip(yargs.argv))
     inquirer.prompt(prompts)
     .then( function(options)
     {
         if (options.columns) {
-            blueprint.generate.questionaire.column();
+            blueprint.questionaire.column();
         }
 
         // Command-line mode only
@@ -48,7 +50,7 @@ function generate(jsonpath, done) {
 
         // Run stream
         gulp.src(['./*.schema.json'])
-            .pipe( blueprint.plugin(options) )
+            .pipe( plugin(options) )
             .pipe( gulp.dest('./') )
             .on('end', function()
             {
