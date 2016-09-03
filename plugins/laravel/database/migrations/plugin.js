@@ -40,36 +40,47 @@ function plugin(options)
         var jsonSchema = JSON.parse( file.contents.toString() ),
             settings = blueprint.settings(options);
 
-        // Create read stream to handle templating
-        var src = {
-                createTable: fs.createReadStream( blueprint.templatePath('create_table.php.tpl') ),
-            },
-            pipe = function(templateFileContents)
-            {
-                var magic = new Magic(mmm.MAGIC_MIME_TYPE);
-                magic.detect(templateFileContents, function(err, mimeType) {
-                    if (err) throw err;
+        // Create sub-streams
+        var subStreams = {
+            /**
+              * Create table stream
+              */
+            createTable: {
+                read: fs.createReadStream( blueprint.templatePath('create_table.php.tpl') ),
+                write: function(templateFileContents)
+                {
+                    var magic = new Magic(mmm.MAGIC_MIME_TYPE);
+                    magic.detect(templateFileContents, function(err, mimeType) {
+                        if (err) throw err;
 
-                    // Templating function
-                    var tpl = _.template( templateFileContents.toString(defaults.encoding) ),
-                        templateData = blueprint.templateData(jsonSchema, settings),
-                        fileContents = tpl(templateData).toString(),
-                        fileExtension = mime.extension(mimeType);
+                        // Templating function
+                        var tpl = _.template( templateFileContents.toString(defaults.encoding) ),
+                            templateData = blueprint.templateData(jsonSchema, settings),
+                            fileContents = tpl(templateData).toString(),
+                            fileExtension = mime.extension(mimeType);
 
-                    // Push generated file to stream
-                    var migrationFile = new File({ // blueprint.file
-                        contents: new Buffer(fileContents, defaults.encoding),
-                        path: blueprint.filename(fileExtension, new moment(), templateData.tableName, 'create')
+                        // Push generated file to stream
+                        var migrationFile = new File({ // blueprint.file
+                            contents: new Buffer(fileContents, defaults.encoding),
+                            path: blueprint.filename(fileExtension, new moment(), templateData.tableName, 'create')
+                        });
+                        stream.push(migrationFile);
+
+                        // Callback
+                        cb(null, file);
                     });
-                    stream.push(migrationFile);
+                }
+            }
+        };
 
-                    // Callback
-                    cb(null, file);
-                });
-            };
+        // Loop and assign streams to pipes
+        for (let streamName in subStreams) {
+            let subStream = subStreams[streamName],
+                readStream = subStream.read,
+                writeStream = subStream.write;
 
-        // Assign pipes
-        src.createTable.on('data', pipe);
+            readStream.on('data', writeStream);
+        };
     });
 
     return stream;
