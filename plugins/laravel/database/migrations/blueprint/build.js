@@ -6,8 +6,7 @@ var changeCase = require('change-case'),
     path = require('path');
 
 // Plugin libs
-var defaults = require('./../defaults.json'),
-    predict = require('./predict');
+var predict = require('./predict');
 
 var build = {
     /**

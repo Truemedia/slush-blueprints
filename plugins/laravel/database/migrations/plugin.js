@@ -2,12 +2,14 @@
 
 // Dependencies
 var through2 = require('through2'),
-    defaults = require('./defaults.json'),
     File = require('vinyl'),
     source = require('vinyl-source-stream'),
+    glob = require('glob'),
+    path = require('path'),
     fs = require('fs'),
     moment = require('moment'),
     _ = require('underscore'),
+    config = require('super-config'),
     mmm = require('mmmagic'),
     Magic = require('mmmagic').Magic,
     mime = require('mime'),
@@ -15,7 +17,9 @@ var through2 = require('through2'),
     gulpPlugins = require('auto-plug')('gulp'),
     PluginError = gulpPlugins.util.PluginError;
 
-mime.define( require('./config/mime.json') );
+// Setup procedure
+config.loadConfig(glob.sync( path.join(__dirname, 'config/*.js') ));
+mime.define( config.get('mime') );
 
 var blueprint = require('./blueprint/build');
 
@@ -54,14 +58,14 @@ function plugin(options)
                         if (err) throw err;
 
                         // Templating function
-                        var tpl = _.template( templateFileContents.toString(defaults.encoding) ),
+                        var tpl = _.template( templateFileContents.toString( config.get('defaults.encoding') )),
                             templateData = blueprint.templateData(jsonSchema, settings),
                             fileContents = tpl(templateData).toString(),
                             fileExtension = mime.extension(mimeType);
 
                         // Push generated file to stream
                         var migrationFile = new File({ // blueprint.file
-                            contents: new Buffer(fileContents, defaults.encoding),
+                            contents: new Buffer(fileContents, config.get('defaults.encoding')),
                             path: blueprint.filename(fileExtension, new moment(), templateData.tableName, 'create')
                         });
                         stream.push(migrationFile);
