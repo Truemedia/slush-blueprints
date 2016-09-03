@@ -34,25 +34,29 @@ function plugin(options)
             settings = blueprint.settings(options);
 
         // Create read stream to handle templating
-        var templateFile = fs.createReadStream( blueprint.templatePath('create_table.php') );
-        templateFile.on('data', function(templateFileContents)
-        {
-            // Templating function
-            var tpl = _.template( templateFileContents.toString(defaults.encoding) ),
-                templateData = blueprint.templateData(jsonSchema, settings),
-                fileContents = tpl(templateData).toString();
+        var src = {
+                createTable: fs.createReadStream( blueprint.templatePath('create_table.php') ),
+            },
+            pipe = function(templateFileContents)
+            {
+                // Templating function
+                var tpl = _.template( templateFileContents.toString(defaults.encoding) ),
+                    templateData = blueprint.templateData(jsonSchema, settings),
+                    fileContents = tpl(templateData).toString();
 
-            // Push generated file to stream
-            var migrationFile = new File({ // blueprint.file
-                contents: new Buffer(fileContents, defaults.encoding),
-                path: blueprint.filename(new moment(), templateData.tableName, 'create')
-            });
-            stream.push(migrationFile);
+                // Push generated file to stream
+                var migrationFile = new File({ // blueprint.file
+                    contents: new Buffer(fileContents, defaults.encoding),
+                    path: blueprint.filename(new moment(), templateData.tableName, 'create')
+                });
+                stream.push(migrationFile);
 
-            // Callback
-            cb(null, file);
-        });
+                // Callback
+                cb(null, file);
+            };
 
+        // Assign pipes
+        src.createTable.on('data', pipe);
     });
 
     return stream;
