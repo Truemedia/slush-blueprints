@@ -33,11 +33,12 @@ var build = {
     /**
       * Generate filename from provided parameters
       *
+      * @param {string} fileExtension - File extension
       * @param {Moment} instance - MomentJS instance
       * @param {string} table_name - Name of database table
       * @param {string} mode - Mode relevant to context of a magic migration
       */
-    filename: function(migration_moment, table_name, mode) {
+    filename: function(fileExtension, migration_moment, table_name, mode) {
         if (mode == undefined)
         {
             mode = 'create';
@@ -45,7 +46,7 @@ var build = {
 
         var migration_datetime = migration_moment.format('YYYY_MM_DD_HHmmss');
 
-        var filename = `${migration_datetime}_${mode}_${table_name}_table.php`;
+        var filename = `${migration_datetime}_${mode}_${table_name}_table.${fileExtension}`;
         return filename;
     },
 

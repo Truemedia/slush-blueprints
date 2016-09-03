@@ -1,3 +1,5 @@
+"use strict";
+
 // Dependencies
 var through2 = require('through2'),
     defaults = require('./defaults.json'),
@@ -6,9 +8,14 @@ var through2 = require('through2'),
     fs = require('fs'),
     moment = require('moment'),
     _ = require('underscore'),
+    mmm = require('mmmagic'),
+    Magic = require('mmmagic').Magic,
+    mime = require('mime'),
     gulp = require('gulp'),
     gulpPlugins = require('auto-plug')('gulp'),
     PluginError = gulpPlugins.util.PluginError;
+
+mime.define( require('./config/mime.json') );
 
 var blueprint = require('./blueprint/build');
 
@@ -35,24 +42,30 @@ function plugin(options)
 
         // Create read stream to handle templating
         var src = {
-                createTable: fs.createReadStream( blueprint.templatePath('create_table.php') ),
+                createTable: fs.createReadStream( blueprint.templatePath('create_table.php.tpl') ),
             },
             pipe = function(templateFileContents)
             {
-                // Templating function
-                var tpl = _.template( templateFileContents.toString(defaults.encoding) ),
-                    templateData = blueprint.templateData(jsonSchema, settings),
-                    fileContents = tpl(templateData).toString();
+                var magic = new Magic(mmm.MAGIC_MIME_TYPE);
+                magic.detect(templateFileContents, function(err, mimeType) {
+                    if (err) throw err;
 
-                // Push generated file to stream
-                var migrationFile = new File({ // blueprint.file
-                    contents: new Buffer(fileContents, defaults.encoding),
-                    path: blueprint.filename(new moment(), templateData.tableName, 'create')
+                    // Templating function
+                    var tpl = _.template( templateFileContents.toString(defaults.encoding) ),
+                        templateData = blueprint.templateData(jsonSchema, settings),
+                        fileContents = tpl(templateData).toString(),
+                        fileExtension = mime.extension(mimeType);
+
+                    // Push generated file to stream
+                    var migrationFile = new File({ // blueprint.file
+                        contents: new Buffer(fileContents, defaults.encoding),
+                        path: blueprint.filename(fileExtension, new moment(), templateData.tableName, 'create')
+                    });
+                    stream.push(migrationFile);
+
+                    // Callback
+                    cb(null, file);
                 });
-                stream.push(migrationFile);
-
-                // Callback
-                cb(null, file);
             };
 
         // Assign pipes
