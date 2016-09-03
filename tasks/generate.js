@@ -51,7 +51,7 @@ function generate(jsonpath, done) {
         // Run stream
         gulp.src(['./*.schema.json'])
             .pipe( plugin(options) )
-            .pipe( gulp.dest('./') )
+            .pipe( gulp.dest(blueprint.build.dest) )
             .on('end', function()
             {
                 done();

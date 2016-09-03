@@ -94,7 +94,9 @@ var build = {
 
         var settings = {tableName};
         return settings;
-    }
+    },
+
+    dest: './database/migrations/'
 };
 
 module.exports = build;
