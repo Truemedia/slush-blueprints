@@ -1,24 +1,29 @@
-var observe = require('./observe'),
+"use strict";
+
+var Observation = require('./observation'),
     dataTypes = require('./datatypes.json'),
     changeCase = require('change-case');
-    mapper = require('../../../../../classes/mapper');
+
+var mapper = require('../../../../../classes/mapper');
 
 /**
   * Predict how migrations will be built using only data provided
   */
 var predict = {
     tableName: function(jsonSchema) {
-        var tableName = null;
+        let tableName = null;
+        let observation = new Observation(jsonSchema);
 
         // Use prefix (if available)
-        if (prefix = observe.keys_prefixed(jsonSchema.items.properties)) {
+        let prefix = observation.prefixedProperties();
+        if (prefix) {
             tableName = prefix;
         }
         return tableName;
     },
 
     column: function(property_index, property_name, property_types, properties) {
-        var flags = predict.flags(property_index, property_name, property_types, properties);
+        var flags = predict.flags(property_index, property_name, property_types, properties),
             name = property_name,
             type = predict.column_type(property_types),
             comment = predict.column_comment(property_name);
@@ -57,13 +62,15 @@ var predict = {
     flag: {
         // Primary key
         pk: function (p_i, p_n, p_ts, p) {
+            let observation = new Observation();
             return (
-                observe.first(p_i) && observe.is('id', p_n) && observe.is('integer', p_ts)
+                observation.first(p_i) && observation.is('id', p_n) && observation.is('integer', p_ts)
             );
         },
         // Not null
         nn: function (p_i, p_n, p_ts, p) {
-            return !observe.is('null', p_ts);
+            let observation = new Observation();
+            return !observation.is('null', p_ts);
         },
         // Unique
         uq: function (p_i, p_n, p_ts, p) {
@@ -78,7 +85,8 @@ var predict = {
         },
         // Unsigned
         un: function (p_i, p_n, p_ts, p) {
-            return observe.is('integer', p_ts);
+            let observation = new Observation();
+            return observation.is('integer', p_ts);
         },
         // Zero filled
         // TODO: Implement
@@ -98,9 +106,9 @@ var predict = {
 
     /* Flag prediction based on patterns */
     flags: function(property_index, property_name, property_types, properties) {
-        var flag_options = {};
+        let flag_options = {};
 
-        for (flag in predict.flag)
+        for (let flag in predict.flag)
         {
             flag_options[flag] = predict.flag[flag](property_index, property_name, property_types, properties);
         }

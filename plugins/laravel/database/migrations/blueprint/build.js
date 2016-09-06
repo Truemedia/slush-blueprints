@@ -1,3 +1,5 @@
+"use strict";
+
 // Dependencies
 var changeCase = require('change-case'),
     File = require('vinyl'),
