@@ -23,16 +23,31 @@ var predict = {
     },
 
     column: function(jsonSchema, property_index, property_name, property_types, properties) {
-        // Remove prefix (if available)
         let observation = new Observation(jsonSchema);
         let prefix = observation.prefixedProperties();
 
         var flags = predict.flags(property_index, property_name, property_types, properties),
-            name = (prefix) ? property_name.replace(`${prefix}_`, '') : property_name,
             type = predict.column_type(property_types),
+            name = predict.column_name(property_name, prefix, type),
             comment = predict.column_comment(property_name);
 
         return {comment, flags, name, type};
+    },
+
+    /**
+     * Column name
+     */
+    column_name: function(propertyName, prefix, type)
+    {
+      // Remove prefix (if applicable)
+      let columnName = (prefix) ? propertyName.replace(`${prefix}_`, '') : propertyName;
+
+      // Add underscore for id column if missing
+      if (type == 'integer' && columnName != 'id' && columnName.indexOf('_id') == -1) {
+        columnName = columnName.replace('id', '_id');
+      }
+
+      return columnName;
     },
 
     /**
