@@ -14,8 +14,8 @@ var buffer = require('vinyl-buffer');
 // Pipes
 var js = require('./../pipes/js');
 
-/* Compile and compress frontend scripts */
-gulp.task('scripts', function()
+// Task
+var scripts = function()
 {
 	var file = './resources/assets/js/index.js';
 	return browserify(file, {debug:true}).transform(babelify, {sourceMaps: true})
@@ -27,4 +27,10 @@ gulp.task('scripts', function()
     .pipe(sourcemaps.write('./'))
 		.pipe( gulp.dest('./public/') )
     .pipe(gutil.noop());
-});
+};
+
+// Task aliases
+gulp.task('js', scripts);
+gulp.task('javascript', scripts);
+gulp.task('script', scripts);
+gulp.task('scripts', scripts);
