@@ -3,8 +3,16 @@
   * General utility class for making observations on data
   */
  class Observational {
+
+   constructor (prefix) {
+     if (prefix == undefined) {
+       var prefix = 50;
+     }
+     this.tolerance = {prefix};
+   }
+
      /**
-       * Check if all array keys have same prefix
+       * Check if array keys have same prefix (with percentage tolerance)
        */
      keysPrefixed (jsonObject) {
          var prefix = null,
@@ -22,7 +30,10 @@
              }
          }
 
-         return ((Object.keys(jsonObject).length == (matches + 1)) ? prefix : false);
+         let match_percentage = ((matches + 1) / Object.keys(jsonObject).length) * 100;
+         return (
+           (match_percentage >= this.tolerance.prefix) ? prefix : false
+         );
      }
  }
 
