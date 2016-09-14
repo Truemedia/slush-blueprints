@@ -22,9 +22,13 @@ var predict = {
         return tableName;
     },
 
-    column: function(property_index, property_name, property_types, properties) {
+    column: function(jsonSchema, property_index, property_name, property_types, properties) {
+        // Remove prefix (if available)
+        let observation = new Observation(jsonSchema);
+        let prefix = observation.prefixedProperties();
+
         var flags = predict.flags(property_index, property_name, property_types, properties),
-            name = property_name,
+            name = (prefix) ? property_name.replace(`${prefix}_`, '') : property_name,
             type = predict.column_type(property_types),
             comment = predict.column_comment(property_name);
 

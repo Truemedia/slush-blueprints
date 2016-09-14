@@ -70,7 +70,7 @@ var build = {
                 property_types = [property_types];
             }
 
-            var column = predict.column(property_index, property_name, property_types, properties);
+            var column = predict.column(jsonSchema, property_index, property_name, property_types, properties);
             columns.push(column);
         });
 
