@@ -12,5 +12,4 @@ var processors = [
 /* Pipeline */
 exports.pipeline = lazypipe()
 	// .pipe(less)
-    .pipe(gulpPlugins.sass)
 		.pipe(gulpPlugins.postcss, processors);

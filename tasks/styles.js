@@ -4,13 +4,15 @@ var gulp = require('gulp'),
 	gulpPlugins = require('auto-plug')('gulp');
 
 // Pipes
-var css = require('./../pipes/css');
+var pre_css = require('./../pipes/pre_css'),
+		post_css = require('./../pipes/post_css');
 
 // Task
 var styles = function()
 {
 	return gulp.src('./resources/assets/sass/app.scss')
-		.pipe( css.pipeline() )
+		.pipe( pre_css.pipeline() )
+		.pipe( post_css.pipeline() )
 		.pipe( gulpPlugins.rename({
 			basename: 'style.min'
 		}) )

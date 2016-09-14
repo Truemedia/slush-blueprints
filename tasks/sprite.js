@@ -1,7 +1,12 @@
 // Gulp core and plugins
 var gulp = require('gulp'),
 	gutil = require('gulp-util'),
-	spritesmith = require('gulp.spritesmith');
+	spritesmith = require('gulp.spritesmith'),
+	buffer = require('vinyl-buffer');
+
+// Pipes
+var post_css = require('./../pipes/post_css'),
+		img = require('./../pipes/img');
 
 /* Compile map images into sprite and less file */
 gulp.task('sprite', function(map)
@@ -12,6 +17,11 @@ gulp.task('sprite', function(map)
 			cssName: 'sprite.css'
 		}));
 
-	spriteData.img.pipe( gulp.dest('./public') );
-	spriteData.css.pipe( gulp.dest('./public') );
+	spriteData.img
+		.pipe( buffer() )
+		.pipe( img.pipeline() )
+		.pipe( gulp.dest('./public') );
+	spriteData.css
+		.pipe( post_css.pipeline() )
+		.pipe( gulp.dest('./public') );
 });
