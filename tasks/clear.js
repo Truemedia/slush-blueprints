@@ -34,6 +34,7 @@ var pipelines = {
 	routes: lazypipe().pipe(gulpPlugins.addsrc.append, ['./app/Http/routes.php']),
 	scripts: lazypipe().pipe(gulpPlugins.addsrc.append, ['./public/script.min.js', './public/script.min.js.map']),
 	seeds: lazypipe().pipe(gulpPlugins.addsrc.append, ['./database/seeds/*.php']),
+	sprite: lazypipe().pipe(gulpPlugins.addsrc.append, ['./public/sprite.png', './public/sprite.css']),
 	styles: lazypipe().pipe(gulpPlugins.addsrc.append, ['./public/style.min.css', './public/style.min.css.map']),
 	views: lazypipe().pipe(gulpPlugins.addsrc.append, [
 		path.join(paths.view, 'layouts', '**', '*.php'), path.join(paths.view, 'pages', '**', '**', '*.php'), path.join(paths.view, 'errors', '*.php')
@@ -74,6 +75,7 @@ gulp.task('clear', [
 		'clear-requests',
 		'clear-scripts',
 		'clear-seeds',
+		'clear-sprite',
 		'clear-styles',
 		'clear-views'
 	], function() {
@@ -90,7 +92,8 @@ gulp.task('clear-policies', function() { return cleanse('policies') }); // Clear
 gulp.task('clear-providers', function() { return cleanse('providers') }); // Clear policies
 gulp.task('clear-requests', function() { return cleanse('requests') }); // Clear requests
 gulp.task('clear-routes', function() { return cleanse('routes') }); // Clear routes
-gulp.task('clear-scripts', function() { return cleanse('scripts') }); // Clear seeds
+gulp.task('clear-scripts', function() { return cleanse('scripts') }); // Clear scripts
 gulp.task('clear-seeds', function() { return cleanse('seeds') }); // Clear seeds
-gulp.task('clear-styles', function() { return cleanse('styles') }); // Clear seeds
+gulp.task('clear-sprite', function() { return cleanse('sprite') }); // Clear sprite
+gulp.task('clear-styles', function() { return cleanse('styles') }); // Clear styles
 gulp.task('clear-views', function() { return cleanse('views') }); // Clear views
