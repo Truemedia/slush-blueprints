@@ -34,3 +34,11 @@ gulp.task('js', scripts);
 gulp.task('javascript', scripts);
 gulp.task('script', scripts);
 gulp.task('scripts', scripts);
+
+// Watch
+gulp.task('watch-scripts', function()
+{
+	gulp.watch(['./resources/assets/js/*.js'], [
+		'scripts'
+	]);
+});
