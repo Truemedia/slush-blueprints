@@ -17,10 +17,10 @@ var js = require('./../pipes/js');
 /* Compile and compress frontend scripts */
 gulp.task('scripts', function()
 {
-	var file = './public/js/index.js';
+	var file = './resources/assets/js/index.js';
 	return browserify(file, {debug:true}).transform(babelify, {sourceMaps: true})
     .bundle()
-    .pipe(source(file))
+    .pipe(source('script.min.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
     .pipe(uglify())
