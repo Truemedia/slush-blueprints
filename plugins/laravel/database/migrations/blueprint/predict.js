@@ -22,12 +22,12 @@ var predict = {
         return tableName;
     },
 
-    column: function(jsonSchema, property_index, property_name, property_types, properties) {
+    column: function(jsonSchema, property_index, property_name, property_types, propertyFormat, properties) {
         let observation = new Observation(jsonSchema);
         let prefix = observation.prefixedProperties();
 
         var flags = predict.flags(property_index, property_name, property_types, properties),
-            type = predict.column_type(property_types),
+            type = predict.column_type(property_types, propertyFormat),
             name = predict.column_name(property_name, prefix, type),
             comment = predict.column_comment(property_name);
 
@@ -53,7 +53,7 @@ var predict = {
     /**
      * Match schema primative datatypes to desired database datatypes for selected data source
      */
-    column_type: function(nativeTypes)
+    column_type: function(nativeTypes, propertyFormat)
     {
         var nativeType = nativeTypes.pop(),
             column_type = null;
@@ -65,6 +65,11 @@ var predict = {
         {
             // Got a direct match
             column_type = changeCase[transformation](nativeType);
+        }
+
+        // Improved accuracy matching
+        if (column_type == 'string' && propertyFormat == 'date-time') {
+          column_type = 'dateTime';
         }
 
         return column_type;

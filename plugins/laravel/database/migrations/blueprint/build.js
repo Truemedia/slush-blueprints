@@ -65,12 +65,14 @@ var build = {
             columns = [];
 
         Object.keys(properties).forEach( function(property_name, property_index) {
-            var property_types = properties[property_name].type;
+            var property_types = properties[property_name].type,
+                propertyFormat = (properties[property_name].format != undefined) ? properties[property_name].format : null;
+
             if (!(property_types instanceof Array)) {
                 property_types = [property_types];
             }
 
-            var column = predict.column(jsonSchema, property_index, property_name, property_types, properties);
+            var column = predict.column(jsonSchema, property_index, property_name, property_types, propertyFormat, properties);
             columns.push(column);
         });
 
