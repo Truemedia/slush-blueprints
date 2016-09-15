@@ -50,7 +50,7 @@ var build = {
       return settings;
     },
 
-    dest: './'
+    dest: './<%= dest %>'
 };
 
 module.exports = build;

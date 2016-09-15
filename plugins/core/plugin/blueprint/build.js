@@ -32,9 +32,10 @@ var build = {
         let commandSlug = settings.commandSlug,
             streamName = settings.streamName,
             streamFunctionName = changeCase.camelCase(settings.streamName),
-            templateFilename = settings.templateFilename;
+            templateFilename = settings.templateFilename,
+            dest = settings.dest;
 
-        return {commandSlug, streamName, streamFunctionName, templateFilename};
+        return {commandSlug, streamName, streamFunctionName, templateFilename, dest};
     },
 
     /**
@@ -51,11 +52,12 @@ var build = {
       *
       */
     settings: function(options) {
-      let commandSlug = (options['command'] != undefined && typeof options['command'] === 'string') ? options['command'] : null;
-      let streamName = (options['stream'] != undefined && typeof options['stream'] === 'string') ? options['stream'] : null;
-      let templateFilename = (options['file'] != undefined && typeof options['file'] === 'string') ? options['file'] : null;
+      let commandSlug = (options['command'] != undefined && typeof options['command'] === 'string') ? options['command'] : null,
+          streamName = (options['stream'] != undefined && typeof options['stream'] === 'string') ? options['stream'] : null,
+          templateFilename = (options['file'] != undefined && typeof options['file'] === 'string') ? options['file'] : null,
+          dest = (options['dest'] != undefined && typeof options['dest'] === 'string') ? options['dest'] : null;
 
-      let settings = {commandSlug, streamName, templateFilename};
+      let settings = {commandSlug, streamName, templateFilename, dest};
       return settings;
     },
 

@@ -177,7 +177,7 @@ function plugin(options)
 
                 // Templating function
                 var tpl = _.template( templateFileContents.toString( config.get('defaults.encoding') )),
-                templateData = {},
+                templateData = blueprint.templateData(jsonSchema, settings),
                 fileContents = tpl(templateData).toString(),
                 fileExtensionByMimeType = mime.extension(mimeType),
                 fileExtensionByFilename = 'js';

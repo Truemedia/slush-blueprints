@@ -72,5 +72,6 @@ function generate(jsonpath, done) {
 //     gulp.task(task, function(done) { generate(autoloadTasks[task], done) });
 // }
 gulp.task('generate-command', function(done) { generate('/laravel/app/Console/Commands', done) });
+gulp.task('generate-config', function(done) { generate('/laravel/config', done) });
 gulp.task('generate-migration', function(done) { generate('/laravel/database/migrations', done) });
 gulp.task('generate-plugin', function(done) { generate('/core/plugin', done) });
