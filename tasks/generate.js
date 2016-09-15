@@ -12,6 +12,8 @@ var gulp = require('gulp'),
         .example(`${PLUGIN_NAME} --table=users`, 'Generate a migration for table called users')
         .nargs('table', null)
         .describe('table', 'Table name for migration to generate')
+        .nargs('command', null)
+        .describe('command', 'Command slug for plugin')
         .alias('table', 'create')
         .nargs('w', null)
         .describe('w', 'Run wizard for generating migration')

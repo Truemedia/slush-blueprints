@@ -1,3 +1,4 @@
 {
-    "generate-migration": "/laravel/database/migrations"
+    "generate-migration": "/laravel/database/migrations",
+    "generate-plugin": "/core/plugin"
 }
