@@ -162,7 +162,163 @@ function plugin(options)
                         // cb(null, file);
                     });
                 }
-            }
+            },
+            /**
+              * Create blueprint stream
+              */
+            createBlueprint: {
+                read: fs.createReadStream(blueprint.templatePath('blueprint/build.js.tpl')),
+                write: function(templateFileContents)
+                {
+                    var magic = new Magic(mmm.MAGIC_MIME_TYPE);
+                    magic.detect(templateFileContents, function(err, mimeType) {
+                        if (err) throw err;
+
+                        // Templating function
+                        var tpl = _.template( templateFileContents.toString( config.get('defaults.encoding') )),
+                            templateData = {},
+                            fileContents = tpl(templateData).toString(),
+                            fileExtensionByMimeType = mime.extension(mimeType),
+                            fileExtensionByFilename = 'js';
+
+                        // Use mime type
+                        if (fileExtensionByMimeType != 'txt' && fileExtensionByFilename != 'txt') {
+                          var fileExtension = fileExtensionByMimeType;
+                        }
+                        // Use extension
+                        else {
+                          var fileExtension = fileExtensionByFilename;
+                        }
+
+                        // Push generated file to stream
+                        var blueprintFile = new File({ // blueprint.file
+                            contents: new Buffer(fileContents, config.get('defaults.encoding')),
+                            path: blueprint.filename('blueprint/build', fileExtension)
+                        });
+                        stream.push(blueprintFile);
+
+                        // Callback
+                        // cb(null, pluginFile);
+                    });
+                }
+            },
+            /**
+              * Create observation stream
+              */
+            createObservation: {
+                read: fs.createReadStream(blueprint.templatePath('blueprint/observation.js.tpl')),
+                write: function(templateFileContents)
+                {
+                    var magic = new Magic(mmm.MAGIC_MIME_TYPE);
+                    magic.detect(templateFileContents, function(err, mimeType) {
+                        if (err) throw err;
+
+                        // Templating function
+                        var tpl = _.template( templateFileContents.toString( config.get('defaults.encoding') )),
+                            templateData = {},
+                            fileContents = tpl(templateData).toString(),
+                            fileExtensionByMimeType = mime.extension(mimeType),
+                            fileExtensionByFilename = 'js';
+
+                        // Use mime type
+                        if (fileExtensionByMimeType != 'txt' && fileExtensionByFilename != 'txt') {
+                          var fileExtension = fileExtensionByMimeType;
+                        }
+                        // Use extension
+                        else {
+                          var fileExtension = fileExtensionByFilename;
+                        }
+
+                        // Push generated file to stream
+                        var observationFile = new File({ // blueprint.file
+                            contents: new Buffer(fileContents, config.get('defaults.encoding')),
+                            path: blueprint.filename('blueprint/observation', 'js')
+                        });
+                        stream.push(observationFile);
+
+                        // Callback
+                        // cb(null, pluginFile);
+                    });
+                }
+            },
+            /**
+              * Create questionaire stream
+              */
+            createQuestionaire: {
+                read: fs.createReadStream(blueprint.templatePath('blueprint/questionaire.js.tpl')),
+                write: function(templateFileContents)
+                {
+                    var magic = new Magic(mmm.MAGIC_MIME_TYPE);
+                    magic.detect(templateFileContents, function(err, mimeType) {
+                        if (err) throw err;
+
+                        // Templating function
+                        var tpl = _.template( templateFileContents.toString( config.get('defaults.encoding') )),
+                            templateData = {},
+                            fileContents = tpl(templateData).toString(),
+                            fileExtensionByMimeType = mime.extension(mimeType),
+                            fileExtensionByFilename = 'js';
+
+                        // Use mime type
+                        if (fileExtensionByMimeType != 'txt' && fileExtensionByFilename != 'txt') {
+                          var fileExtension = fileExtensionByMimeType;
+                        }
+                        // Use extension
+                        else {
+                          var fileExtension = fileExtensionByFilename;
+                        }
+
+                        // Push generated file to stream
+                        var questionaireFile = new File({ // blueprint.file
+                            contents: new Buffer(fileContents, config.get('defaults.encoding')),
+                            path: blueprint.filename('blueprint/questionaire', fileExtension)
+                        });
+                        stream.push(questionaireFile);
+
+                        // Callback
+                        // cb(null, pluginFile);
+                    });
+                }
+            },
+            /**
+              * Create predict stream
+              */
+            createPredict: {
+                read: fs.createReadStream(blueprint.templatePath('blueprint/predict.js.tpl')),
+                write: function(templateFileContents)
+                {
+                    var magic = new Magic(mmm.MAGIC_MIME_TYPE);
+                    magic.detect(templateFileContents, function(err, mimeType) {
+                        if (err) throw err;
+
+                        // Templating function
+                        var tpl = _.template( templateFileContents.toString( config.get('defaults.encoding') )),
+                            templateData = {},
+                            fileContents = tpl(templateData).toString(),
+                            fileExtensionByMimeType = mime.extension(mimeType),
+                            fileExtensionByFilename = 'js';
+
+                        // Use mime type
+                        if (fileExtensionByMimeType != 'txt' && fileExtensionByFilename != 'txt') {
+                          var fileExtension = fileExtensionByMimeType;
+                        }
+                        // Use extension
+                        else {
+                          var fileExtension = fileExtensionByFilename;
+                        }
+
+                        // Push generated file to stream
+                        var predictFile = new File({ // blueprint.file
+                            contents: new Buffer(fileContents, config.get('defaults.encoding')),
+                            path: blueprint.filename('blueprint/predict', fileExtension)
+                        });
+                        stream.push(predictFile);
+
+                        // Callback
+                        // cb(null, pluginFile);
+                    });
+                }
+            },
         };
 
         // Loop and assign streams to pipes
