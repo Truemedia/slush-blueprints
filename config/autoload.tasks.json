@@ -1,4 +1,5 @@
 {
-    "generate-migration": "/laravel/database/migrations",
-    "generate-plugin": "/core/plugin"
+  "generate-command": "/laravel/app/Console/Commands",
+  "generate-migration": "/laravel/database/migrations",
+  "generate-plugin": "/core/plugin"
 }

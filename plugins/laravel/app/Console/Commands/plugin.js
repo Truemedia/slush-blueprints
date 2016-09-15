@@ -24,7 +24,7 @@ mime.define( config.get('mime') );
 var blueprint = require('./blueprint/build');
 
 // Overview
-const PLUGIN_NAME = 'slush-regenerator:<%= commandSlug %>';
+const PLUGIN_NAME = 'slush-regenerator:generate-command';
 
 /**
   * Plugin level function
@@ -47,10 +47,10 @@ function plugin(options)
         // Create sub-streams
         var subStreams = {
             /**
-              * <%= streamName %> stream
+              * Create command stream
               */
-            <%= streamFunctionName %>: {
-                read: fs.createReadStream( blueprint.templatePath('<%= templateFilename %>') ),
+            createCommand: {
+                read: fs.createReadStream( blueprint.templatePath('Command.php.tpl') ),
                 write: function(templateFileContents)
                 {
                     var magic = new Magic(mmm.MAGIC_MIME_TYPE);
@@ -66,7 +66,7 @@ function plugin(options)
                         // Push generated file to stream
                         var newFile = new File({ // blueprint.file
                             contents: new Buffer(fileContents, config.get('defaults.encoding')),
-                            path: blueprint.filename('basename', fileExtension)
+                            path: blueprint.filename('Command', fileExtension)
                         });
                         stream.push(newFile);
 

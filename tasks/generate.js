@@ -21,6 +21,8 @@ var gulp = require('gulp'),
         .describe('stream', 'Name of stream')
         .nargs('file', null)
         .describe('file', 'Template file')
+        .nargs('dest', null)
+        .describe('dest', 'File destination')
         // General
         .nargs('w', null)
         .describe('w', 'Run wizard')
@@ -29,8 +31,8 @@ var gulp = require('gulp'),
         .alias('h', 'help');
 
 // Automatically map plugins and tasks
-var regeneratorPlugins = requireDir(path.join(__dirname, '..', 'plugins'), { recurse: true }),
-    autoloadTasks = require('./../config/autoload.tasks.json');
+var regeneratorPlugins = requireDir(path.join(__dirname, '..', 'plugins'), { recurse: true });
+    // autoloadTasks = require('./../config/autoload.tasks.json');
 
 // Help dialogue
 if (yargs.argv.h) {
@@ -43,15 +45,12 @@ function generate(jsonpath, done) {
         blueprint = context.blueprint,
         plugin = context.plugin;
 
+
     // Ask questions?
     var prompts = ((yargs.argv.w) ? blueprint.questionaire.ask(yargs.argv) : blueprint.questionaire.skip(yargs.argv))
     inquirer.prompt(prompts)
     .then( function(options)
     {
-        if (options.columns) {
-            blueprint.questionaire.column();
-        }
-
         // Command-line mode only
         if (Object.keys(options).length === 0 && options.constructor === Object) {
             options = yargs.argv;
@@ -69,6 +68,9 @@ function generate(jsonpath, done) {
 }
 
 // Autoload tasks
-for (var task in autoloadTasks) {
-    gulp.task(task, function(done) { generate(autoloadTasks[task], done) });
-}
+// for (var task in autoloadTasks) {
+//     gulp.task(task, function(done) { generate(autoloadTasks[task], done) });
+// }
+gulp.task('generate-command', function(done) { generate('/laravel/app/Console/Commands', done) });
+gulp.task('generate-migration', function(done) { generate('/laravel/database/migrations', done) });
+gulp.task('generate-plugin', function(done) { generate('/core/plugin', done) });
