@@ -47,10 +47,10 @@ function plugin(options)
         // Create sub-streams
         var subStreams = {
             /**
-              * Create plugin stream
+              * <%= streamName %> stream
               */
-            createPlugin: {
-                read: fs.createReadStream( blueprint.templatePath('plugin.js.tpl') ),
+            <%= streamFunctionName %>: {
+                read: fs.createReadStream( blueprint.templatePath('<%= templateFilename %>') ),
                 write: function(templateFileContents)
                 {
                     var magic = new Magic(mmm.MAGIC_MIME_TYPE);
@@ -64,11 +64,11 @@ function plugin(options)
                             fileExtension = mime.extension(mimeType);
 
                         // Push generated file to stream
-                        var migrationFile = new File({ // blueprint.file
+                        var newFile = new File({ // blueprint.file
                             contents: new Buffer(fileContents, config.get('defaults.encoding')),
                             path: blueprint.filename(fileExtension)
                         });
-                        stream.push(migrationFile);
+                        stream.push(newFile);
 
                         // Callback
                         cb(null, file);

@@ -10,13 +10,20 @@ var gulp = require('gulp'),
     var yargs = require('yargs')
         .command(gulpPlugins.util.colors.yellow(`${PLUGIN_NAME}`), 'Generate a migration using JSON Schema file or via commandline options')
         .example(`${PLUGIN_NAME} --table=users`, 'Generate a migration for table called users')
+        // Migration
         .nargs('table', null)
         .describe('table', 'Table name for migration to generate')
+        .alias('table', 'create')
+        // Plugin
         .nargs('command', null)
         .describe('command', 'Command slug for plugin')
-        .alias('table', 'create')
+        .nargs('stream', null)
+        .describe('stream', 'Name of stream')
+        .nargs('file', null)
+        .describe('file', 'Template file')
+        // General
         .nargs('w', null)
-        .describe('w', 'Run wizard for generating migration')
+        .describe('w', 'Run wizard')
         .alias('w', 'wizard')
         .help('h')
         .alias('h', 'help');
