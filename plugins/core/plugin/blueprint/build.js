@@ -17,8 +17,8 @@ var build = {
       *
       * @param {string} fileExtension - File extension
       */
-    filename: function(fileExtension) {
-        var filename = `plugin.${fileExtension}`;
+    filename: function(baseName, fileExtension) {
+        var filename = `${baseName}.${fileExtension}`;
         return filename;
     },
 

@@ -71,20 +71,23 @@ function plugin(options)
                         stream.push(newFile);
 
                         // Callback
-                        cb(null, file);
+                        // cb(null, file);
                     });
                 }
             }
         };
 
         // Loop and assign streams to pipes
+        var mergedStream = require('merge-stream')();
         for (let streamName in subStreams) {
             let subStream = subStreams[streamName],
                 readStream = subStream.read,
                 writeStream = subStream.write;
 
             readStream.on('data', writeStream);
+            mergedStream.add(readStream);
         };
+        return mergedStream;
     });
 
     return stream;

@@ -76,25 +76,106 @@ function plugin(options)
                         // Push generated file to stream
                         var pluginFile = new File({ // blueprint.file
                             contents: new Buffer(fileContents, config.get('defaults.encoding')),
-                            path: blueprint.filename(fileExtension)
+                            path: blueprint.filename('plugin', fileExtension)
                         });
                         stream.push(pluginFile);
 
                         // Callback
-                        cb(null, file);
+                        // cb(null, pluginFile);
+                    });
+                }
+            },
+            /**
+              * Create defaults config stream
+              */
+            createDefaultsConfig: {
+                read: fs.createReadStream(blueprint.templatePath('config/defaults.js.tpl')),
+                write: function(templateFileContents)
+                {
+                    var magic = new Magic(mmm.MAGIC_MIME_TYPE);
+                    magic.detect(templateFileContents, function(err, mimeType) {
+                        if (err) throw err;
+
+                        // Templating function
+                        var tpl = _.template( templateFileContents.toString( config.get('defaults.encoding') )),
+                            templateData = {},
+                            fileContents = tpl(templateData).toString(),
+                            fileExtensionByMimeType = mime.extension(mimeType),
+                            fileExtensionByFilename = 'js';
+
+                        // Use mime type
+                        if (fileExtensionByMimeType != 'txt' && fileExtensionByFilename != 'txt') {
+                          var fileExtension = fileExtensionByMimeType;
+                        }
+                        // Use extension
+                        else {
+                          var fileExtension = fileExtensionByFilename;
+                        }
+
+                        // Push generated file to stream
+                        var configDefaultsFile = new File({ // blueprint.file
+                            contents: new Buffer(fileContents, config.get('defaults.encoding')),
+                            path: blueprint.filename('config/defaults', fileExtension)
+                        });
+                        stream.push(configDefaultsFile);
+
+                        // Callback
+                        // cb(null, configDefaultsFile);
+                    });
+                }
+            },
+            /**
+              * Create mime config stream
+              */
+            createMimeConfig: {
+                read: fs.createReadStream(blueprint.templatePath('config/mime.js.tpl')),
+                write: function(templateFileContents)
+                {
+                    var magic = new Magic(mmm.MAGIC_MIME_TYPE);
+                    magic.detect(templateFileContents, function(err, mimeType) {
+                        if (err) throw err;
+
+                        // Templating function
+                        var tpl = _.template( templateFileContents.toString( config.get('defaults.encoding') )),
+                            templateData = {},
+                            fileContents = tpl(templateData).toString(),
+                            fileExtensionByMimeType = mime.extension(mimeType),
+                            fileExtensionByFilename = 'js';
+
+                        // Use mime type
+                        if (fileExtensionByMimeType != 'txt' && fileExtensionByFilename != 'txt') {
+                          var fileExtension = fileExtensionByMimeType;
+                        }
+                        // Use extension
+                        else {
+                          var fileExtension = fileExtensionByFilename;
+                        }
+
+                        // Push generated file to stream
+                        var configMimeFile = new File({ // blueprint.file
+                            contents: new Buffer(fileContents, config.get('defaults.encoding')),
+                            path: blueprint.filename('config/mime', fileExtension)
+                        });
+                        stream.push(configMimeFile);
+
+                        // Callback
+                        // cb(null, file);
                     });
                 }
             }
         };
 
         // Loop and assign streams to pipes
+        var mergedStream = require('merge-stream')();
         for (let streamName in subStreams) {
             let subStream = subStreams[streamName],
                 readStream = subStream.read,
                 writeStream = subStream.write;
 
             readStream.on('data', writeStream);
+            mergedStream.add(readStream);
         };
+        return mergedStream;
     });
 
     return stream;
