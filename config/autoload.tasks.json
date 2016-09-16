@@ -4,5 +4,6 @@
   "generate-config": "/laravel/config",
   "generate-migration": "/laravel/database/migrations",
   "general-model": "/laravel/app",
-  "generate-plugin": "/core/plugin"
+  "generate-plugin": "/core/plugin",
+  "generate-view": "laravel/resources/views"
 }
