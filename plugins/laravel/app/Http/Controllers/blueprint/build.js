@@ -38,7 +38,7 @@ var build = {
           resourceName = (settings.resourceName != undefined) ? settings.resourceName : predict.resourceName(jsonSchema),
           requestName = `${modelName}Request`,
           controllerName = `${modelName}Controller`,
-          layoutName = 'default',
+          layoutName = 'bootstrap',
           attributes = [];
 
       // Iterate properties in schema

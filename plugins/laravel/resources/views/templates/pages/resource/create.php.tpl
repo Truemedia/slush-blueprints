@@ -8,6 +8,6 @@
         </div>
     </div>
     <div class="col-md-12">
-        <?php echo view('pages.<%= resourceName %>._form', compact('data_options', 'entry', 'form_action'))->render(); ?>
+        <?php echo view('pages.<%= resourceName %>.._form', compact('data_options', 'form_action'))->render(); ?>
     </div>
 </div>

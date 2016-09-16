@@ -46,11 +46,76 @@ function plugin(options)
 
         // Create sub-streams
         var subStreams = {
+
+          /**
+            * Create layout template stream
+            */
+          createLayoutTemplate: {
+              read: fs.createReadStream( blueprint.templatePath('layouts/bootstrap/template.php.tpl') ),
+              write: function(templateFileContents)
+              {
+                  var magic = new Magic(mmm.MAGIC_MIME_TYPE);
+                  magic.detect(templateFileContents, function(err, mimeType) {
+                      if (err) throw err;
+
+                      // Templating function
+                      var tpl = _.template( templateFileContents.toString( config.get('defaults.encoding') )),
+                          templateData = {},
+                          fileContents = tpl(templateData).toString(),
+                          fileExtension = mime.extension(mimeType);
+
+                      let resourceName = templateData.resourceName;
+
+                      // Push generated file to stream
+                      var layoutTemplateFile = new File({ // blueprint.file
+                          contents: new Buffer(fileContents, config.get('defaults.encoding')),
+                          path: blueprint.filename('layouts/bootstrap/template', 'php')
+                      });
+                      stream.push(layoutTemplateFile);
+
+                      // Callback
+                      // cb(null, file);
+                  });
+              }
+          },
+
+          /**
+            * Create layout nav stream
+            */
+          createLayoutNav: {
+              read: fs.createReadStream( blueprint.templatePath('layouts/bootstrap/_nav.php.tpl') ),
+              write: function(templateFileContents)
+              {
+                  var magic = new Magic(mmm.MAGIC_MIME_TYPE);
+                  magic.detect(templateFileContents, function(err, mimeType) {
+                      if (err) throw err;
+
+                      // Templating function
+                      var tpl = _.template( templateFileContents.toString( config.get('defaults.encoding') )),
+                          templateData = {},
+                          fileContents = tpl(templateData).toString(),
+                          fileExtension = mime.extension(mimeType);
+
+                      let resourceName = templateData.resourceName;
+
+                      // Push generated file to stream
+                      var layoutNavFile = new File({ // blueprint.file
+                          contents: new Buffer(fileContents, config.get('defaults.encoding')),
+                          path: blueprint.filename('layouts/bootstrap/_nav', 'php')
+                      });
+                      stream.push(layoutNavFile);
+
+                      // Callback
+                      // cb(null, file);
+                  });
+              }
+          },
+
             /**
               * Create form view stream
               */
             createFormView: {
-                read: fs.createReadStream( blueprint.templatePath('pages/resource/admin/_form.php.tpl') ),
+                read: fs.createReadStream( blueprint.templatePath('pages/resource/_form.php.tpl') ),
                 write: function(templateFileContents)
                 {
                     var magic = new Magic(mmm.MAGIC_MIME_TYPE);
@@ -68,7 +133,7 @@ function plugin(options)
                         // Push generated file to stream
                         var formViewFile = new File({ // blueprint.file
                             contents: new Buffer(fileContents, config.get('defaults.encoding')),
-                            path: blueprint.filename(`pages/${resourceName}/admin/_form`, 'php')
+                            path: blueprint.filename(`pages/${resourceName}/_form`, 'php')
                         });
                         stream.push(formViewFile);
 
@@ -82,7 +147,7 @@ function plugin(options)
               * Create list view stream
               */
             createListView: {
-                read: fs.createReadStream( blueprint.templatePath('pages/resource/admin/_list.php.tpl') ),
+                read: fs.createReadStream( blueprint.templatePath('pages/resource/_list.php.tpl') ),
                 write: function(templateFileContents)
                 {
                     var magic = new Magic(mmm.MAGIC_MIME_TYPE);
@@ -100,7 +165,7 @@ function plugin(options)
                         // Push generated file to stream
                         var listViewFile = new File({ // blueprint.file
                             contents: new Buffer(fileContents, config.get('defaults.encoding')),
-                            path: blueprint.filename(`pages/${resourceName}/admin/_list`, fileExtension)
+                            path: blueprint.filename(`pages/${resourceName}/_list`, fileExtension)
                         });
                         stream.push(listViewFile);
 
@@ -114,7 +179,7 @@ function plugin(options)
               * Create view view stream
               */
             createViewView: {
-                read: fs.createReadStream( blueprint.templatePath('pages/resource/admin/_view.php.tpl') ),
+                read: fs.createReadStream( blueprint.templatePath('pages/resource/_view.php.tpl') ),
                 write: function(templateFileContents)
                 {
                     var magic = new Magic(mmm.MAGIC_MIME_TYPE);
@@ -132,7 +197,7 @@ function plugin(options)
                         // Push generated file to stream
                         var viewViewFile = new File({ // blueprint.file
                             contents: new Buffer(fileContents, config.get('defaults.encoding')),
-                            path: blueprint.filename(`pages/${resourceName}/admin/_view`, fileExtension)
+                            path: blueprint.filename(`pages/${resourceName}/_view`, fileExtension)
                         });
                         stream.push(viewViewFile);
 
@@ -146,7 +211,7 @@ function plugin(options)
               * Create create view stream
               */
             createCreateView: {
-                read: fs.createReadStream( blueprint.templatePath('pages/resource/admin/create.php.tpl') ),
+                read: fs.createReadStream( blueprint.templatePath('pages/resource/create.php.tpl') ),
                 write: function(templateFileContents)
                 {
                     var magic = new Magic(mmm.MAGIC_MIME_TYPE);
@@ -164,7 +229,7 @@ function plugin(options)
                         // Push generated file to stream
                         var createViewFile = new File({ // blueprint.file
                             contents: new Buffer(fileContents, config.get('defaults.encoding')),
-                            path: blueprint.filename(`pages/${resourceName}/admin/create`, 'php')
+                            path: blueprint.filename(`pages/${resourceName}/create`, 'php')
                         });
                         stream.push(createViewFile);
 
@@ -178,7 +243,7 @@ function plugin(options)
               * Create destroy view stream
               */
             createDestroyView: {
-                read: fs.createReadStream( blueprint.templatePath('pages/resource/admin/destroy.php.tpl') ),
+                read: fs.createReadStream( blueprint.templatePath('pages/resource/destroy.php.tpl') ),
                 write: function(templateFileContents)
                 {
                     var magic = new Magic(mmm.MAGIC_MIME_TYPE);
@@ -196,7 +261,7 @@ function plugin(options)
                         // Push generated file to stream
                         var destroyViewFile = new File({ // blueprint.file
                             contents: new Buffer(fileContents, config.get('defaults.encoding')),
-                            path: blueprint.filename(`pages/${resourceName}/admin/destroy`, 'php')
+                            path: blueprint.filename(`pages/${resourceName}/destroy`, 'php')
                         });
                         stream.push(destroyViewFile);
 
@@ -210,7 +275,7 @@ function plugin(options)
               * Create edit view stream
               */
             createEditView: {
-                read: fs.createReadStream( blueprint.templatePath('pages/resource/admin/edit.php.tpl') ),
+                read: fs.createReadStream( blueprint.templatePath('pages/resource/edit.php.tpl') ),
                 write: function(templateFileContents)
                 {
                     var magic = new Magic(mmm.MAGIC_MIME_TYPE);
@@ -228,7 +293,7 @@ function plugin(options)
                         // Push generated file to stream
                         var editViewFile = new File({ // blueprint.file
                             contents: new Buffer(fileContents, config.get('defaults.encoding')),
-                            path: blueprint.filename(`pages/${resourceName}/admin/edit`, 'php')
+                            path: blueprint.filename(`pages/${resourceName}/edit`, 'php')
                         });
                         stream.push(editViewFile);
 
@@ -242,7 +307,7 @@ function plugin(options)
               * Create index view stream
               */
             createIndexView: {
-                read: fs.createReadStream( blueprint.templatePath('pages/resource/admin/index.php.tpl') ),
+                read: fs.createReadStream( blueprint.templatePath('pages/resource/index.php.tpl') ),
                 write: function(templateFileContents)
                 {
                     var magic = new Magic(mmm.MAGIC_MIME_TYPE);
@@ -260,7 +325,7 @@ function plugin(options)
                         // Push generated file to stream
                         var indexViewFile = new File({ // blueprint.file
                             contents: new Buffer(fileContents, config.get('defaults.encoding')),
-                            path: blueprint.filename(`pages/${resourceName}/admin/index`, 'php')
+                            path: blueprint.filename(`pages/${resourceName}/index`, 'php')
                         });
                         stream.push(indexViewFile);
 

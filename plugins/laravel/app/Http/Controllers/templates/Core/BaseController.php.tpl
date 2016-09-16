@@ -93,7 +93,9 @@ class BaseController extends Controller
 	{
 		$resource = ucwords( str_replace('Controller', '', class_basename($class)) );
 
-		$this->layout->things = json_decode( file_get_contents( base_path('regeneration.json') ) );
+		$this->layout->things = (file_exists( base_path('regeneration.json') )) ?
+		json_decode( file_get_contents( base_path('regeneration.json') ) ) :
+		null;
 		$this->layout->thing = $resource;
 		$this->layout->thing_path = snake_case($resource);
 	}
