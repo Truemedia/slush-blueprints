@@ -24,7 +24,7 @@ mime.define( config.get('mime') );
 var blueprint = require('./blueprint/build');
 
 // Overview
-const PLUGIN_NAME = 'slush-regenerator:generate-controller';
+const PLUGIN_NAME = 'slush-regenerator:generate-model';
 
 /**
   * Plugin level function
@@ -47,10 +47,10 @@ function plugin(options)
         // Create sub-streams
         var subStreams = {
             /**
-              * Create admin controller stream
+              * Create stream
               */
-            createAdminController: {
-                read: fs.createReadStream( blueprint.templatePath('Resources/AdminController.php.tpl') ),
+            create: {
+                read: fs.createReadStream( blueprint.templatePath('Model.php.tpl') ),
                 write: function(templateFileContents)
                 {
                     var magic = new Magic(mmm.MAGIC_MIME_TYPE);
@@ -64,11 +64,11 @@ function plugin(options)
                             fileExtension = mime.extension(mimeType);
 
                         // Push generated file to stream
-                        var adminControllerFile = new File({ // blueprint.file
+                        var newFile = new File({ // blueprint.file
                             contents: new Buffer(fileContents, config.get('defaults.encoding')),
-                            path: blueprint.filename(path.join(templateData.resourceName, 'AdminController'), fileExtension)
+                            path: blueprint.filename(templateData.modelName, fileExtension)
                         });
-                        stream.push(adminControllerFile);
+                        stream.push(newFile);
 
                         // Callback
                         // cb(null, file);

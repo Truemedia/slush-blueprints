@@ -58,12 +58,12 @@ var build = {
       * @param {json} settings - Preconfigured options
       */
     templateData: function(jsonSchema, settings) {
-        // Iterate properties in schema
         var properties = jsonSchema.items.properties;
 
         var tableName = (settings.tableName != undefined) ? settings.tableName : predict.tableName(jsonSchema),
             columns = [];
 
+        // Iterate properties in schema
         Object.keys(properties).forEach( function(property_name, property_index) {
             var property_types = properties[property_name].type,
                 propertyFormat = (properties[property_name].format != undefined) ? properties[property_name].format : null;
