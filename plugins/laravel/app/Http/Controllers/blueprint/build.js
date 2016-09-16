@@ -29,13 +29,32 @@ var build = {
       * @param {json} settings - Preconfigured options
       */
     templateData: function(jsonSchema, settings) {
-      let modelName = (settings.modelName != undefined) ? settings.modelName : predict.modelName(jsonSchema),
-          controllerName = `${modelName}Controller`,
-          requestName = `${modelName}Request`,
-          layoutName = 'default',
-          resourceName = (settings.resourceName != undefined) ? settings.resourceName : predict.resourceName(jsonSchema);
+      var properties = jsonSchema.items.properties;
 
-      return {resourceName, modelName, requestName, layoutName};
+      let modelName = (settings.modelName != undefined) ? settings.modelName : predict.modelName(jsonSchema),
+          tableName = (settings.tableName != undefined) ? settings.tableName : predict.tableName(jsonSchema),
+          parentModelName = (settings.parentModelName != undefined) ? settings.parentModelName : predict.parentModelName(jsonSchema),
+          parentTableName = (settings.parentTableName != undefined) ? settings.parentTableName : predict.parentTableName(jsonSchema),
+          resourceName = (settings.resourceName != undefined) ? settings.resourceName : predict.resourceName(jsonSchema),
+          requestName = `${modelName}Request`,
+          controllerName = `${modelName}Controller`,
+          layoutName = 'default',
+          attributes = [];
+
+      // Iterate properties in schema
+      Object.keys(properties).forEach( function(propertyName, propertyIndex) {
+        var propertyTypes = properties[propertyName].type,
+            propertyFormat = (properties[propertyName].format != undefined) ? properties[propertyName].format : null;
+
+        if (!(propertyTypes instanceof Array)) {
+          propertyTypes = [propertyTypes];
+        }
+
+        var attribute = predict.attribute(jsonSchema, propertyIndex, propertyName, propertyTypes, propertyFormat, properties);
+        attributes.push(attribute);
+      });
+
+      return {modelName, tableName, parentModelName, parentTableName, resourceName, requestName, controllerName, layoutName, attributes};
     },
 
     /**
@@ -53,9 +72,11 @@ var build = {
       */
     settings: function(options) {
       let modelName = (options['model'] != undefined && typeof options['model'] === 'string') ? options['model'] : null,
+          tableName = (options['table'] != undefined && typeof options['table'] === 'string') ? options['table'] : null,
+          parentModelName = (options['parent-model'] != undefined && typeof options['parent-model'] === 'string') ? options['parent-model'] : null,
+          parentTableName = (options['parent-table'] != undefined && typeof options['parent-table'] === 'string') ? options['parent-table'] : null,
           resourceName = (options['resource'] != undefined && typeof options['resource'] === 'string') ? options['resource'] : null;
-
-      return {modelName, resourceName};
+      return {modelName, tableName, parentModelName, parentTableName, resourceName};
     },
 
     dest:  './app/Http/Controllers'
