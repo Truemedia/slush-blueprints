@@ -73,5 +73,6 @@ function generate(jsonpath, done) {
 // }
 gulp.task('generate-command', function(done) { generate('/laravel/app/Console/Commands', done) });
 gulp.task('generate-config', function(done) { generate('/laravel/config', done) });
+gulp.task('generate-controller', function(done) { generate('/laravel/app/Http/Controllers', done) });
 gulp.task('generate-migration', function(done) { generate('/laravel/database/migrations', done) });
 gulp.task('generate-plugin', function(done) { generate('/core/plugin', done) });

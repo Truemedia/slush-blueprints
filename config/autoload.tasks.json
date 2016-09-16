@@ -1,5 +1,6 @@
 {
   "generate-command": "/laravel/app/Console/Commands",
+  "generate-controller": "/laravel/app/Http/Controllers",
   "generate-config": "/laravel/config",
   "generate-migration": "/laravel/database/migrations",
   "generate-plugin": "/core/plugin"
