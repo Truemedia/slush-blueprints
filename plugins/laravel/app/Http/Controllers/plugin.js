@@ -46,10 +46,70 @@ function plugin(options)
 
         // Create sub-streams
         var subStreams = {
+          /**
+          * Create core admin controller stream
+          */
+          createCoreAdminController: {
+            read: fs.createReadStream( blueprint.templatePath('Core/AdminController.php.tpl') ),
+            write: function(templateFileContents)
+            {
+              var magic = new Magic(mmm.MAGIC_MIME_TYPE);
+              magic.detect(templateFileContents, function(err, mimeType) {
+                if (err) throw err;
+
+                // Templating function
+                var tpl = _.template( templateFileContents.toString( config.get('defaults.encoding') )),
+                templateData = {},
+                fileContents = tpl(templateData).toString(),
+                fileExtension = mime.extension(mimeType);
+
+                // Push generated file to stream
+                var coreAdminControllerFile = new File({ // blueprint.file
+                  contents: new Buffer(fileContents, config.get('defaults.encoding')),
+                  path: blueprint.filename('Core/AdminController', fileExtension)
+                });
+                stream.push(coreAdminControllerFile);
+
+                // Callback
+                // cb(null, file);
+              });
+            }
+          },
+
+          /**
+          * Create core base controller stream
+          */
+          createCoreBaseController: {
+            read: fs.createReadStream( blueprint.templatePath('Core/BaseController.php.tpl') ),
+            write: function(templateFileContents)
+            {
+              var magic = new Magic(mmm.MAGIC_MIME_TYPE);
+              magic.detect(templateFileContents, function(err, mimeType) {
+                if (err) throw err;
+
+                // Templating function
+                var tpl = _.template( templateFileContents.toString( config.get('defaults.encoding') )),
+                templateData = {},
+                fileContents = tpl(templateData).toString(),
+                fileExtension = mime.extension(mimeType);
+
+                // Push generated file to stream
+                var coreBaseControllerFile = new File({ // blueprint.file
+                  contents: new Buffer(fileContents, config.get('defaults.encoding')),
+                  path: blueprint.filename('Core/BaseController', fileExtension)
+                });
+                stream.push(coreBaseControllerFile);
+
+                // Callback
+                // cb(null, file);
+              });
+            }
+          },
+
             /**
-              * Create admin controller stream
+              * Create resouce admin controller stream
               */
-            createAdminController: {
+            createResourceAdminController: {
                 read: fs.createReadStream( blueprint.templatePath('Resources/AdminController.php.tpl') ),
                 write: function(templateFileContents)
                 {
@@ -63,12 +123,14 @@ function plugin(options)
                             fileContents = tpl(templateData).toString(),
                             fileExtension = mime.extension(mimeType);
 
+                        let resourceName = templateData.resourceName;
+
                         // Push generated file to stream
-                        var adminControllerFile = new File({ // blueprint.file
+                        var resourceAdminControllerFile = new File({ // blueprint.file
                             contents: new Buffer(fileContents, config.get('defaults.encoding')),
-                            path: blueprint.filename(path.join(templateData.resourceName, 'AdminController'), fileExtension)
+                            path: blueprint.filename(`Resources/${resourceName}/AdminController`, fileExtension)
                         });
-                        stream.push(adminControllerFile);
+                        stream.push(resourceAdminControllerFile);
 
                         // Callback
                         // cb(null, file);
