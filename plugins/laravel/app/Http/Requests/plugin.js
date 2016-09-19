@@ -24,7 +24,7 @@ mime.define( config.get('mime') );
 var blueprint = require('./blueprint/build');
 
 // Overview
-const PLUGIN_NAME = 'slush-regenerator:generate-request';
+const PLUGIN_NAME = 'slush-regenerator:make-request';
 
 /**
   * Plugin level function
@@ -63,12 +63,15 @@ function plugin(options)
                             fileContents = tpl(templateData).toString(),
                             fileExtension = mime.extension(mimeType);
 
+
+                        let requestName = templateData.requestName;
+
                         // Push generated file to stream
-                        var newFile = new File({ // blueprint.file
+                        var requestFile = new File({ // blueprint.file
                             contents: new Buffer(fileContents, config.get('defaults.encoding')),
-                            path: blueprint.filename('basename', fileExtension)
+                            path: blueprint.filename(`${requestName}`, fileExtension)
                         });
-                        stream.push(newFile);
+                        stream.push(requestFile);
 
                         // Callback
                         // cb(null, file);

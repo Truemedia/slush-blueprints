@@ -10,6 +10,9 @@ class Observation extends Observational {
         super();
         this.schema = jsonSchema;
     }
+    prefixedProperties () {
+        return this.keysPrefixed(this.schema.items.properties);
+    }
 }
 
 module.exports = Observation;

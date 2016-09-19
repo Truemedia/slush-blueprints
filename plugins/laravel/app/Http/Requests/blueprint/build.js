@@ -29,7 +29,10 @@ var build = {
       * @param {json} settings - Preconfigured options
       */
     templateData: function(jsonSchema, settings) {
-        return {};
+        let modelName = (settings.modelName != undefined) ? settings.modelName : predict.modelName(jsonSchema),
+            requestName = `${modelName}Request`;
+
+        return {modelName, requestName};
     },
 
     /**
@@ -46,8 +49,9 @@ var build = {
       *
       */
     settings: function(options) {
-      let settings = {};
-      return settings;
+      let modelName = (options['model'] != undefined && typeof options['model'] === 'string') ? options['model'] : null;
+
+      return {modelName};
     },
 
     dest: './app/Http/Requests'

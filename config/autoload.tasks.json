@@ -4,6 +4,7 @@
   "make-config": "/laravel/config",
   "make-migration": "/laravel/database/migrations",
   "make-model": "/laravel/app",
+  "make-request": "/laravel/app/Http/Requests",
   "make-plugin": "/core/plugin",
   "make-view": "/laravel/resources/views"
 }

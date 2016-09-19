@@ -6,7 +6,7 @@ var gulp = require('gulp'),
     path = require('path'),
     pointer = require('json-pointer');
     // TODO: Load this from plugin dynamically
-    const PLUGIN_NAME = 'slush-regenerator:make:migration';
+    const PLUGIN_NAME = 'slush-regenerator:make-migration';
     var yargs = require('yargs')
         .command(gulpPlugins.util.colors.yellow(`${PLUGIN_NAME}`), 'Generate a migration using JSON Schema file or via commandline options')
         .example(`${PLUGIN_NAME} --table=users`, 'Generate a migration for table called users')
@@ -43,44 +43,38 @@ if (yargs.argv.h) {
     yargs.showHelp();
 }
 
-/* Generate */
-function generate(jsonpath, done) {
-    var context = pointer.get(regeneratorPlugins, jsonpath),
-        blueprint = context.blueprint,
-        plugin = context.plugin;
-
-
-    // Ask questions?
-    var prompts = ((yargs.argv.w) ? blueprint.questionaire.ask(yargs.argv) : blueprint.questionaire.skip(yargs.argv))
-    inquirer.prompt(prompts)
-    .then( function(options)
+// Autoload make tasks
+Object.keys(autoloadTasks).forEach( function(task)
+{
+    gulp.task(task, function(done)
     {
-        // Command-line mode only
-        if (Object.keys(options).length === 0 && options.constructor === Object) {
-            options = yargs.argv;
-        }
+        // Load plugin
+        let jsonpath = autoloadTasks[task],
+          context = pointer.get(regeneratorPlugins, jsonpath);
 
-        // Run stream
-        gulp.src(['./*.schema.json'])
-            .pipe( plugin(options) )
-            .pipe( gulp.dest(blueprint.build.dest) )
-            .on('end', function()
-            {
-                done();
-            });
+        // Plugin libs
+        let blueprint = context.blueprint,
+            plugin = context.plugin;
+
+
+        // Ask questions?
+        var prompts = ((yargs.argv.w) ? blueprint.questionaire.ask(yargs.argv) : blueprint.questionaire.skip(yargs.argv))
+        inquirer.prompt(prompts)
+        .then( function(options)
+        {
+            // Command-line mode only
+            if (Object.keys(options).length === 0 && options.constructor === Object) {
+                options = yargs.argv;
+            }
+
+            // Run stream
+            gulp.src(['./*.schema.json'])
+                .pipe( plugin(options) )
+                .pipe( gulp.dest(blueprint.build.dest) )
+                .on('end', function()
+                {
+                    done();
+                });
+        });
     });
-}
-
-// Autoload tasks
-for (var task in autoloadTasks) {
-    gulp.task(task, function(done) { generate(autoloadTasks[task], done) });
-}
-// // Laravel
-// gulp.task('generate-command', function(done) { generate('/laravel/app/Console/Commands', done) });
-// gulp.task('generate-config', function(done) { generate('/laravel/config', done) });
-// gulp.task('generate-controller', function(done) { generate('/laravel/app/Http/Controllers', done) });
-// gulp.task('generate-migration', function(done) { generate('/laravel/database/migrations', done) });
-// gulp.task('generate-model', function(done) { generate('/laravel/app', done) });
-// gulp.task('generate-view', function(done) { generate('/laravel/resources/views', done) });
-// // Core
-// gulp.task('generate-plugin', function(done) { generate('/core/plugin', done) });
+});
