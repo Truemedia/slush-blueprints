@@ -1,6 +1,6 @@
 "use strict";
 
-var Observational = require('./../../../../classes/observational');
+var Observational = require('./../../../../../../classes/observational');
 
 /**
   * Make observations on jsonSchema

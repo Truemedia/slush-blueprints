@@ -6,7 +6,7 @@ var gulp = require('gulp'),
     path = require('path'),
     pointer = require('json-pointer');
     // TODO: Load this from plugin dynamically
-    const PLUGIN_NAME = 'slush-regenerator:generate-migration';
+    const PLUGIN_NAME = 'slush-regenerator:make:migration';
     var yargs = require('yargs')
         .command(gulpPlugins.util.colors.yellow(`${PLUGIN_NAME}`), 'Generate a migration using JSON Schema file or via commandline options')
         .example(`${PLUGIN_NAME} --table=users`, 'Generate a migration for table called users')
@@ -35,8 +35,8 @@ var gulp = require('gulp'),
         .alias('h', 'help');
 
 // Automatically map plugins and tasks
-var regeneratorPlugins = requireDir(path.join(__dirname, '..', 'plugins'), { recurse: true });
-    // autoloadTasks = require('./../config/autoload.tasks.json');
+var regeneratorPlugins = requireDir(path.join(__dirname, '..', 'plugins'), { recurse: true }),
+    autoloadTasks = require('./../config/autoload.tasks.json');
 
 // Help dialogue
 if (yargs.argv.h) {
@@ -72,15 +72,15 @@ function generate(jsonpath, done) {
 }
 
 // Autoload tasks
-// for (var task in autoloadTasks) {
-//     gulp.task(task, function(done) { generate(autoloadTasks[task], done) });
-// }
-// Laravel
-gulp.task('generate-command', function(done) { generate('/laravel/app/Console/Commands', done) });
-gulp.task('generate-config', function(done) { generate('/laravel/config', done) });
-gulp.task('generate-controller', function(done) { generate('/laravel/app/Http/Controllers', done) });
-gulp.task('generate-migration', function(done) { generate('/laravel/database/migrations', done) });
-gulp.task('generate-model', function(done) { generate('/laravel/app', done) });
-gulp.task('generate-view', function(done) { generate('/laravel/resources/views', done) });
-// Core
-gulp.task('generate-plugin', function(done) { generate('/core/plugin', done) });
+for (var task in autoloadTasks) {
+    gulp.task(task, function(done) { generate(autoloadTasks[task], done) });
+}
+// // Laravel
+// gulp.task('generate-command', function(done) { generate('/laravel/app/Console/Commands', done) });
+// gulp.task('generate-config', function(done) { generate('/laravel/config', done) });
+// gulp.task('generate-controller', function(done) { generate('/laravel/app/Http/Controllers', done) });
+// gulp.task('generate-migration', function(done) { generate('/laravel/database/migrations', done) });
+// gulp.task('generate-model', function(done) { generate('/laravel/app', done) });
+// gulp.task('generate-view', function(done) { generate('/laravel/resources/views', done) });
+// // Core
+// gulp.task('generate-plugin', function(done) { generate('/core/plugin', done) });

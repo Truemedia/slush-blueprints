@@ -1,9 +1,9 @@
 {
-  "generate-command": "/laravel/app/Console/Commands",
-  "generate-controller": "/laravel/app/Http/Controllers",
-  "generate-config": "/laravel/config",
-  "generate-migration": "/laravel/database/migrations",
-  "general-model": "/laravel/app",
-  "generate-plugin": "/core/plugin",
-  "generate-view": "laravel/resources/views"
+  "make-command": "/laravel/app/Console/Commands",
+  "make-controller": "/laravel/app/Http/Controllers",
+  "make-config": "/laravel/config",
+  "make-migration": "/laravel/database/migrations",
+  "make-model": "/laravel/app",
+  "make-plugin": "/core/plugin",
+  "make-view": "/laravel/resources/views"
 }
