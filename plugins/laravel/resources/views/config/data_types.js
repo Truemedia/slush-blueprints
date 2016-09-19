@@ -1,4 +1,5 @@
-[
+module.exports = {
+  "data_types": [
     "bigIncrements",
     "bigInteger",
     "binary",
@@ -28,4 +29,5 @@
     "tinyInteger",
     "timestamp",
     "timestamps"
-]
+  ]
+};

@@ -35,7 +35,8 @@ var build = {
           tableName = (settings.tableName != undefined) ? settings.tableName : predict.tableName(jsonSchema),
           parentModelName = (settings.parentModelName != undefined) ? settings.parentModelName : predict.parentModelName(jsonSchema),
           parentTableName = (settings.parentTableName != undefined) ? settings.parentTableName : predict.parentTableName(jsonSchema),
-          attributes = [];
+          attributes = [],
+          things = [];
 
       // Iterate properties in schema
       Object.keys(properties).forEach( function(propertyName, propertyIndex) {
@@ -50,7 +51,7 @@ var build = {
         attributes.push(attribute);
       });
 
-      return {modelName, tableName, parentModelName, parentTableName, attributes};
+      return {modelName, tableName, parentModelName, parentTableName, attributes, things};
     },
 
     /**

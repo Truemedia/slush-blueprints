@@ -24,7 +24,7 @@ mime.define( config.get('mime') );
 var blueprint = require('./blueprint/build');
 
 // Overview
-const PLUGIN_NAME = 'slush-regenerator:generate-view';
+const PLUGIN_NAME = 'slush-regenerator:make-view';
 
 /**
   * Plugin level function

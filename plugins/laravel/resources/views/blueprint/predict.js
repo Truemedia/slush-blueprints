@@ -1,10 +1,12 @@
 "use strict";
 
 var Observation = require('./observation'),
-    changeCase = require('change-case');
+    changeCase = require('change-case'),
+    config = require('super-config'),
+    glob = require('glob');
 
 var mapper = require('./../../../../../classes/mapper');
-var dataTypes = require('./datatypes');
+config.loadConfig(glob.sync( path.join(__dirname, 'config/*.js') ));
 
 /**
   * Predict how migrations will be built using only data provided
@@ -64,40 +66,37 @@ var predict = {
   },
 
   /**
-   * Attribute name
-   */
-  formFieldName: function(propertyName, prefix, type)
-  {
-    // Remove prefix (if applicable)
-    let formFieldName = (prefix) ? propertyName.replace(`${prefix}_`, '') : propertyName;
-
-    // Add underscore for id formField if missing
-    if (type == 'integer' && formFieldName != 'id' && formFieldName.indexOf('_id') == -1) {
-      formFieldName = formFieldName.replace('id', '_id');
-    }
-
-    return formFieldName;
-  },
-
-  /**
    * Match schema primative datatypes to desired database datatypes for selected data source
    */
   formFieldType: function(nativeTypes, propertyFormat)
   {
+    let dataTypes = config.get('data_types'),
+        nativeMappings = config.get('native_mappings');
+
       var nativeType = nativeTypes.pop(),
           formFieldType = null;
 
-      // Match using type
+      // Match using type against native types
       var transformation = mapper.direct_datatype_transformation_match(dataTypes, nativeType);
-      // Match using format
+      // Match using format against native types
       if (transformation == null) {
         transformation = mapper.direct_datatype_transformation_match(dataTypes, propertyFormat);
       }
 
-      // Got a direct match
-      if (transformation != null)
-      {
+      // Got a match for native type
+      if (transformation != null) {
+          nativeType = changeCase[transformation](nativeType);
+      }
+
+      // Map native type to view type
+      var transformation = mapper.direct_datatype_transformation_match(config.get('input_types'), nativeType);
+
+      if (transformation != null) {
+          // Got a direct match
           formFieldType = changeCase[transformation](nativeType);
+      }
+      else if (Object.keys(nativeMappings).indexOf( changeCase.camelCase(nativeType) ) > -1) {
+        formFieldType = nativeMappings[changeCase.camelCase(nativeType)];
       }
 
       return formFieldType;
@@ -121,13 +120,10 @@ var predict = {
 
   formFieldLabel: function(propertyName, prefix, type)
   {
-      let resourceName = null;
+    let formFieldName = predict.formFieldName(propertyName, prefix, type),
+        formFieldLabel = changeCase.sentenceCase( pluralize.singular(formFieldName) );
 
-      // Use prefix (if available)
-      if (prefix) {
-          resourceName = changeCase.sentenceCase( pluralize.singular(prefix) );
-      }
-      return resourceName;
+      return formFieldLabel;
   },
 
   formFieldTableName: function()

@@ -67,7 +67,7 @@ class <%= modelName %> extends <%= parentModelName != null ? parentModelName : '
     /**
      * Get child classes
      */
-     <% _.each(attributes, function(attribute) { %>public function <%= attribute.functionName %>() { return $this->hasOne('App\<%= attribute.modelName %>'); }
+     <% _.each(things, function(thing) { %>public function <%= thing.functionName %>() { return $this->hasOne('App\<%= thing.modelName %>'); }
      <% }); %>
 
      /**
