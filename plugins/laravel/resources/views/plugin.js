@@ -12,6 +12,7 @@ var through2 = require('through2'),
     config = require('super-config'),
     mmm = require('mmmagic'),
     Magic = require('mmmagic').Magic,
+    magic = new Magic(mmm.MAGIC_MIME_TYPE),
     mime = require('mime'),
     gulp = require('gulp'),
     gulpPlugins = require('auto-plug')('gulp'),
@@ -44,17 +45,16 @@ function plugin(options)
         var jsonSchema = JSON.parse( file.contents.toString() ),
             settings = blueprint.settings(options);
 
-        // Create sub-streams
-        var subStreams = {
+        // Create duplex streams
+        var duplexStreams = {
 
           /**
             * Create layout template stream
             */
           createLayoutTemplate: {
               read: fs.createReadStream( blueprint.templatePath('layouts/bootstrap/template.php.tpl') ),
-              write: function(templateFileContents)
+              data: function(templateFileContents)
               {
-                  var magic = new Magic(mmm.MAGIC_MIME_TYPE);
                   magic.detect(templateFileContents, function(err, mimeType) {
                       if (err) throw err;
 
@@ -84,9 +84,8 @@ function plugin(options)
             */
           createLayoutNav: {
               read: fs.createReadStream( blueprint.templatePath('layouts/bootstrap/_nav.php.tpl') ),
-              write: function(templateFileContents)
+              data: function(templateFileContents)
               {
-                  var magic = new Magic(mmm.MAGIC_MIME_TYPE);
                   magic.detect(templateFileContents, function(err, mimeType) {
                       if (err) throw err;
 
@@ -116,9 +115,8 @@ function plugin(options)
               */
             createFormView: {
                 read: fs.createReadStream( blueprint.templatePath('pages/resource/_form.php.tpl') ),
-                write: function(templateFileContents)
+                data: function(templateFileContents)
                 {
-                    var magic = new Magic(mmm.MAGIC_MIME_TYPE);
                     magic.detect(templateFileContents, function(err, mimeType) {
                         if (err) throw err;
 
@@ -148,9 +146,8 @@ function plugin(options)
               */
             createListView: {
                 read: fs.createReadStream( blueprint.templatePath('pages/resource/_list.php.tpl') ),
-                write: function(templateFileContents)
+                data: function(templateFileContents)
                 {
-                    var magic = new Magic(mmm.MAGIC_MIME_TYPE);
                     magic.detect(templateFileContents, function(err, mimeType) {
                         if (err) throw err;
 
@@ -180,9 +177,8 @@ function plugin(options)
               */
             createViewView: {
                 read: fs.createReadStream( blueprint.templatePath('pages/resource/_view.php.tpl') ),
-                write: function(templateFileContents)
+                data: function(templateFileContents)
                 {
-                    var magic = new Magic(mmm.MAGIC_MIME_TYPE);
                     magic.detect(templateFileContents, function(err, mimeType) {
                         if (err) throw err;
 
@@ -212,9 +208,8 @@ function plugin(options)
               */
             createCreateView: {
                 read: fs.createReadStream( blueprint.templatePath('pages/resource/create.php.tpl') ),
-                write: function(templateFileContents)
+                data: function(templateFileContents)
                 {
-                    var magic = new Magic(mmm.MAGIC_MIME_TYPE);
                     magic.detect(templateFileContents, function(err, mimeType) {
                         if (err) throw err;
 
@@ -244,9 +239,8 @@ function plugin(options)
               */
             createDestroyView: {
                 read: fs.createReadStream( blueprint.templatePath('pages/resource/destroy.php.tpl') ),
-                write: function(templateFileContents)
+                data: function(templateFileContents)
                 {
-                    var magic = new Magic(mmm.MAGIC_MIME_TYPE);
                     magic.detect(templateFileContents, function(err, mimeType) {
                         if (err) throw err;
 
@@ -276,9 +270,8 @@ function plugin(options)
               */
             createEditView: {
                 read: fs.createReadStream( blueprint.templatePath('pages/resource/edit.php.tpl') ),
-                write: function(templateFileContents)
+                data: function(templateFileContents)
                 {
-                    var magic = new Magic(mmm.MAGIC_MIME_TYPE);
                     magic.detect(templateFileContents, function(err, mimeType) {
                         if (err) throw err;
 
@@ -308,9 +301,8 @@ function plugin(options)
               */
             createIndexView: {
                 read: fs.createReadStream( blueprint.templatePath('pages/resource/index.php.tpl') ),
-                write: function(templateFileContents)
+                data: function(templateFileContents)
                 {
-                    var magic = new Magic(mmm.MAGIC_MIME_TYPE);
                     magic.detect(templateFileContents, function(err, mimeType) {
                         if (err) throw err;
 
@@ -338,15 +330,16 @@ function plugin(options)
 
         // Loop and assign streams to pipes
         var mergedStream = require('merge-stream')();
-        for (let streamName in subStreams) {
-            let subStream = subStreams[streamName],
+        for (let streamName in duplexStreams) {
+            let subStream = duplexStreams[streamName],
                 readStream = subStream.read,
-                writeStream = subStream.write;
+                data = subStream.data;
 
-            readStream.on('data', writeStream);
+            readStream.on('data', data);
             mergedStream.add(readStream);
         };
         return mergedStream;
+
     });
 
     return stream;
