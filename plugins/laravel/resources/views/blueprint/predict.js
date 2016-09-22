@@ -87,6 +87,9 @@ var predict = {
       if (transformation != null) {
           nativeType = changeCase[transformation](nativeType);
       }
+      if (nativeType == 'number') {
+        nativeType = 'boolean';
+      }
 
       // Map native type to view type
       var transformation = mapper.direct_datatype_transformation_match(config.get('input_types'), nativeType);

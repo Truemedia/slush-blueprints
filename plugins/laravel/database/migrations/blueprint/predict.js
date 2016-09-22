@@ -1,10 +1,13 @@
 "use strict";
 
 var Observation = require('./observation'),
-    dataTypes = require('./datatypes.json'),
-    changeCase = require('change-case');
+    changeCase = require('change-case'),
+    glob = require('glob'),
+    path = require('path'),
+    config = require('super-config');
 
-var mapper = require('../../../../../classes/mapper');
+var Mapper = require('../../../../../classes/new_mapper');
+config.loadConfig(glob.sync( path.join(__dirname, 'config/{column_types,map}.js') ));
 
 /**
   * Predict how migrations will be built using only data provided
@@ -27,11 +30,12 @@ var predict = {
         let prefix = observation.prefixedProperties();
 
         var flags = predict.flags(property_index, property_name, property_types, properties),
-            type = predict.column_type(property_types, propertyFormat),
+            type = predict.column_type(property_name, property_types, propertyFormat),
             name = predict.column_name(property_name, prefix, type),
             comment = predict.column_comment(property_name);
 
-        return {comment, flags, name, type};
+        let column = {comment, flags, name, type};
+        return column;
     },
 
     /**
@@ -53,26 +57,17 @@ var predict = {
     /**
      * Match schema primative datatypes to desired database datatypes for selected data source
      */
-    column_type: function(nativeTypes, propertyFormat)
+    column_type: function(propertyName, propertyTypes, propertyFormat)
     {
-        var nativeType = nativeTypes.pop(),
-            column_type = null;
+        let propertyType = propertyTypes.pop(),
+            columnTypes = config.get('column_types');
 
-        // Direct datatype match
-        var transformation = mapper.direct_datatype_transformation_match(dataTypes, nativeType);
+        let mapping = new Mapper(columnTypes);
+        let columnType = mapping.match({
+          type: propertyType, format: propertyFormat
+        }, config.get('map'), 'type');
 
-        if (transformation != null)
-        {
-            // Got a direct match
-            column_type = changeCase[transformation](nativeType);
-        }
-
-        // Improved accuracy matching
-        if (column_type == 'string' && propertyFormat == 'date-time') {
-          column_type = 'dateTime';
-        }
-
-        return column_type;
+        return columnType;
     },
 
     /**
