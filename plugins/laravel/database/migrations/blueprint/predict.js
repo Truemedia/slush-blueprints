@@ -59,7 +59,7 @@ var predict = {
      */
     column_type: function(propertyName, propertyTypes, propertyFormat, flags)
     {
-        let propertyType = propertyTypes.pop(),
+        let propertyType = propertyTypes.values().next().value,
             columnTypes = config.get('column_types');
 
         // Map using properties
@@ -89,13 +89,12 @@ var predict = {
         pk: function (p_i, p_n, p_ts, p) {
             let observation = new Observation();
             return (
-                observation.first(p_i) && observation.is('id', p_n) && observation.is('integer', p_ts)
+                observation.first(p_i) && observation.is('id', p_n) && p_ts.has('integer')
             );
         },
         // Not null
         nn: function (p_i, p_n, p_ts, p) {
-            let observation = new Observation();
-            return !observation.is('null', p_ts);
+            return !p_ts.has('null');
         },
         // Unique
         uq: function (p_i, p_n, p_ts, p) {
@@ -110,8 +109,7 @@ var predict = {
         },
         // Unsigned
         un: function (p_i, p_n, p_ts, p) {
-            let observation = new Observation();
-            return observation.is('integer', p_ts);
+            return p_ts.has('integer');
         },
         // Zero filled
         // TODO: Implement

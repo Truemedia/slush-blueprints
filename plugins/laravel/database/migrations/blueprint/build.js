@@ -64,15 +64,14 @@ var build = {
             columns = [];
 
         // Iterate properties in schema
-        Object.keys(properties).forEach( function(property_name, property_index) {
-            var property_types = properties[property_name].type,
-                propertyFormat = (properties[property_name].format != undefined) ? properties[property_name].format : null;
+        Object.keys(properties).forEach( function(propertyName, propertyIndex) {
+            let propertyFormat = (properties[propertyName].format != undefined) ? properties[propertyName].format : null;
 
-            if (!(property_types instanceof Array)) {
-                property_types = [property_types];
-            }
+            let propertyTypes = (properties[propertyName].type instanceof Array)
+              ? new Set(properties[propertyName].type)
+              : new Set([properties[propertyName].type]);
 
-            var column = predict.column(jsonSchema, property_index, property_name, property_types, propertyFormat, properties);
+            var column = predict.column(jsonSchema, propertyIndex, propertyName, propertyTypes, propertyFormat, properties);
             columns.push(column);
         });
 
