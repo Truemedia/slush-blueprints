@@ -29,7 +29,27 @@ var build = {
       * @param {json} settings - Preconfigured options
       */
     templateData: function(jsonSchema, settings) {
-        return {};
+      var properties = jsonSchema.items.properties;
+
+      var tableName = (settings.tableName != undefined) ? settings.tableName : predict.tableName(jsonSchema),
+          columns = [];
+
+      // Iterate properties in schema
+      Object.keys(properties).forEach( function(property_name, property_index) {
+          var property_types = properties[property_name].type,
+              propertyFormat = (properties[property_name].format != undefined) ? properties[property_name].format : null;
+
+          if (!(property_types instanceof Array)) {
+              property_types = [property_types];
+          }
+
+          var column = predict.column(jsonSchema, property_index, property_name, property_types, propertyFormat, properties);
+          columns.push(column);
+      });
+
+      let tableClass = changeCase.pascalCase(tableName),
+          seederClass = `${tableClass}Seeder`;
+      return {seederClass, tableClass, tableName, columns};
     },
 
     /**
@@ -46,7 +66,9 @@ var build = {
       *
       */
     settings: function(options) {
-      let settings = {};
+      let tableName = (options['table'] != undefined && typeof options['table'] === 'string') ? options['table'] : null;
+
+      let settings = {tableName};
       return settings;
     },
 

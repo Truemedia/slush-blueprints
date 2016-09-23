@@ -133,11 +133,6 @@ var predict = {
         }
 
         return flag_options;
-    },
-
-    /* Datatype prediction based on patterns */
-    datatype: function(property_index, property_name, property_types, properties) {
-
     }
 };
 

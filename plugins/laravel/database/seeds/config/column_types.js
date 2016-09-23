@@ -1,0 +1,33 @@
+module.exports = {
+  column_types: [
+    "bigIncrements",
+    "bigInteger",
+    "binary",
+    "boolean",
+    "char",
+    "date",
+    "dateTime",
+    "decimal",
+    "double",
+    "enum",
+    "float",
+    "increments",
+    "integer",
+    "json",
+    "jsonb",
+    "longText",
+    "mediumInteger",
+    "mediumText",
+    "morphs",
+    "nullableTimestamps",
+    "rememberToken",
+    "smallInteger",
+    "softDeletes",
+    "string",
+    "text",
+    "time",
+    "tinyInteger",
+    "timestamp",
+    "timestamps"
+  ]
+};

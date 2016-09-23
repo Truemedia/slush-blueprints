@@ -20,6 +20,7 @@ var through2 = require('through2'),
 // Setup procedure
 config.loadConfig(glob.sync( path.join(__dirname, 'config/*.js') ));
 mime.define( config.get('mime') );
+let magic = new Magic(mmm.MAGIC_MIME_TYPE);
 
 var blueprint = require('./blueprint/build');
 
@@ -44,16 +45,15 @@ function plugin(options)
         var jsonSchema = JSON.parse( file.contents.toString() ),
             settings = blueprint.settings(options);
 
-        // Create sub-streams
-        var subStreams = {
+        // Create duplex streams
+        var duplexStreams = {
             /**
               * Create stream
               */
             create: {
                 read: fs.createReadStream( blueprint.templatePath('Seeder.php.tpl') ),
-                write: function(templateFileContents)
+                data: function(templateFileContents)
                 {
-                    var magic = new Magic(mmm.MAGIC_MIME_TYPE);
                     magic.detect(templateFileContents, function(err, mimeType) {
                         if (err) throw err;
 
@@ -66,12 +66,12 @@ function plugin(options)
                         // Push generated file to stream
                         var newFile = new File({ // blueprint.file
                             contents: new Buffer(fileContents, config.get('defaults.encoding')),
-                            path: blueprint.filename('basename', fileExtension)
+                            path: blueprint.filename(templateData.seederClass, fileExtension)
                         });
                         stream.push(newFile);
 
                         // Callback
-                        // cb(null, file);
+                        cb(null, file);
                     });
                 }
             }
@@ -79,12 +79,12 @@ function plugin(options)
 
         // Loop and assign streams to pipes
         var mergedStream = require('merge-stream')();
-        for (let streamName in subStreams) {
-            let subStream = subStreams[streamName],
-                readStream = subStream.read,
-                writeStream = subStream.write;
+        for (let streamName in duplexStreams) {
+            let duplexStream = duplexStreams[streamName],
+                readStream = duplexStream.read,
+                data = duplexStream.data;
 
-            readStream.on('data', writeStream);
+            readStream.on('data', data);
             mergedStream.add(readStream);
         };
         return mergedStream;
