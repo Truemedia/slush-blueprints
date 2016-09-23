@@ -30,7 +30,7 @@ var predict = {
         let prefix = observation.prefixedProperties();
 
         var flags = predict.flags(property_index, property_name, property_types, properties),
-            type = predict.column_type(property_name, property_types, propertyFormat),
+            type = predict.column_type(property_name, property_types, propertyFormat, flags),
             name = predict.column_name(property_name, prefix, type),
             comment = predict.column_comment(property_name);
 
@@ -57,15 +57,21 @@ var predict = {
     /**
      * Match schema primative datatypes to desired database datatypes for selected data source
      */
-    column_type: function(propertyName, propertyTypes, propertyFormat)
+    column_type: function(propertyName, propertyTypes, propertyFormat, flags)
     {
         let propertyType = propertyTypes.pop(),
             columnTypes = config.get('column_types');
 
+        // Map using properties
         let mapping = new Mapper(columnTypes);
         let columnType = mapping.match({
           type: propertyType, format: propertyFormat
         }, config.get('map'), 'type');
+
+        // Remap using flags
+        if (flags.pk) {
+          columnType = 'increments';
+        }
 
         return columnType;
     },
@@ -74,7 +80,7 @@ var predict = {
       * Comment
       */
     column_comment: function(property_name) {
-        return property_name;
+        return changeCase.titleCase(property_name);
     },
 
     /* Flag prediction submethods */

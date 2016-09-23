@@ -44,46 +44,45 @@ function plugin(options)
         var jsonSchema = JSON.parse( file.contents.toString() ),
             settings = blueprint.settings(options);
 
-        // Create sub-streams
-        var subStreams = {
+        // Create duplex streams
+        var duplexStreams = {
             /**
               * Create table stream
               */
             createTable: {
                 read: fs.createReadStream( blueprint.templatePath('create_table.php.tpl') ),
-                write: function(templateFileContents)
+                data: function(templateFileContents)
                 {
-                    var magic = new Magic(mmm.MAGIC_MIME_TYPE);
+                    let magic = new Magic(mmm.MAGIC_MIME_TYPE);
                     magic.detect(templateFileContents, function(err, mimeType) {
                         if (err) throw err;
 
                         // Templating function
                         var tpl = _.template( templateFileContents.toString( config.get('defaults.encoding') )),
                             templateData = blueprint.templateData(jsonSchema, settings),
-                            fileContents = tpl(templateData).toString(),
-                            fileExtension = mime.extension(mimeType);
+                            fileContents = tpl(templateData).toString();
 
                         // Push generated file to stream
                         var migrationFile = new File({ // blueprint.file
                             contents: new Buffer(fileContents, config.get('defaults.encoding')),
-                            path: blueprint.filename(fileExtension, new moment(), templateData.tableName, 'create')
+                            path: blueprint.filename(mime.extension(mimeType), new moment(), templateData.tableName, 'create')
                         });
                         stream.push(migrationFile);
 
                         // Callback
-                        cb(null, file);
+                        cb(null, migrationFile);
                     });
                 }
             }
         };
 
         // Loop and assign streams to pipes
-        for (let streamName in subStreams) {
-            let subStream = subStreams[streamName],
-                readStream = subStream.read,
-                writeStream = subStream.write;
+        for (let streamName in duplexStreams) {
+            let duplexStream = duplexStreams[streamName],
+                readStream = duplexStream.read,
+                data = duplexStream.data;
 
-            readStream.on('data', writeStream);
+            readStream.on('data', data);
         };
     });
 
