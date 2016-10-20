@@ -50,15 +50,15 @@ Object.keys(autoloadTasks).forEach( function(task)
     {
         // Load plugin
         let jsonpath = autoloadTasks[task],
-          context = pointer.get(regeneratorPlugins, jsonpath);
+            context = pointer.get(regeneratorPlugins, jsonpath);
 
         // Plugin libs
-        let blueprint = context.blueprint,
+        let questionaire = context.regen.helpers.questionaire,
             plugin = context.plugin;
 
 
         // Ask questions?
-        var prompts = ((yargs.argv.w) ? blueprint.questionaire.ask(yargs.argv) : blueprint.questionaire.skip(yargs.argv))
+        var prompts = ((yargs.argv.w) ? questionaire.ask(yargs.argv) : questionaire.skip(yargs.argv))
         inquirer.prompt(prompts)
         .then( function(options)
         {

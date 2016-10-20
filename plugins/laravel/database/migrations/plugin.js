@@ -19,7 +19,7 @@ var through2 = require('through2'),
 config.loadConfig(glob.sync( path.join(__dirname, 'config/*.js') ));
 mime.define( config.get('mime') );
 
-var Blueprint = require('./blueprint/build');
+var BaseBlueprint = require('./regen/blueprints/base');
 
 // Overview
 const PLUGIN_NAME = 'slush-regenerator:generate-migration';
@@ -40,7 +40,7 @@ function plugin(options)
 
         let dest = '/database/migrations/*';
         let packagePath = null;
-        let migrationFile = new Blueprint({
+        let migrationFile = new BaseBlueprint({
             pluginPath: __dirname,
             path: (packagePath != null) ? path.join('.', packagePath, dest) : path.join('.', dest),
             encoding: config.get('defaults.encoding')

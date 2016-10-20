@@ -8,10 +8,10 @@ var changeCase = require('change-case'),
     path = require('path');
 
 // Plugin libs
-var predict = require('./predict');
-var CoreBlueprint = require('./../../../../../classes/blueprint');
+var predict = require('./../helpers/predict');
+var CoreBlueprint = require('./../../../../../../classes/blueprint');
 
-class Blueprint extends CoreBlueprint {
+class BaseBlueprint extends CoreBlueprint {
     /**
       * Settings
       *
@@ -88,4 +88,4 @@ class Blueprint extends CoreBlueprint {
     }
 }
 
-module.exports = Blueprint;
+module.exports = BaseBlueprint;

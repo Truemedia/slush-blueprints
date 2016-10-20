@@ -6,7 +6,7 @@ var Observation = require('./observation'),
     path = require('path'),
     config = require('super-config');
 
-var Mapper = require('../../../../../classes/new_mapper');
+var Mapper = require('../../../../../../classes/new_mapper');
 config.loadConfig(glob.sync( path.join(__dirname, 'config/{column_types,map}.js') ));
 
 /**

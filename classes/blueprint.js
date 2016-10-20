@@ -28,7 +28,7 @@ class CoreBlueprint extends File {
       * Get template path
       */
     templatePath (templateFilename) {
-        return path.join(this.pluginPath, 'templates', templateFilename);
+        return path.join(this.pluginPath, 'regen', 'templates', templateFilename);
     }
 }
 
