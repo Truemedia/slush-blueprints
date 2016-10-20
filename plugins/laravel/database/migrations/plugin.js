@@ -13,16 +13,16 @@ var through2 = require('through2'),
     mime = require('mime'),
     gulp = require('gulp'),
     gulpPlugins = require('auto-plug')('gulp'),
+    requireDir = require('require-dir'),
     PluginError = gulpPlugins.util.PluginError;
+
+// Overview
+const PLUGIN_NAME = 'slush-regenerator:generate-migration';
 
 // Setup procedure
 config.loadConfig(glob.sync( path.join(__dirname, 'config/*.js') ));
 mime.define( config.get('mime') );
-
-var BaseBlueprint = require('./regen/blueprints/base');
-
-// Overview
-const PLUGIN_NAME = 'slush-regenerator:generate-migration';
+var Blueprints = requireDir(path.join(__dirname, 'regen', 'blueprints'), { recurse: true });
 
 /**
   * Plugin level function
@@ -39,7 +39,7 @@ function plugin(options, dest)
         }
 
         let packagePath = null;
-        let migrationFile = new BaseBlueprint({
+        let migrationFile = new Blueprints.base({
             pluginPath: __dirname,
             path: (packagePath != null) ? path.join('.', packagePath, dest) : path.join('.', dest),
             encoding: config.get('defaults.encoding')
