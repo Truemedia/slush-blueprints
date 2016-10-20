@@ -2,13 +2,11 @@
 
 // Dependencies
 var through2 = require('through2'),
-    File = require('vinyl'),
     source = require('vinyl-source-stream'),
     glob = require('glob'),
     path = require('path'),
     fs = require('fs'),
     moment = require('moment'),
-    _ = require('underscore'),
     config = require('super-config'),
     mmm = require('mmmagic'),
     Magic = require('mmmagic').Magic,
@@ -21,7 +19,7 @@ var through2 = require('through2'),
 config.loadConfig(glob.sync( path.join(__dirname, 'config/*.js') ));
 mime.define( config.get('mime') );
 
-var blueprint = require('./blueprint/build');
+var Blueprint = require('./blueprint/build');
 
 // Overview
 const PLUGIN_NAME = 'slush-regenerator:generate-migration';
@@ -40,9 +38,17 @@ function plugin(options)
             return cb(new PluginError(PLUGIN_NAME, 'Streaming not supported'));
         }
 
+        let dest = '/database/migrations/*';
+        let packagePath = null;
+        let migrationFile = new Blueprint({
+            pluginPath: __dirname,
+            path: (packagePath != null) ? path.join('.', packagePath, dest) : path.join('.', dest),
+            encoding: config.get('defaults.encoding')
+        });
+
         // Grab schema to work with
-        var jsonSchema = JSON.parse( file.contents.toString() ),
-            settings = blueprint.settings(options);
+        var jsonSchema = JSON.parse( file.contents.toString() );
+            migrationFile.options = options;
 
         // Create duplex streams
         var duplexStreams = {
@@ -50,23 +56,18 @@ function plugin(options)
               * Create table stream
               */
             createTable: {
-                read: fs.createReadStream( blueprint.templatePath('create_table.php.tpl') ),
+                read: fs.createReadStream( migrationFile.templatePath('create_table.php.tpl') ),
                 data: function(templateFileContents)
                 {
                     let magic = new Magic(mmm.MAGIC_MIME_TYPE);
                     magic.detect(templateFileContents, function(err, mimeType) {
                         if (err) throw err;
 
-                        // Templating function
-                        var tpl = _.template( templateFileContents.toString( config.get('defaults.encoding') )),
-                            templateData = blueprint.templateData(jsonSchema, settings),
-                            fileContents = tpl(templateData).toString();
+                        let templateData = migrationFile.templateData(jsonSchema);
+                        migrationFile.basename = migrationFile.baseName(new moment(), templateData.tableName, mime.extension(mimeType));
+                        migrationFile.compile(templateFileContents, templateData);
 
                         // Push generated file to stream
-                        var migrationFile = new File({ // blueprint.file
-                            contents: new Buffer(fileContents, config.get('defaults.encoding')),
-                            path: blueprint.filename(mime.extension(mimeType), new moment(), templateData.tableName, 'create')
-                        });
                         stream.push(migrationFile);
 
                         // Callback

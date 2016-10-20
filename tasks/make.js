@@ -68,9 +68,9 @@ Object.keys(autoloadTasks).forEach( function(task)
             }
 
             // Run stream
-            gulp.src(['./*.schema.json'])
+            return gulp.src(['./*.schema.json'])
                 .pipe( plugin(options) )
-                .pipe( gulp.dest(blueprint.build.dest) )
+                .pipe( gulp.dest('.') )
                 .on('end', function()
                 {
                     done();

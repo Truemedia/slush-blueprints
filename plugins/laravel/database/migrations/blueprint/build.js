@@ -9,47 +9,18 @@ var changeCase = require('change-case'),
 
 // Plugin libs
 var predict = require('./predict');
+var CoreBlueprint = require('./../../../../../classes/blueprint');
 
-var build = {
+class Blueprint extends CoreBlueprint {
     /**
-     * Format table column
-     *
-     * @param {string} name - Column name
-     * @param {string} type - Column datatype
-     * @param {boolean} flags - Column flags
-     * @param {string} comment - Column comment
-     * @param {string} parentTable - Name of parent table, column is relevant to
-     */
-    ftc: function(name, type, flags, comment, parentTable) {
-        var name = changeCase.snakeCase(name),
-            type = changeCase.camelCase(type),
-            comment = changeCase.titleCase(comment);
-
-        var column = {name, type, flags, comment};
-        column.parentTable = (parentTable != undefined) ? parentTable : null;
-
-        return column;
-    },
-
-    /**
-      * Generate filename from provided parameters
+      * Settings
       *
-      * @param {string} fileExtension - File extension
-      * @param {Moment} instance - MomentJS instance
-      * @param {string} table_name - Name of database table
-      * @param {string} mode - Mode relevant to context of a magic migration
       */
-    filename: function(fileExtension, migration_moment, table_name, mode) {
-        if (mode == undefined)
-        {
-            mode = 'create';
-        }
+    set options (options) {
+        var tableName = (options['table'] != undefined && typeof options['table'] === 'string') ? options['table'] : null;
 
-        var migration_datetime = migration_moment.format('YYYY_MM_DD_HHmmss');
-
-        var filename = `${migration_datetime}_${mode}_${table_name}_table.${fileExtension}`;
-        return filename;
-    },
+        this.settings = {tableName};
+    }
 
     /**
       * Extract template data from jsonSchema
@@ -57,10 +28,10 @@ var build = {
       * @param {json} jsonSchema - JSONschema instance
       * @param {json} settings - Preconfigured options
       */
-    templateData: function(jsonSchema, settings) {
+    templateData (jsonSchema) {
         var properties = jsonSchema.items.properties;
 
-        var tableName = (settings.tableName != undefined) ? settings.tableName : predict.tableName(jsonSchema),
+        var tableName = (this.settings.tableName != null) ? this.settings.tableName : predict.tableName(jsonSchema),
             columns = [];
 
         // Iterate properties in schema
@@ -76,30 +47,45 @@ var build = {
         });
 
         var tableClassName = changeCase.pascalCase(tableName);
-        return {tableClassName, tableName, columns};
-    },
+        let templateData = {tableClassName, tableName, columns};
+        return templateData;
+    }
 
     /**
-      * Get template path
-      *
-      * @param {string} file - Filename
-      */
-    templatePath: function(filename) {
-        return path.join(__dirname, '..', 'templates', filename);
-    },
+     * Format table column
+     *
+     * @param {string} name - Column name
+     * @param {string} type - Column datatype
+     * @param {boolean} flags - Column flags
+     * @param {string} comment - Column comment
+     * @param {string} parentTable - Name of parent table, column is relevant to
+     */
+    ftc (name, type, flags, comment, parentTable) {
+        var name = changeCase.snakeCase(name),
+            type = changeCase.camelCase(type),
+            comment = changeCase.titleCase(comment);
+
+        var column = {name, type, flags, comment};
+        column.parentTable = (parentTable != undefined) ? parentTable : null;
+
+        return column;
+    }
 
     /**
-      * Build settings
+      * Generate basename of file from provided parameters
       *
+      * @param {Moment} instance - MomentJS instance
+      * @param {string} table_name - Name of database table
+      * @param {string} mode - Mode relevant to context of a magic migration
       */
-    settings: function(options) {
-        var tableName = (options['table'] != undefined && typeof options['table'] === 'string') ? options['table'] : null;
+    baseName (migrationMoment, tableName, ext, mode) {
+        if (mode == undefined) { mode = 'create'; }
 
-        var settings = {tableName};
-        return settings;
-    },
+        let migrationDatetime = migrationMoment.format('YYYY_MM_DD_HHmmss');
 
-    dest: './database/migrations/'
-};
+        let baseName = `${migrationDatetime}_${mode}_${tableName}_table.${ext}`;
+        return baseName;
+    }
+}
 
-module.exports = build;
+module.exports = Blueprint;

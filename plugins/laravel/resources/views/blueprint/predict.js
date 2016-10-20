@@ -5,7 +5,7 @@ var Observation = require('./observation'),
     config = require('super-config'),
     glob = require('glob');
 
-var mapper = require('./../../../../../classes/mapper');
+var mapper = require('./../../../../../classes/new_mapper');
 config.loadConfig(glob.sync( path.join(__dirname, 'config/*.js') ));
 
 /**
@@ -68,10 +68,19 @@ var predict = {
   /**
    * Match schema primative datatypes to desired database datatypes for selected data source
    */
-  formFieldType: function(nativeTypes, propertyFormat)
+  formFieldType: function(propertyTypes, propertyFormat)
   {
     let dataTypes = config.get('data_types'),
         nativeMappings = config.get('native_mappings');
+
+        let propertyType = propertyTypes.values().next().value,
+            columnTypes = config.get('column_types');
+
+        // Map using properties
+        let mapping = new Mapper(columnTypes);
+        let columnType = mapping.match({
+          type: propertyType, format: propertyFormat
+        }, config.get('map'), 'type');
 
       var nativeType = nativeTypes.pop(),
           formFieldType = null;
