@@ -43,6 +43,11 @@ if (yargs.argv.h) {
     yargs.showHelp();
 }
 
+// TODO: Turn function into plugin helper
+var dest = function(jsonpath) {
+    return path.join(jsonpath.replace('/laravel/', '/'), '*');
+};
+
 // Autoload make tasks
 Object.keys(autoloadTasks).forEach( function(task)
 {
@@ -69,7 +74,7 @@ Object.keys(autoloadTasks).forEach( function(task)
 
             // Run stream
             return gulp.src(['./*.schema.json'])
-                .pipe( plugin(options) )
+                .pipe( plugin(options, dest(jsonpath)) )
                 .pipe( gulp.dest('.') )
                 .on('end', function()
                 {

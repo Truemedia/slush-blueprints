@@ -27,7 +27,7 @@ const PLUGIN_NAME = 'slush-regenerator:generate-migration';
 /**
   * Plugin level function
   */
-function plugin(options)
+function plugin(options, dest)
 {
     var stream = through2.obj( function(file, enc, cb) {
         // Deal with potential issues
@@ -38,7 +38,6 @@ function plugin(options)
             return cb(new PluginError(PLUGIN_NAME, 'Streaming not supported'));
         }
 
-        let dest = '/database/migrations/*';
         let packagePath = null;
         let migrationFile = new BaseBlueprint({
             pluginPath: __dirname,
