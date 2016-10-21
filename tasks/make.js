@@ -4,12 +4,50 @@ var gulp = require('gulp'),
     inquirer = require('inquirer'),
     requireDir = require('require-dir'),
     path = require('path'),
-    pointer = require('json-pointer');
+    pointer = require('json-pointer'),
+    Rx = require('rx');
     // TODO: Load this from plugin dynamically
-    const PLUGIN_NAME = 'slush-regenerator:make-migration';
+    const GENERATOR_NAME = 'slush-regenerator';
+    const MAKER_PREFIX = 'make';
+    const GM = `${GENERATOR_NAME}:${MAKER_PREFIX}`;
+
+    // TODO: Implement PO/MO language string handler
+    var _ = function (string) {
+        return string;
+    };
+
     var yargs = require('yargs')
-        .command(gulpPlugins.util.colors.yellow(`${PLUGIN_NAME}`), 'Generate a migration using JSON Schema file or via commandline options')
-        .example(`${PLUGIN_NAME} --table=users`, 'Generate a migration for table called users')
+        // Make commands
+        .command(gulpPlugins.util.colors.yellow(`${GM}-command`), _("Create a Command file"))
+        .example(`${GM}-command`, _("Create a Command file"))
+		.command(gulpPlugins.util.colors.yellow(`${GM}-configuration`), _("Create a Configuration file"))
+        .example(`${GM}-configuration`, _("Create a Configuration file"))
+		.command(gulpPlugins.util.colors.yellow(`${GM}-controller`), _("Create a Controller file"))
+        .example(`${GM}-controller`, _("Create a Controller file"))
+		.command(gulpPlugins.util.colors.yellow(`${GM}-handler`), _("Create a Handler file"))
+        .example(`${GM}-handler`, _("Create a Handler file"))
+        .command(gulpPlugins.util.colors.yellow(`${GM}-migration`), _("Create a Migration file"))
+        .example(`${GM}-migration --table=users`, _("Generate a migration for table called users"))
+		.command(gulpPlugins.util.colors.yellow(`${GM}-model`), _("Create a Model file"))
+        .example(`${GM}-model`, _("Create a Model file"))
+		.command(gulpPlugins.util.colors.yellow(`${GM}-policy`), _("Create a Policy file"))
+        .example(`${GM}-policy`, _("Create a Policy file"))
+		.command(gulpPlugins.util.colors.yellow(`${GM}-provider`), _("Create a Provider file"))
+        .example(`${GM}-provider`, _("Create a Provider file"))
+		.command(gulpPlugins.util.colors.yellow(`${GM}-routes`), _("Create a Routes file"))
+        .example(`${GM}-routes`, _("Create a Routes file"))
+		.command(gulpPlugins.util.colors.yellow(`${GM}-request`), _("Create a Request file"))
+        .example(`${GM}-request`, _("Create a Request file"))
+		.command(gulpPlugins.util.colors.yellow(`${GM}-script`), _("Create a Javascript file"))
+        .example(`${GM}-script`, _("Create a Javascript file"))
+		.command(gulpPlugins.util.colors.yellow(`${GM}-seed`), _("Create a Seed file"))
+        .example(`${GM}-seed`, _("Create a Seed file"))
+		.command(gulpPlugins.util.colors.yellow(`${GM}-sprite`), _("Create a Sprite file"))
+        .example(`${GM}-sprite`, _("Create a Sprite file"))
+		.command(gulpPlugins.util.colors.yellow(`${GM}-style`), _("Create a Stylesheet file"))
+        .example(`${GM}-style`, _("Create a Stylesheet file"))
+		.command(gulpPlugins.util.colors.yellow(`${GM}-view`), _("Create a View file"))
+        .example(`${GM}-view`, _("Create a View file"))
         // Laravel plugin options
         .nargs('command', null)
         .describe('command', 'Command slug for plugin')
@@ -63,10 +101,9 @@ Object.keys(autoloadTasks).forEach( function(task)
 
 
         // Ask questions?
-        var prompts = ((yargs.argv.w) ? questionaire.ask(yargs.argv) : questionaire.skip(yargs.argv))
-        inquirer.prompt(prompts)
-        .then( function(options)
-        {
+        var questions = ((yargs.argv.w) ? questionaire.ask(yargs.argv) : questionaire.skip(yargs.argv))
+        var prompts = new Rx.Subject();
+        var build = function() {
             // Command-line mode only
             if (Object.keys(options).length === 0 && options.constructor === Object) {
                 options = yargs.argv;
@@ -80,6 +117,12 @@ Object.keys(autoloadTasks).forEach( function(task)
                 {
                     done();
                 });
-        });
+        };
+
+        for (var question of questions) {
+            prompts.onNext(question);
+        }
+
+        prompts.onCompleted();
     });
 });
